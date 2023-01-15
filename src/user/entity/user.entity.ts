@@ -33,6 +33,9 @@ export class UserEntity {
   })
   status?: string;
 
+  @Column({ default: false })
+  isAdmin?: boolean;
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
