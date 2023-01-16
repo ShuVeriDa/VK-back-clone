@@ -11,6 +11,7 @@ import { AuthDto } from './dto/auth.dto';
 import { validationOldUser } from '../components/forServices/validationOldUser';
 import { compare, genSalt, hash } from 'bcryptjs';
 import { LoginDto } from '../user/dto/login.dto';
+import { RefreshTokenDto } from './dto/refreshToken.dto';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +23,23 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     const user = await this.validateUser(dto);
+
+    const tokens = await this.issueTokenPair(String(user.id));
+
+    return {
+      user: this.returnUserFields(user),
+      ...tokens,
+    };
+  }
+
+  async getNewTokens({ refreshToken }: RefreshTokenDto) {
+    if (!refreshToken) throw new UnauthorizedException('Please sign in');
+
+    const result = await this.jwtService.verifyAsync(refreshToken);
+
+    if (!result) throw new UnauthorizedException('Invalid token or expired');
+
+    const user = await this.authRepository.findOneBy({ id: result.id });
 
     const tokens = await this.issueTokenPair(String(user.id));
 
