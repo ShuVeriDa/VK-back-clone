@@ -25,7 +25,9 @@ export class UserEntity {
   @Column()
   lastName: string;
 
-  @Column()
+  @Column({
+    default: '',
+  })
   avatar?: string;
 
   @Column({

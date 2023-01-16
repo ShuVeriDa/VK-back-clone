@@ -1,26 +1,51 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../user/entity/user.entity';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { AuthDto } from './dto/auth.dto';
 import { validationOldUser } from '../components/forServices/validationOldUser';
-import { genSalt, hash } from 'bcryptjs';
+import { compare, genSalt, hash } from 'bcryptjs';
+import { LoginDto } from '../user/dto/login.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(UserEntity)
-    private readonly repository: Repository<UserEntity>,
+    private readonly authRepository: Repository<UserEntity>,
     private readonly jwtService: JwtService,
   ) {}
 
+  async login(dto: LoginDto) {
+    const user = await this.validateUser(dto);
+
+    const tokens = await this.issueTokenPair(String(user.id));
+
+    return {
+      user: this.returnUserFields(user),
+      ...tokens,
+    };
+  }
+
+  async validateUser(dto: LoginDto) {
+    const user = await this.authRepository.findOneBy({ email: dto.email });
+    if (!user) throw new UnauthorizedException('User not found');
+
+    const isValidPassword = await compare(dto.password, user.password); // сравнение пароля который пришел из dto с паролемя который находится в базе данных
+    if (!isValidPassword) throw new UnauthorizedException('Invalid password');
+
+    return user;
+  }
   async register(dto: AuthDto) {
     await validationOldUser(dto.email, this);
 
     const salt = await genSalt(10);
 
-    const user = await this.repository.save({
+    const user = await this.authRepository.save({
       email: dto.email,
       password: await hash(dto.password, salt),
       firstName: dto.firstName,
