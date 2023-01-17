@@ -12,6 +12,21 @@ export class PostService {
   @InjectRepository(UserEntity)
   private readonly userRepository: Repository<UserEntity>;
 
+  async findAll() {
+    const posts = await this.postRepository.find({
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+
+    return posts.map((obj) => {
+      delete obj.user.password;
+      delete obj.user.createdAt;
+      delete obj.user.updatedAt;
+      return obj;
+    });
+  }
+
   async create(dto: CreatePostDto, userId: string) {
     const post = await this.postRepository.save({
       text: dto.text,

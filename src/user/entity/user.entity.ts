@@ -2,9 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { PostEntity } from '../../post/entity/post.entity';
 
 @Entity('user')
 export class UserEntity {
@@ -37,6 +40,12 @@ export class UserEntity {
 
   @Column({ default: false })
   isAdmin?: boolean;
+
+  @OneToMany(() => PostEntity, (post) => post.user, {
+    eager: false,
+    nullable: true,
+  })
+  posts: PostEntity[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

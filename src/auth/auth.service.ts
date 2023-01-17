@@ -59,7 +59,7 @@ export class AuthService {
     return user;
   }
   async register(dto: AuthDto) {
-    await validationOldUser(dto.email, this);
+    await validationOldUser(dto.email, this.authRepository);
 
     const salt = await genSalt(10);
 

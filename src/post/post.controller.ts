@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   Post,
+  Query,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -14,6 +16,11 @@ import { User } from '../user/decorators/user.decorator';
 @Controller('posts')
 export class PostController {
   constructor(private readonly postService: PostService) {}
+
+  @Get()
+  findAll() {
+    return this.postService.findAll();
+  }
 
   @UsePipes(new ValidationPipe())
   @Post()
