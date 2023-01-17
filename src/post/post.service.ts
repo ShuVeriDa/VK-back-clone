@@ -28,11 +28,16 @@ export class PostService {
   }
 
   async findOne(id: string) {
-    const post = await this.postRepository.findOneBy({
-      id: id,
-    });
+    const post = await this.postRepository.findOneBy({ id });
 
     if (!post) throw new NotFoundException('Post not found');
+
+    await this.postRepository
+      .createQueryBuilder('posts')
+      .whereInIds(id)
+      .update()
+      .set({ views: () => 'views + 1' })
+      .execute();
 
     delete post.user.password;
     delete post.user.createdAt;

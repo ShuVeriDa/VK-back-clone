@@ -24,6 +24,7 @@ export class PostEntity {
     default: 0,
   })
   views: number;
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
