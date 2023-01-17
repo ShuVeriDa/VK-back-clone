@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostEntity } from './entity/post.entity';
 import { Repository } from 'typeorm';
@@ -25,6 +25,19 @@ export class PostService {
       delete obj.user.updatedAt;
       return obj;
     });
+  }
+
+  async findOne(id: string) {
+    const post = await this.postRepository.findOneBy({
+      id: id,
+    });
+
+    if (!post) throw new NotFoundException('Post not found');
+
+    delete post.user.password;
+    delete post.user.createdAt;
+    delete post.user.updatedAt;
+    return post;
   }
 
   async create(dto: CreatePostDto, userId: string) {
