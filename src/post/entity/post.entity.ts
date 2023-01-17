@@ -25,6 +25,12 @@ export class PostEntity {
   })
   views: number;
 
+  @Column({ default: 0 })
+  favorites: number;
+
+  @Column({ default: 4.0 })
+  rating?: number;
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 

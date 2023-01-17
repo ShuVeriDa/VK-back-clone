@@ -4,6 +4,7 @@ import { PostEntity } from './entity/post.entity';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../user/entity/user.entity';
 import { CreatePostDto } from './entity/dto/create.dto';
+import { SearchPostDto } from './entity/dto/search.dto';
 
 @Injectable()
 export class PostService {
@@ -25,6 +26,49 @@ export class PostService {
       delete obj.user.updatedAt;
       return obj;
     });
+  }
+
+  async search(dto: SearchPostDto) {
+    const qb = this.postRepository.createQueryBuilder('posts');
+
+    qb.limit(dto.limit || 0);
+    qb.take(dto.take || 100);
+
+    if (dto.text) {
+      qb.andWhere('posts.text ILIKE :text');
+    }
+
+    if (dto.views) {
+      qb.orderBy('views', dto.views);
+    }
+
+    if (dto.rating) {
+      qb.orderBy('rating', dto.rating);
+    }
+
+    if (dto.favorites) {
+      qb.orderBy('favorites', dto.favorites);
+    }
+
+    qb.setParameters({
+      text: `%${dto.text}%`,
+      views: dto.views || 'DESC',
+      rating: dto.rating || 'DESC',
+      favorites: dto.favorites || 'DESC',
+    });
+
+    const [posts, total] = await qb
+      .leftJoinAndSelect('posts.user', 'user')
+      .getManyAndCount();
+
+    const arr = posts.map((p) => {
+      delete p.user.password;
+      delete p.user.createdAt;
+      delete p.user.updatedAt;
+      return p;
+    });
+
+    return { posts: arr, total };
   }
 
   async findOne(id: string) {

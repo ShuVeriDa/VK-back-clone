@@ -13,6 +13,7 @@ import { PostService } from './post.service';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { CreatePostDto } from './entity/dto/create.dto';
 import { User } from '../user/decorators/user.decorator';
+import { SearchPostDto } from './entity/dto/search.dto';
 
 @Controller('posts')
 export class PostController {
@@ -21,6 +22,11 @@ export class PostController {
   @Get()
   findAll() {
     return this.postService.findAll();
+  }
+
+  @Get('/search')
+  search(@Query() dto: SearchPostDto) {
+    return this.postService.search(dto);
   }
 
   @Get(':id')
