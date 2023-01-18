@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Param,
@@ -50,5 +51,11 @@ export class PostController {
   @Auth('user')
   update(@Param('id') id: string, @Body() dto: UpdatePostDto) {
     return this.postService.update(id, dto);
+  }
+
+  @Delete(':id')
+  @Auth('user')
+  delete(@Param('id') id: string, @User('id') userId: string) {
+    return this.postService.delete(id, userId);
   }
 }

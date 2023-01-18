@@ -121,4 +121,14 @@ export class PostService {
 
     return fetchPost;
   }
+
+  async delete(id: string, userId: string) {
+    const post = await this.postRepository.findOneBy({ id });
+    if (!post) throw new NotFoundException('Post not found');
+
+    if (post.user.id !== userId)
+      throw new NotFoundException("You don't have not access to this post");
+
+    return this.postRepository.delete(id);
+  }
 }
