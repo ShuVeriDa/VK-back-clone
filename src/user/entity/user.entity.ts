@@ -3,6 +3,8 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -46,6 +48,10 @@ export class UserEntity {
     nullable: true,
   })
   posts: PostEntity[];
+
+  @ManyToMany(() => PostEntity)
+  @JoinTable()
+  favorites: PostEntity[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

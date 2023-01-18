@@ -58,4 +58,10 @@ export class PostController {
   delete(@Param('id') id: string, @User('id') userId: string) {
     return this.postService.delete(id, userId);
   }
+
+  @Post(':id/favorites')
+  @Auth('user')
+  async addToFavorites(@User('id') userId: string, @Param('id') id: string) {
+    return this.postService.addToFavorites(id, userId);
+  }
 }

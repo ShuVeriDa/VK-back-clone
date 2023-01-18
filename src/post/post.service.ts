@@ -131,4 +131,27 @@ export class PostService {
 
     return this.postRepository.delete(id);
   }
+
+  async addToFavorites(id: string, userId: string) {
+    const post = await this.findOne(id);
+
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['favorites'],
+    });
+
+    // const isNotFavorites =
+    //   user.favorites.findIndex((obj) => obj.id === post.id) === -1;
+
+    const isNotFavorites = user.favorites.find((obj) => obj.id === post.id);
+
+    if (!isNotFavorites) {
+      user.favorites.push(post);
+      post.favorites++;
+      await this.userRepository.save(user);
+      await this.postRepository.save(post);
+    }
+
+    return post;
+  }
 }
