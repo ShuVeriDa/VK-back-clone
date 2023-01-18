@@ -51,6 +51,10 @@ export class UserEntity {
 
   @ManyToMany(() => PostEntity)
   @JoinTable()
+  reposts: PostEntity[];
+
+  @ManyToMany(() => PostEntity)
+  @JoinTable()
   favorites: PostEntity[];
 
   @CreateDateColumn({ type: 'timestamp' })

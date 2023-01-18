@@ -140,12 +140,10 @@ export class PostService {
       relations: ['favorites'],
     });
 
-    // const isNotFavorites =
-    //   user.favorites.findIndex((obj) => obj.id === post.id) === -1;
+    const isNotFavorites =
+      user.favorites.findIndex((obj) => obj.id === post.id) === -1;
 
-    const isNotFavorites = user.favorites.find((obj) => obj.id === post.id);
-
-    if (!isNotFavorites) {
+    if (isNotFavorites) {
       user.favorites.push(post);
       post.favorites++;
       await this.userRepository.save(user);
@@ -168,6 +166,47 @@ export class PostService {
     if (postIndex >= 0) {
       user.favorites.splice(postIndex, 1);
       post.favorites--;
+      await this.userRepository.save(user);
+      await this.postRepository.save(post);
+    }
+
+    return post;
+  }
+
+  async repostPost(id: string, userId: string) {
+    const post = await this.findOne(id);
+
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['reposts'],
+    });
+
+    const isReposts =
+      user.reposts.findIndex((obj) => obj.id === post.id) === -1;
+
+    if (isReposts) {
+      user.reposts.push(post);
+      post.reposts++;
+      await this.userRepository.save(user);
+      await this.postRepository.save(post);
+    }
+
+    return post;
+  }
+
+  async removeFromRepost(id: string, userId: string) {
+    const post = await this.findOne(id);
+
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['reposts'],
+    });
+
+    const postIndex = user.reposts.findIndex((obj) => obj.id === post.id);
+
+    if (postIndex >= 0) {
+      user.reposts.splice(postIndex, 1);
+      post.reposts--;
       await this.userRepository.save(user);
       await this.postRepository.save(post);
     }

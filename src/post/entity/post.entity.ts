@@ -25,6 +25,11 @@ export class PostEntity {
   })
   views: number;
 
+  @Column({
+    default: 0,
+  })
+  reposts: number;
+
   @Column({ default: 0 })
   favorites: number;
 

@@ -73,4 +73,17 @@ export class PostController {
   ) {
     return this.postService.removeFromFavorites(id, userId);
   }
+  @UsePipes(new ValidationPipe())
+  @Post(':id/repost')
+  @Auth('user')
+  async repostPost(@User('id') userId: string, @Param('id') id: string) {
+    return this.postService.repostPost(id, userId);
+  }
+
+  @UsePipes(new ValidationPipe())
+  @Delete(':id/repost')
+  @Auth('user')
+  async removeFromRepost(@User('id') userId: string, @Param('id') id: string) {
+    return this.postService.removeFromRepost(id, userId);
+  }
 }
