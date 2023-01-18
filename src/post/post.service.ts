@@ -154,4 +154,24 @@ export class PostService {
 
     return post;
   }
+
+  async removeFromFavorites(id: string, userId: string) {
+    const post = await this.findOne(id);
+
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['favorites'],
+    });
+
+    const postIndex = user.favorites.findIndex((obj) => obj.id === post.id);
+
+    if (postIndex >= 0) {
+      user.favorites.splice(postIndex, 1);
+      post.favorites--;
+      await this.userRepository.save(user);
+      await this.postRepository.save(post);
+    }
+
+    return post;
+  }
 }
