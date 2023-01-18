@@ -6,6 +6,9 @@ import { UserEntity } from '../user/entity/user.entity';
 import { CreatePostDto } from './entity/dto/create.dto';
 import { SearchPostDto } from './entity/dto/search.dto';
 import { UpdatePostDto } from './entity/dto/update.dto';
+import { getOnePost } from '../components/forServices/getOnePost';
+import { favoritesAndReposts } from '../components/forServices/favoritesAndReposts';
+import { removeFromFavoritesAndReposts } from '../components/forServices/removeFromFavoritesAndReposts';
 
 @Injectable()
 export class PostService {
@@ -73,21 +76,7 @@ export class PostService {
   }
 
   async findOne(id: string) {
-    const post = await this.postRepository.findOneBy({ id });
-
-    if (!post) throw new NotFoundException('Post not found');
-
-    await this.postRepository
-      .createQueryBuilder('posts')
-      .whereInIds(id)
-      .update()
-      .set({ views: () => 'views + 1' })
-      .execute();
-
-    delete post.user.password;
-    delete post.user.createdAt;
-    delete post.user.updatedAt;
-    return post;
+    return getOnePost(id, this.postRepository);
   }
 
   async create(dto: CreatePostDto, userId: string) {
@@ -133,84 +122,79 @@ export class PostService {
   }
 
   async addToFavorites(id: string, userId: string) {
-    const post = await this.findOne(id);
-
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-      relations: ['favorites'],
-    });
-
-    const isNotFavorites =
-      user.favorites.findIndex((obj) => obj.id === post.id) === -1;
-
-    if (isNotFavorites) {
-      user.favorites.push(post);
-      post.favorites++;
-      await this.userRepository.save(user);
-      await this.postRepository.save(post);
-    }
-
-    return post;
+    return favoritesAndReposts(
+      id,
+      userId,
+      'favorites',
+      this.postRepository,
+      this.userRepository,
+    );
   }
 
   async removeFromFavorites(id: string, userId: string) {
-    const post = await this.findOne(id);
+    // const post = await getOnePost(id, this.postRepository);
+    //
+    // const user = await this.userRepository.findOne({
+    //   where: { id: userId },
+    //   relations: ['favorites'],
+    // });
+    //
+    // const postIndex = user.favorites.findIndex((obj) => obj.id === post.id);
+    //
+    // if (postIndex >= 0) {
+    //   user.favorites.splice(postIndex, 1);
+    //   post.favorites--;
+    //   await this.userRepository.save(user);
+    //   await this.postRepository.save(post);
+    // }
+    //
+    // return post;
 
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-      relations: ['favorites'],
-    });
-
-    const postIndex = user.favorites.findIndex((obj) => obj.id === post.id);
-
-    if (postIndex >= 0) {
-      user.favorites.splice(postIndex, 1);
-      post.favorites--;
-      await this.userRepository.save(user);
-      await this.postRepository.save(post);
-    }
-
-    return post;
+    return removeFromFavoritesAndReposts(
+      id,
+      userId,
+      'favorites',
+      this.postRepository,
+      this.userRepository,
+    );
   }
 
   async repostPost(id: string, userId: string) {
-    const post = await this.findOne(id);
-
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-      relations: ['reposts'],
-    });
-
-    const isReposts =
-      user.reposts.findIndex((obj) => obj.id === post.id) === -1;
-
-    if (isReposts) {
-      user.reposts.push(post);
-      post.reposts++;
-      await this.userRepository.save(user);
-      await this.postRepository.save(post);
-    }
-
-    return post;
+    return favoritesAndReposts(
+      id,
+      userId,
+      'reposts',
+      this.postRepository,
+      this.userRepository,
+    );
   }
 
   async removeFromRepost(id: string, userId: string) {
-    const post = await this.findOne(id);
+    //   const post = await getOnePost(id, this.postRepository);
+    //
+    //   const user = await this.userRepository.findOne({
+    //     where: { id: userId },
+    //     relations: ['reposts'],
+    //   });
+    //
+    //   const postIndex = user.reposts.findIndex((obj) => obj.id === post.id);
+    //
+    //   if (postIndex >= 0) {
+    //     user.reposts.splice(postIndex, 1);
+    //     post.reposts--;
+    //     await this.userRepository.save(user);
+    //     await this.postRepository.save(post);
+    //   }
+    //
+    //   return post;
+    // }
 
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-      relations: ['reposts'],
-    });
-
-    const postIndex = user.reposts.findIndex((obj) => obj.id === post.id);
-
-    if (postIndex >= 0) {
-      user.reposts.splice(postIndex, 1);
-      post.reposts--;
-      await this.userRepository.save(user);
-      await this.postRepository.save(post);
-    }
-
-    return post;
+    return removeFromFavoritesAndReposts(
+      id,
+      userId,
+      'reposts',
+      this.postRepository,
+      this.userRepository,
+    );
   }
 }
