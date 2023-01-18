@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { UserEntity } from '../user/entity/user.entity';
 import { CreatePostDto } from './entity/dto/create.dto';
 import { SearchPostDto } from './entity/dto/search.dto';
+import { UpdatePostDto } from './entity/dto/update.dto';
 
 @Injectable()
 export class PostService {
@@ -96,6 +97,25 @@ export class PostService {
     });
 
     const fetchPost = await this.postRepository.findOneBy({ id: post.id });
+    const { user } = fetchPost;
+    delete user.password;
+
+    return fetchPost;
+  }
+
+  async update(id: string, dto: UpdatePostDto) {
+    const food = await this.postRepository.findOneBy({ id });
+
+    if (!food) throw new NotFoundException('Post not found');
+
+    await this.postRepository.update(
+      {
+        id: id,
+      },
+      { text: dto.text },
+    );
+
+    const fetchPost = await this.postRepository.findOneBy({ id: id });
     const { user } = fetchPost;
     delete user.password;
 
