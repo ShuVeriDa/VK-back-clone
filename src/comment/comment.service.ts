@@ -29,7 +29,7 @@ export class CommentService {
         delete obj.user.password;
         return {
           ...obj,
-          post: { id: obj.post.id, text: obj.text },
+          post: { id: obj.post.id, text: obj.post.text },
         };
       });
 
