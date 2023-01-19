@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Param,
@@ -37,5 +38,13 @@ export class UserController {
     @Body() dto: UpdateUserDto,
   ) {
     return this.userService.updateUser(userIdToChange, userId, dto);
+  }
+
+  @UsePipes(new ValidationPipe())
+  @HttpCode(200)
+  @Delete(':id')
+  @Auth('user')
+  removeUser(@Param('id') userIdToChange: string, @User('id') userId: string) {
+    return this.userService.removeUser(userIdToChange, userId);
   }
 }

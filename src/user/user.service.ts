@@ -52,4 +52,11 @@ export class UserService {
 
     return this.getById(userIdToChange);
   }
+
+  async removeUser(userIdToChange: string, userId: string) {
+    if (userIdToChange !== String(userId))
+      throw new Error("You don't have access");
+
+    return this.userRepository.delete({ id: userIdToChange });
+  }
 }
