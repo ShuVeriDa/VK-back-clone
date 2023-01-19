@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { CommentEntity } from './entity/comment.entity';
 import { CreateCommentDto } from './dto/comment.dto';
 import { UserEntity } from '../user/entity/user.entity';
-import { map } from 'rxjs';
+import { validationUserForComments } from '../components/forServices/validationUserForComments';
 
 @Injectable()
 export class CommentService {
@@ -86,5 +86,22 @@ export class CommentService {
 
     // return await this.commentRepository.findOneBy({ id: comment.id });
     return this.findOneById(comment.id);
+  }
+
+  async update(id: string, userId: string, dto: CreateCommentDto) {
+    await validationUserForComments(id, userId, this);
+
+    const comment = await this.commentRepository.update(
+      {
+        id,
+      },
+      {
+        text: dto.text,
+        post: { id: dto.postId },
+        user: { id: userId },
+      },
+    );
+
+    return this.findOneById(id);
   }
 }

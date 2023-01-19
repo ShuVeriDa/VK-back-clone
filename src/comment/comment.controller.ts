@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -34,8 +35,19 @@ export class CommentController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  @Auth()
+  @Auth('user')
   create(@Body() dto: CreateCommentDto, @User('id') userId: string) {
     return this.commentService.create(dto, userId);
+  }
+
+  @Put(':id')
+  @UseGuards(JwtAuthGuard)
+  @Auth('user')
+  update(
+    @Param('id') id: string,
+    @Body() dto: CreateCommentDto,
+    @User('id') userId: string,
+  ) {
+    return this.commentService.update(id, userId, dto);
   }
 }

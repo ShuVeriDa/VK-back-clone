@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entity/user.entity';
 import { Repository } from 'typeorm';
@@ -32,7 +36,7 @@ export class UserService {
 
   async updateUser(userIdToChange: string, userId: string, dto: UpdateUserDto) {
     if (userIdToChange !== String(userId))
-      throw new Error("You don't have access");
+      throw new ForbiddenException("You don't have access");
 
     const user = await this.userRepository.findOneBy({ id: userIdToChange });
 
@@ -56,7 +60,7 @@ export class UserService {
 
   async removeUser(userIdToChange: string, userId: string) {
     if (userIdToChange !== String(userId))
-      throw new Error("You don't have access");
+      throw new ForbiddenException("You don't have access");
 
     return this.userRepository.delete({ id: userIdToChange });
   }
