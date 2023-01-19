@@ -15,6 +15,26 @@ export class CommentService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
+  async findAll(postId: number) {
+    const qb = this.commentRepository.createQueryBuilder('c');
+
+    if (postId) {
+      qb.where('c.postId = :postId', { postId });
+    }
+
+    const arr = await qb
+      .leftJoinAndSelect('c.post', 'post')
+      .leftJoinAndSelect('c.user', 'user')
+      .getMany();
+
+    return arr.map((obj) => {
+      delete obj.user.password;
+      return {
+        ...obj,
+        post: { id: obj.post.id, title: obj.post.text },
+      };
+    });
+  }
   async findByPostId(postId: string) {
     const qb = await this.commentRepository.createQueryBuilder('c');
 

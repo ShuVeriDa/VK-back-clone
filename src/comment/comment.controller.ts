@@ -17,6 +17,11 @@ import { User } from '../user/decorators/user.decorator';
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
+  @Get()
+  findAll(@Query() query: { postId?: string }) {
+    return this.commentService.findAll(+query.postId);
+  }
+
   @Get(':id')
   findOneById(@Param('id') id: string) {
     return this.commentService.findOneById(id);
