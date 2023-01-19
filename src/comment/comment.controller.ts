@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { Auth } from '../auth/decorators/auth.decorator';
@@ -9,6 +17,10 @@ import { User } from '../user/decorators/user.decorator';
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
+  @Get(':id')
+  findOneById(@Param('id') postId: string) {
+    return this.commentService.findOneById(postId);
+  }
   @Post()
   @UseGuards(JwtAuthGuard)
   @Auth()
