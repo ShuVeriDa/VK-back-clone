@@ -26,6 +26,7 @@ export class UserService {
     if (!user) throw new NotFoundException('User not found');
 
     delete user.password;
+    delete user.favorites;
     return user;
   }
 

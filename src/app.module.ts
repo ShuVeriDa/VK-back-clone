@@ -8,6 +8,8 @@ import { AuthModule } from './auth/auth.module';
 import { PostModule } from './post/post.module';
 import { PostEntity } from './post/entity/post.entity';
 import { FileModule } from './file/file.module';
+import { CommentModule } from './comment/comment.module';
+import { CommentEntity } from './comment/entity/comment.entity';
 
 @Module({
   imports: [
@@ -18,13 +20,14 @@ import { FileModule } from './file/file.module';
       username: 'postgres',
       password: '5940530bbbb',
       database: 'vk',
-      entities: [UserEntity, PostEntity],
+      entities: [UserEntity, PostEntity, CommentEntity],
       synchronize: true,
     }),
     UserModule,
     AuthModule,
     PostModule,
     FileModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

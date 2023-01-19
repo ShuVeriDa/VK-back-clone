@@ -10,6 +10,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { PostEntity } from '../../post/entity/post.entity';
+import { CommentEntity } from '../../comment/entity/comment.entity';
 
 @Entity('user')
 export class UserEntity {
@@ -56,6 +57,12 @@ export class UserEntity {
   @ManyToMany(() => PostEntity)
   @JoinTable()
   favorites: PostEntity[];
+
+  @OneToMany(() => CommentEntity, (comment) => comment.user, {
+    eager: false,
+    nullable: true,
+  })
+  comments: CommentEntity[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
