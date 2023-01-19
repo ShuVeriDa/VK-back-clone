@@ -18,9 +18,15 @@ export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
   @Get(':id')
-  findOneById(@Param('id') postId: string) {
-    return this.commentService.findOneById(postId);
+  findOneById(@Param('id') id: string) {
+    return this.commentService.findOneById(id);
   }
+
+  @Get('post/:id')
+  findByPostId(@Param('id') postId: string) {
+    return this.commentService.findByPostId(postId);
+  }
+
   @Post()
   @UseGuards(JwtAuthGuard)
   @Auth()
