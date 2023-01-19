@@ -104,4 +104,12 @@ export class CommentService {
 
     return this.findOneById(id);
   }
+
+  async remove(id: string, userId: string) {
+    const user = await this.userRepository.findOneBy({ id: userId });
+
+    await validationUserForComments(id, userId, this, user.isAdmin);
+
+    return this.commentRepository.delete(id);
+  }
 }

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -49,5 +50,12 @@ export class CommentController {
     @User('id') userId: string,
   ) {
     return this.commentService.update(id, userId, dto);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @Auth()
+  remove(@Param('id') id: string, @User('id') userId: string) {
+    return this.commentService.remove(id, userId);
   }
 }
