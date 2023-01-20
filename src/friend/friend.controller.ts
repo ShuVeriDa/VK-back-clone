@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   Param,
   Post,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -12,12 +14,18 @@ import { Auth } from '../auth/decorators/auth.decorator';
 import { FriendDto } from './dto/friend.dto';
 import { User } from '../user/decorators/user.decorator';
 import { CreatePostDto } from '../post/entity/dto/create.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 
 @Controller('friends')
 export class FriendController {
   constructor(private readonly friendService: FriendService) {}
 
+  @Get()
+  getAll() {
+    return this.friendService.getAll();
+  }
   @UsePipes(new ValidationPipe())
+  @UseGuards(JwtAuthGuard)
   @Post(':id')
   @HttpCode(200)
   @Auth('user')
