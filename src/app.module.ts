@@ -10,6 +10,8 @@ import { PostEntity } from './post/entity/post.entity';
 import { FileModule } from './file/file.module';
 import { CommentModule } from './comment/comment.module';
 import { CommentEntity } from './comment/entity/comment.entity';
+import { FriendModule } from './friend/friend.module';
+import { FriendEntity } from './friend/entity/friend.entity';
 
 @Module({
   imports: [
@@ -20,7 +22,7 @@ import { CommentEntity } from './comment/entity/comment.entity';
       username: 'postgres',
       password: '5940530bbbb',
       database: 'vk',
-      entities: [UserEntity, PostEntity, CommentEntity],
+      entities: [UserEntity, PostEntity, CommentEntity, FriendEntity],
       synchronize: true,
     }),
     UserModule,
@@ -28,6 +30,7 @@ import { CommentEntity } from './comment/entity/comment.entity';
     PostModule,
     FileModule,
     CommentModule,
+    FriendModule,
   ],
   controllers: [AppController],
   providers: [AppService],

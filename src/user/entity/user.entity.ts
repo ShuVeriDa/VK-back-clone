@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { PostEntity } from '../../post/entity/post.entity';
 import { CommentEntity } from '../../comment/entity/comment.entity';
+import { FriendEntity } from '../../friend/entity/friend.entity';
 
 @Entity('user')
 export class UserEntity {
@@ -63,6 +64,12 @@ export class UserEntity {
     nullable: true,
   })
   comments: CommentEntity[];
+
+  @OneToMany(() => FriendEntity, (friend) => friend.user, {
+    eager: false,
+    nullable: true,
+  })
+  friends: FriendEntity[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

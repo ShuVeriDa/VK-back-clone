@@ -16,13 +16,34 @@ export class UserService {
   ) {}
 
   async getAll() {
-    const users = await this.userRepository.find();
+    const users = await this.userRepository.find({
+      relations: ['friends.friend'],
+    });
 
     return users.map((user) => {
+      user.friends.map((friend) => {
+        delete friend.friend.password;
+        return friend;
+      });
       delete user.password;
       delete user.favorites;
       return user;
     });
+    // const qb = this.userRepository.createQueryBuilder('u');
+    //
+    // const arr = await qb
+    //   // .leftJoinAndSelect('u.posts', 'posts')
+    //   // .leftJoinAndSelect('u.comments', 'comments')
+    //   // .leftJoinAndSelect('u.reposts', 'reposts')
+    //   .leftJoinAndSelect('u.friends', 'friends')
+    //   .getMany();
+    //
+    // return arr.map((obj) => {
+    //   delete obj.password;
+    //   return {
+    //     ...obj,
+    //   };
+    // });
   }
 
   async getById(id: string) {
