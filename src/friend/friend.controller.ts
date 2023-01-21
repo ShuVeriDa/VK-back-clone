@@ -24,6 +24,13 @@ export class FriendController {
   getAll() {
     return this.friendService.getAll();
   }
+
+  @Get(':id')
+  @Auth('user')
+  getOneById(@Param('id') id: string, @User('id') userId: string) {
+    return this.friendService.getOneById(id, userId);
+  }
+
   @UsePipes(new ValidationPipe())
   @UseGuards(JwtAuthGuard)
   @Post(':id')
