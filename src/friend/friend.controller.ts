@@ -21,10 +21,10 @@ export class FriendController {
   constructor(private readonly friendService: FriendService) {}
 
   // All
-  // @Get()
-  // getAll() {
-  //   return this.friendService.getAll();
-  // }
+  @Get('/all')
+  getAll() {
+    return this.friendService.getAll();
+  }
 
   @Get(':id')
   @Auth('user')

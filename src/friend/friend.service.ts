@@ -59,12 +59,13 @@ export class FriendService {
   async getAllFriends(userId: string) {
     const friends = await this.userRepository.find({
       where: { id: userId },
-      relations: ['friends.friend'],
+      relations: ['friends.friend', 'friends.user'],
     });
 
     return friends.map((obj) => {
       const { friends } = obj;
       friends.map((obj) => {
+        delete obj.user.password;
         delete obj.friend.password;
         return obj;
       });
