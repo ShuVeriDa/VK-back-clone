@@ -26,7 +26,7 @@ export class FriendController {
     return this.friendService.getAll();
   }
 
-  @Get(':id')
+  @Get('all/:id')
   @Auth('user')
   getById(@Param('id') id: string, @User('id') userId: string) {
     return this.friendService.getById(id, userId);
@@ -37,6 +37,12 @@ export class FriendController {
   @Auth('user')
   getAllFriends(@User('id') userId: string) {
     return this.friendService.getAllFriends(userId);
+  }
+
+  @Get(':id')
+  @Auth('user')
+  getOneFriendById(@Param('id') friendId: string, @User('id') userId: string) {
+    return this.friendService.getOneFriendById(friendId, userId);
   }
 
   @UsePipes(new ValidationPipe())

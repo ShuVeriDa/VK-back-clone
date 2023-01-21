@@ -55,7 +55,6 @@ export class FriendService {
   }
 
   //Current User
-
   async getAllFriends(userId: string) {
     const friends = await this.userRepository.find({
       where: { id: userId },
@@ -72,6 +71,34 @@ export class FriendService {
 
       return friends;
     });
+  }
+
+  async getOneFriendById(friendId: string, userId: string) {
+    const userExist = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['friends', 'friends.friend', 'friends.user'],
+    });
+    const friendExist = await this.userRepository.findOneBy({ id: friendId });
+
+    if (!userExist || !friendExist) {
+      throw new HttpException(
+        'Invalid user or friend id!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const friend = userExist.friends.find(
+      (obj) => String(obj.friend.id) === friendId,
+    );
+
+    if (!friend) {
+      throw new NotFoundException('Friend not found');
+    }
+
+    delete friend.friend.password;
+    delete friend.user.password;
+
+    return friend;
   }
 
   async addFriend(friendId: string, userId: string) {
@@ -93,11 +120,6 @@ export class FriendService {
         HttpStatus.BAD_REQUEST,
       );
     }
-
-    // const user = await this.userRepository.findOne({
-    //   where: { id: userId },
-    //   relations: ['friends', 'friends.friend'],
-    // });
 
     const isFriendExist = userExist.friends.find(
       (obj) => String(obj?.friend.id) === friendId,
