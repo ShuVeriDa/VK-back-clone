@@ -7,9 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { FriendEntity } from './entity/friend.entity';
 import { Repository } from 'typeorm';
-import { FriendDto } from './dto/friend.dto';
 import { UserEntity } from '../user/entity/user.entity';
-import { findIndex } from 'rxjs';
 
 @Injectable()
 export class FriendService {
@@ -21,6 +19,7 @@ export class FriendService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
+  //all
   async getAll() {
     const friends = await this.friendRepository.find({
       relations: ['friend', 'user'],
@@ -34,12 +33,11 @@ export class FriendService {
     });
   }
 
-  async getOneById(id: string, userId: string) {
+  async getById(id: string, userId: string) {
     const find = await this.friendRepository.findOne({
       where: { id: id },
       relations: ['friend', 'user'],
     });
-    // if (find.user.id !== userId) {}
 
     if (id === String(userId)) {
       throw new NotFoundException(
@@ -56,8 +54,30 @@ export class FriendService {
     return find;
   }
 
+  //Current User
+
+  async getAllFriends(userId: string) {
+    const friends = await this.userRepository.find({
+      where: { id: userId },
+      relations: ['friends.friend'],
+    });
+
+    return friends.map((obj) => {
+      const { friends } = obj;
+      friends.map((obj) => {
+        delete obj.friend.password;
+        return obj;
+      });
+
+      return friends;
+    });
+  }
+
   async addFriend(friendId: string, userId: string) {
-    const userExist = await this.userRepository.findOneBy({ id: userId });
+    const userExist = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['friends', 'friends.friend'],
+    });
     const friendExist = await this.userRepository.findOneBy({ id: friendId });
     if (!userExist || !friendExist) {
       throw new HttpException(
@@ -73,12 +93,12 @@ export class FriendService {
       );
     }
 
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-      relations: ['friends', 'friends.friend'],
-    });
+    // const user = await this.userRepository.findOne({
+    //   where: { id: userId },
+    //   relations: ['friends', 'friends.friend'],
+    // });
 
-    const isFriendExist = user.friends.find(
+    const isFriendExist = userExist.friends.find(
       (obj) => String(obj?.friend.id) === friendId,
     );
 

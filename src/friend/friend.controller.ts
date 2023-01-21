@@ -20,15 +20,23 @@ import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 export class FriendController {
   constructor(private readonly friendService: FriendService) {}
 
-  @Get()
-  getAll() {
-    return this.friendService.getAll();
-  }
+  // All
+  // @Get()
+  // getAll() {
+  //   return this.friendService.getAll();
+  // }
 
   @Get(':id')
   @Auth('user')
-  getOneById(@Param('id') id: string, @User('id') userId: string) {
-    return this.friendService.getOneById(id, userId);
+  getById(@Param('id') id: string, @User('id') userId: string) {
+    return this.friendService.getById(id, userId);
+  }
+
+  //CurrentUser
+  @Get()
+  @Auth('user')
+  getAllFriends(@User('id') userId: string) {
+    return this.friendService.getAllFriends(userId);
   }
 
   @UsePipes(new ValidationPipe())
