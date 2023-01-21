@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Param,
@@ -30,6 +31,12 @@ export class FriendController {
   @Auth('user')
   getById(@Param('id') id: string, @User('id') userId: string) {
     return this.friendService.getById(id, userId);
+  }
+
+  @Delete(':id')
+  @Auth('user')
+  removeFriend(@Param('id') friendId: string, @User('id') userId: string) {
+    return this.friendService.removeFriend(friendId, userId);
   }
 
   //CurrentUser
