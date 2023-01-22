@@ -13,10 +13,10 @@ import {
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { Auth } from '../auth/decorators/auth.decorator';
-import { CreatePostDto } from './entity/dto/create.dto';
+import { CreatePostDto } from './dto/create.dto';
 import { User } from '../user/decorators/user.decorator';
-import { SearchPostDto } from './entity/dto/search.dto';
-import { UpdatePostDto } from './entity/dto/update.dto';
+import { SearchPostDto } from './dto/search.dto';
+import { UpdatePostDto } from './dto/update.dto';
 
 @Controller('posts')
 export class PostController {

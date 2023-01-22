@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { UserEntity } from '../../user/entity/user.entity';
 import { CommentEntity } from '../../comment/entity/comment.entity';
+import { CommunityEntity } from '../../community/entity/community.entity';
 
 @Entity('posts')
 export class PostEntity {
@@ -41,6 +42,9 @@ export class PostEntity {
   @OneToMany(() => CommentEntity, (comment) => comment.post, { eager: true })
   @JoinColumn()
   comments: CommentEntity[];
+
+  @ManyToOne(() => CommunityEntity, (community) => community.posts)
+  community: CommunityEntity;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

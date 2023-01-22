@@ -14,7 +14,7 @@ import { FriendService } from './friend.service';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { FriendDto } from './dto/friend.dto';
 import { User } from '../user/decorators/user.decorator';
-import { CreatePostDto } from '../post/entity/dto/create.dto';
+import { CreatePostDto } from '../post/dto/create.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 
 @Controller('friends')

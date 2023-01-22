@@ -12,6 +12,8 @@ import { CommentModule } from './comment/comment.module';
 import { CommentEntity } from './comment/entity/comment.entity';
 import { FriendModule } from './friend/friend.module';
 import { FriendEntity } from './friend/entity/friend.entity';
+import { CommunityModule } from './community/community.module';
+import { CommunityEntity } from './community/entity/community.entity';
 
 @Module({
   imports: [
@@ -22,7 +24,13 @@ import { FriendEntity } from './friend/entity/friend.entity';
       username: 'postgres',
       password: '5940530bbbb',
       database: 'vk',
-      entities: [UserEntity, PostEntity, CommentEntity, FriendEntity],
+      entities: [
+        UserEntity,
+        PostEntity,
+        CommentEntity,
+        FriendEntity,
+        CommunityEntity,
+      ],
       synchronize: true,
     }),
     UserModule,
@@ -31,6 +39,7 @@ import { FriendEntity } from './friend/entity/friend.entity';
     FileModule,
     CommentModule,
     FriendModule,
+    CommunityModule,
   ],
   controllers: [AppController],
   providers: [AppService],

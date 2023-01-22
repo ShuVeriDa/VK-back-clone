@@ -12,6 +12,7 @@ import {
 import { PostEntity } from '../../post/entity/post.entity';
 import { CommentEntity } from '../../comment/entity/comment.entity';
 import { FriendEntity } from '../../friend/entity/friend.entity';
+import { CommunityEntity } from '../../community/entity/community.entity';
 
 @Entity('user')
 export class UserEntity {
@@ -70,6 +71,10 @@ export class UserEntity {
     nullable: true,
   })
   friends: FriendEntity[];
+
+  @ManyToMany(() => CommunityEntity, (community) => community.members)
+  @JoinTable()
+  communities: CommunityEntity[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
