@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommunityEntity } from './entity/community.entity';
 import { Repository } from 'typeorm';
@@ -22,6 +26,10 @@ export class CommunityService {
 
     return communities.map((c) => {
       delete c.author.password;
+      c.members.map((m) => {
+        delete m.password;
+        return m;
+      });
       return c;
     });
   }
@@ -54,16 +62,31 @@ export class CommunityService {
     if (!community) {
       throw new NotFoundException(`Community with id ${communityId} not found`);
     }
-    const user = await this.userRepository.findOneBy({ id: userId });
-    if (!user) {
-      throw new NotFoundException(`User with id ${userId} not found`);
-    }
-    community.members = [...community.members, user];
-    await this.communityRepository.save(community);
 
-    return await this.communityRepository.findOne({
+    const isMember = community.members.find(
+      (c) => String(c.id) === String(userId),
+    );
+    if (isMember) {
+      throw new ForbiddenException(
+        'This user already exists in this community',
+      );
+    }
+
+    await this.communityRepository.save({
+      ...community,
+      members: [...community.members, { id: userId }],
+    });
+
+    const existCommunity = await this.communityRepository.findOne({
       where: { id: communityId },
       relations: ['members'],
     });
+
+    existCommunity.members.map((m) => {
+      delete m.password;
+      return m;
+    });
+
+    return existCommunity;
   }
 }
