@@ -43,14 +43,32 @@ export class CommunityService {
       author: { id: userId },
     });
 
-    const find = await this.communityRepository.findOne({
+    const existedCommunity = await this.communityRepository.findOne({
       where: { id: community.id },
       relations: ['members'],
     });
 
-    delete find.author.password;
+    delete existedCommunity.author.password;
 
-    return find;
+    return existedCommunity;
+  }
+
+  async delete(communityId: string, userId: string) {
+    const community = await this.communityRepository.findOneBy({
+      id: communityId,
+    });
+
+    if (!community) {
+      throw new NotFoundException('Community not found');
+    }
+
+    if (String(community.author.id) !== String(userId)) {
+      throw new ForbiddenException(
+        'This user does not have permission to delete this community',
+      );
+    }
+
+    return this.communityRepository.remove(community);
   }
 
   async subscribe(communityId: string, userId: string) {

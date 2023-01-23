@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -30,6 +31,11 @@ export class CommunityController {
     return this.communityService.create(dto, userId);
   }
 
+  @Delete(':id')
+  @Auth('user')
+  delete(@Param('id') communityId: string, @User('id') userId: string) {
+    return this.communityService.delete(communityId, userId);
+  }
   @Post('subscribe/:id')
   @UseGuards(JwtAuthGuard)
   @Auth('user')
