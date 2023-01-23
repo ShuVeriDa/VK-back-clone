@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -24,6 +25,10 @@ export class CommunityController {
     return this.communityService.getAll();
   }
 
+  @Get(':id')
+  getOne(@Param('id') communityId: string) {
+    return this.communityService.getOne(communityId);
+  }
   @Post()
   @UseGuards(JwtAuthGuard)
   @Auth('user')
@@ -31,7 +36,9 @@ export class CommunityController {
     return this.communityService.create(dto, userId);
   }
 
+  @Put(':id')
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   @Auth('user')
   delete(@Param('id') communityId: string, @User('id') userId: string) {
     return this.communityService.delete(communityId, userId);

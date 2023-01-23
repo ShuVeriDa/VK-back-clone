@@ -33,6 +33,26 @@ export class CommunityService {
       return c;
     });
   }
+
+  async getOne(communityId: string) {
+    const community = await this.communityRepository.findOne({
+      where: { id: communityId },
+      relations: ['members'],
+    });
+
+    if (!community) {
+      throw new NotFoundException('Community not found');
+    }
+
+    delete community.author.password;
+
+    community.members.map((m) => {
+      delete m.password;
+      return m;
+    });
+
+    return community;
+  }
   async create(dto: CreateCommunityDto, userId: string) {
     const community = await this.communityRepository.save({
       name: dto.name,
