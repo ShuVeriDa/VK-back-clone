@@ -34,8 +34,12 @@ export class CommunityEntity {
   @OneToMany(() => PostEntity, (post) => post.community)
   posts: PostEntity[];
 
-  @ManyToMany(() => UserEntity, (user) => user.communities)
-  @JoinTable()
+  @ManyToMany(() => UserEntity, (user) => user.communities, {
+    eager: true,
+    nullable: false,
+  })
+  // @JoinTable()
+  @JoinColumn({ name: 'memberId' })
   members: UserEntity[];
 
   @ManyToOne(() => UserEntity, { eager: true, nullable: false })

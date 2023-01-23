@@ -22,7 +22,7 @@ export class FriendController {
   constructor(private readonly friendService: FriendService) {}
 
   // All
-  @Get('/all')
+  @Get('all')
   getAll() {
     return this.friendService.getAll();
   }

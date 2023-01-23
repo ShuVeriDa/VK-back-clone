@@ -26,13 +26,12 @@ export class CommunityService {
     });
   }
   async create(dto: CreateCommunityDto, userId: string) {
-    const user = await this.userRepository.findOne({ where: { id: userId } });
     const community = await this.communityRepository.save({
       name: dto.name,
       description: dto.description,
       imageUrl: dto.imageUrl,
       isAdmin: true,
-      // members: [user],
+      members: [{ id: userId }],
       author: { id: userId },
     });
 
@@ -40,10 +39,8 @@ export class CommunityService {
       where: { id: community.id },
       relations: ['members'],
     });
-    // find.members.push(user);
-    delete find.author.password;
 
-    // await this.communityRepository.update({ id: find.id }, find);
+    delete find.author.password;
 
     return find;
   }

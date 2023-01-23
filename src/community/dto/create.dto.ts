@@ -1,4 +1,5 @@
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsOptional, IsString } from 'class-validator';
+import { UserEntity } from '../../user/entity/user.entity';
 
 export class CreateCommunityDto {
   @IsString()
@@ -15,4 +16,13 @@ export class CreateCommunityDto {
   @IsOptional()
   @IsBoolean()
   isAdmin?: boolean;
+
+  @IsOptional()
+  @IsString()
+  @IsArray()
+  members?: UserEntity[];
+
+  @IsOptional()
+  @IsString()
+  author?: { id: string };
 }
