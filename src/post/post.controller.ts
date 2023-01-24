@@ -96,6 +96,14 @@ export class PostController {
   getAllPostsInCommunity(@Param('id') communityId: string) {
     return this.postService.getAllPostsInCommunity(communityId);
   }
+  @Get('/community/post/:id')
+  getOnePostInCommunity(
+    @Param('id') postId: string,
+    @Body() dto: FetchPostDto,
+  ) {
+    return this.postService.getOnePostInCommunity(postId, dto);
+  }
+
   @Post('community')
   @UseGuards(JwtAuthGuard)
   @Auth('user')

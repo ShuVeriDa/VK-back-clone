@@ -218,6 +218,38 @@ export class PostService {
       return p;
     });
   }
+
+  async getOnePostInCommunity(postId: string, dto: FetchPostDto) {
+    const post = await this.postRepository.findOne({
+      where: { id: postId },
+      relations: ['community'],
+    });
+
+    if (!post) throw new NotFoundException('Post not found');
+
+    const community = await this.communityRepository.findOne({
+      where: { id: dto.communityId },
+      relations: ['members', 'posts'],
+    });
+
+    if (!community)
+      throw new NotFoundException(
+        `Community with id ${dto.communityId} not found`,
+      );
+
+    const isExistPost = community.posts.find((post) => post.id === postId);
+
+    if (!isExistPost)
+      throw new NotFoundException('Post not found in this community');
+
+    delete post.user.password;
+    delete post.community.author.password;
+    post.community.members.map((m) => {
+      delete m.password;
+      return m;
+    });
+    return post;
+  }
   async postCreateInCommunity(dto: CreatePostDto, userId: string) {
     const community = await this.communityRepository.findOne({
       where: { id: dto.communityId },
