@@ -9,6 +9,7 @@ import { UpdatePostDto } from './dto/update.dto';
 import { getOnePost } from '../components/forServices/getOnePost';
 import { favoritesAndReposts } from '../components/forServices/favoritesAndReposts';
 import { removeFromFavoritesAndReposts } from '../components/forServices/removeFromFavoritesAndReposts';
+import { CommunityEntity } from '../community/entity/community.entity';
 
 @Injectable()
 export class PostService {
@@ -16,6 +17,8 @@ export class PostService {
   private readonly postRepository: Repository<PostEntity>;
   @InjectRepository(UserEntity)
   private readonly userRepository: Repository<UserEntity>;
+  @InjectRepository(CommunityEntity)
+  private readonly communityRepository: Repository<CommunityEntity>;
 
   async findAll() {
     const posts = await this.postRepository.find({
@@ -196,5 +199,34 @@ export class PostService {
       this.postRepository,
       this.userRepository,
     );
+  }
+
+  //for community
+  async writePost(dto: CreatePostDto, communityId: string, userId: string) {
+    const community = await this.communityRepository.findOne({
+      where: { id: communityId },
+      relations: ['members'],
+    });
+
+    if (!community)
+      throw new NotFoundException(`Community with id ${communityId} not found`);
+
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) throw new NotFoundException(`User with id ${userId} not found`);
+
+    const post = await this.postRepository.save({
+      text: dto.text,
+      user: { id: user.id },
+      community: { id: community.id },
+    });
+
+    const fetchPost = await this.postRepository.findOne({
+      where: { id: post.id },
+      relations: ['community'],
+    });
+
+    delete fetchPost.user.password;
+
+    return fetchPost;
   }
 }

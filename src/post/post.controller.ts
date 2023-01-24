@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -17,6 +18,7 @@ import { CreatePostDto } from './dto/create.dto';
 import { User } from '../user/decorators/user.decorator';
 import { SearchPostDto } from './dto/search.dto';
 import { UpdatePostDto } from './dto/update.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 
 @Controller('posts')
 export class PostController {
@@ -85,5 +87,17 @@ export class PostController {
   @Auth('user')
   async removeFromRepost(@User('id') userId: string, @Param('id') id: string) {
     return this.postService.removeFromRepost(id, userId);
+  }
+
+  //for community
+  @Post('community/:id')
+  @UseGuards(JwtAuthGuard)
+  @Auth('user')
+  postWrite(
+    @Body() dto: CreatePostDto,
+    @Param('id') communityId: string,
+    @User('id') userId: string,
+  ) {
+    return this.postService.writePost(dto, communityId, userId);
   }
 }
