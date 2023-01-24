@@ -19,6 +19,7 @@ import { User } from '../user/decorators/user.decorator';
 import { SearchPostDto } from './dto/search.dto';
 import { UpdatePostDto } from './dto/update.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
+import { FetchPostDto } from './dto/fetch.dto';
 
 @Controller('posts')
 export class PostController {
@@ -90,6 +91,11 @@ export class PostController {
   }
 
   //for community
+
+  @Get('/community/:id')
+  getAllPostsInCommunity(@Param('id') communityId: string) {
+    return this.postService.getAllPostsInCommunity(communityId);
+  }
   @Post('community')
   @UseGuards(JwtAuthGuard)
   @Auth('user')

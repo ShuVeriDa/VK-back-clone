@@ -10,6 +10,7 @@ import { getOnePost } from '../components/forServices/getOnePost';
 import { favoritesAndReposts } from '../components/forServices/favoritesAndReposts';
 import { removeFromFavoritesAndReposts } from '../components/forServices/removeFromFavoritesAndReposts';
 import { CommunityEntity } from '../community/entity/community.entity';
+import { FetchPostDto } from './dto/fetch.dto';
 
 @Injectable()
 export class PostService {
@@ -203,6 +204,20 @@ export class PostService {
   }
 
   //for community
+
+  async getAllPostsInCommunity(communityId: string) {
+    const community = await this.communityRepository.findOne({
+      where: { id: communityId },
+      relations: ['posts', 'posts.comments'],
+    });
+
+    if (!community) throw new NotFoundException('Community not found');
+
+    return community.posts.map((p) => {
+      delete p.user.password;
+      return p;
+    });
+  }
   async postCreateInCommunity(dto: CreatePostDto, userId: string) {
     const community = await this.communityRepository.findOne({
       where: { id: dto.communityId },
