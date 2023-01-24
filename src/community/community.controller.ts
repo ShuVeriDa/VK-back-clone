@@ -15,8 +15,9 @@ import { User } from '../user/decorators/user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { CreateCommunityDto } from './dto/create.dto';
+import { CreatePostDto } from '../post/dto/create.dto';
 
-@Controller('communities')
+@Controller('community')
 export class CommunityController {
   constructor(private readonly communityService: CommunityService) {}
 
@@ -48,5 +49,12 @@ export class CommunityController {
   @Auth('user')
   subscribe(@Param('id') communityId: string, @User('id') userId: string) {
     return this.communityService.subscribe(communityId, userId);
+  }
+
+  @Delete('unsubscribe/:id')
+  @UseGuards(JwtAuthGuard)
+  @Auth('user')
+  unsubscribe(@Param('id') communityId: string, @User('id') userId: string) {
+    return this.communityService.unsubscribe(communityId, userId);
   }
 }

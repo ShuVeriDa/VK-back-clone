@@ -21,7 +21,7 @@ export class CommunityService {
 
   async getAll() {
     const communities = await this.communityRepository.find({
-      relations: ['members'],
+      relations: ['members', 'posts'],
     });
 
     return communities.map((c) => {
@@ -29,6 +29,10 @@ export class CommunityService {
       c.members.map((m) => {
         delete m.password;
         return m;
+      });
+      c.posts.map((p) => {
+        delete p.user.password;
+        return p;
       });
       return c;
     });
@@ -114,6 +118,48 @@ export class CommunityService {
       ...community,
       members: [...community.members, { id: userId }],
     });
+
+    const existCommunity = await this.communityRepository.findOne({
+      where: { id: communityId },
+      relations: ['members'],
+    });
+
+    existCommunity.members.map((m) => {
+      delete m.password;
+      return m;
+    });
+
+    return existCommunity;
+  }
+
+  async unsubscribe(communityId: string, userId: string) {
+    const community = await this.communityRepository.findOne({
+      where: { id: communityId },
+      relations: ['members'],
+    });
+
+    if (!community) {
+      throw new NotFoundException(`Community with id ${communityId} not found`);
+    }
+
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new NotFoundException(`User with id ${userId} not found`);
+    }
+
+    const isMember = community.members.find(
+      (c) => String(c.id) === String(userId),
+    );
+    if (!isMember) {
+      throw new ForbiddenException(
+        'This user does not exist in this community',
+      );
+    }
+
+    community.members = community.members.filter(
+      (member) => member.id !== user.id,
+    );
+    await this.communityRepository.save(community);
 
     const existCommunity = await this.communityRepository.findOne({
       where: { id: communityId },
