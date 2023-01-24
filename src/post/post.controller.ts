@@ -90,14 +90,24 @@ export class PostController {
   }
 
   //for community
-  @Post('community/:id')
+  @Post('community')
   @UseGuards(JwtAuthGuard)
   @Auth('user')
-  postWrite(
+  postCreateInCommunity(
     @Body() dto: CreatePostDto,
-    @Param('id') communityId: string,
     @User('id') userId: string,
   ) {
-    return this.postService.writePost(dto, communityId, userId);
+    return this.postService.postCreateInCommunity(dto, userId);
+  }
+
+  @Put('community/:id')
+  @UseGuards(JwtAuthGuard)
+  @Auth('user')
+  postUpdateInCommunity(
+    @Body() dto: UpdatePostDto,
+    @Param('id') postId: string,
+    @User('id') userId: string,
+  ) {
+    return this.postService.postUpdateInCommunity(dto, postId, userId);
   }
 }

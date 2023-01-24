@@ -25,6 +25,7 @@ export class PostService {
       order: {
         createdAt: 'DESC',
       },
+      relations: ['community'],
     });
 
     return posts.map((obj) => {
@@ -202,14 +203,16 @@ export class PostService {
   }
 
   //for community
-  async writePost(dto: CreatePostDto, communityId: string, userId: string) {
+  async postCreateInCommunity(dto: CreatePostDto, userId: string) {
     const community = await this.communityRepository.findOne({
-      where: { id: communityId },
+      where: { id: dto.communityId },
       relations: ['members'],
     });
 
     if (!community)
-      throw new NotFoundException(`Community with id ${communityId} not found`);
+      throw new NotFoundException(
+        `Community with id ${dto.communityId} not found`,
+      );
 
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) throw new NotFoundException(`User with id ${userId} not found`);
@@ -222,6 +225,41 @@ export class PostService {
 
     const fetchPost = await this.postRepository.findOne({
       where: { id: post.id },
+      relations: ['community'],
+    });
+
+    delete fetchPost.user.password;
+
+    return fetchPost;
+  }
+
+  async postUpdateInCommunity(
+    dto: UpdatePostDto,
+    postId: string,
+    userId: string,
+  ) {
+    const community = await this.communityRepository.findOne({
+      where: { id: dto.communityId },
+      relations: ['members'],
+    });
+
+    if (!community)
+      throw new NotFoundException(
+        `Community with id ${dto.communityId} not found`,
+      );
+
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) throw new NotFoundException(`User with id ${userId} not found`);
+
+    await this.postRepository.update(
+      { id: postId },
+      {
+        text: dto.text,
+      },
+    );
+
+    const fetchPost = await this.postRepository.findOne({
+      where: { id: postId },
       relations: ['community'],
     });
 
