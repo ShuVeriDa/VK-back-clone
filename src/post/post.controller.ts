@@ -110,4 +110,14 @@ export class PostController {
   ) {
     return this.postService.postUpdateInCommunity(dto, postId, userId);
   }
+
+  @Delete('community/:id')
+  @UseGuards(JwtAuthGuard)
+  @Auth('user')
+  postDeleteInCommunity(
+    @Param('id') postId: string,
+    @User('id') userId: string,
+  ) {
+    return this.postService.postDeleteInCommunity(postId, userId);
+  }
 }

@@ -267,4 +267,28 @@ export class PostService {
 
     return fetchPost;
   }
+
+  async postDeleteInCommunity(postId: string, userId: string) {
+    const post = await this.postRepository.findOne({
+      where: { id: postId },
+      relations: ['community'],
+    });
+
+    if (!post) throw new NotFoundException(`Post not found`);
+
+    const community = await this.communityRepository.findOne({
+      where: { id: post.community.id },
+      relations: ['members'],
+    });
+
+    if (!community) throw new NotFoundException(`Community not found`);
+
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) throw new NotFoundException(`User with id ${userId} not found`);
+
+    if (post.user.id !== userId)
+      throw new NotFoundException("You don't have not access to this post");
+
+    return await this.postRepository.delete(postId);
+  }
 }
