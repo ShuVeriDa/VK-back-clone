@@ -11,20 +11,6 @@ export const subscribeAndUnSubscribe = async (
   userRepos: Repository<UserEntity>,
   flag: 'subscribe' | 'unsubscribe',
 ) => {
-  // const community = await communityRepos.findOne({
-  //   where: { id: communityId },
-  //   relations: ['members'],
-  // });
-  //
-  // if (!community) {
-  //   throw new NotFoundException(`Community with id ${communityId} not found`);
-  // }
-  //
-  // const user = await userRepos.findOneBy({ id: userId });
-  // if (!user) {
-  //   throw new NotFoundException(`User with id ${userId} not found`);
-  // }
-
   const { community, user } = await validationCommunity(
     communityId,
     communityRepos,
@@ -70,6 +56,8 @@ export const subscribeAndUnSubscribe = async (
     delete m.password;
     return m;
   });
+
+  delete existCommunity.author.password;
 
   return existCommunity;
 };

@@ -41,26 +41,21 @@ export class CommunityService {
   }
 
   async getOne(communityId: string) {
-    // const community = await this.communityRepository.findOne({
-    //   where: { id: communityId },
-    //   relations: ['members'],
-    // });
-    //
-    // if (!community) {
-    //   throw new NotFoundException('Community not found');
-    // }
-
     const { community } = await validationCommunity(
       communityId,
       this.communityRepository,
     );
 
-    delete community.author.password;
-
     community.members.map((m) => {
       delete m.password;
       return m;
     });
+    community.posts.map((p) => {
+      delete p.user.password;
+      return p;
+    });
+
+    delete community.author.password;
 
     return community;
   }
@@ -77,6 +72,11 @@ export class CommunityService {
     const existedCommunity = await this.communityRepository.findOne({
       where: { id: community.id },
       relations: ['members'],
+    });
+
+    existedCommunity.members.map((m) => {
+      delete m.password;
+      return m;
     });
 
     delete existedCommunity.author.password;
