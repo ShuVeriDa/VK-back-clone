@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { CreateCommunityDto } from './dto/create.dto';
 import { UserEntity } from '../user/entity/user.entity';
 import { subscribeAndUnSubscribe } from '../components/forServices/subscribeAndUnSubscribe';
+import { validationCommunity } from '../components/forServices/validationCommunity';
 
 @Injectable()
 export class CommunityService {
@@ -40,14 +41,19 @@ export class CommunityService {
   }
 
   async getOne(communityId: string) {
-    const community = await this.communityRepository.findOne({
-      where: { id: communityId },
-      relations: ['members'],
-    });
+    // const community = await this.communityRepository.findOne({
+    //   where: { id: communityId },
+    //   relations: ['members'],
+    // });
+    //
+    // if (!community) {
+    //   throw new NotFoundException('Community not found');
+    // }
 
-    if (!community) {
-      throw new NotFoundException('Community not found');
-    }
+    const { community } = await validationCommunity(
+      communityId,
+      this.communityRepository,
+    );
 
     delete community.author.password;
 
@@ -79,13 +85,10 @@ export class CommunityService {
   }
 
   async delete(communityId: string, userId: string) {
-    const community = await this.communityRepository.findOneBy({
-      id: communityId,
-    });
-
-    if (!community) {
-      throw new NotFoundException('Community not found');
-    }
+    const { community } = await validationCommunity(
+      communityId,
+      this.communityRepository,
+    );
 
     if (String(community.author.id) !== String(userId)) {
       throw new ForbiddenException(
@@ -104,46 +107,6 @@ export class CommunityService {
       this.userRepository,
       'subscribe',
     );
-
-    // const community = await this.communityRepository.findOne({
-    //   where: { id: communityId },
-    //   relations: ['members'],
-    // });
-    //
-    // if (!community) {
-    //   throw new NotFoundException(`Community not found`);
-    // }
-    //
-    // const user = await this.userRepository.findOneBy({ id: userId });
-    // if (!user) {
-    //   throw new NotFoundException(`User with id ${userId} not found`);
-    // }
-    //
-    // const isMember = community.members.find(
-    //   (c) => String(c.id) === String(userId),
-    // );
-    // if (isMember) {
-    //   throw new ForbiddenException(
-    //     'This user already exists in this community',
-    //   );
-    // }
-    //
-    // await this.communityRepository.save({
-    //   ...community,
-    //   members: [...community.members, { id: user.id }],
-    // });
-    //
-    // const existCommunity = await this.communityRepository.findOne({
-    //   where: { id: communityId },
-    //   relations: ['members'],
-    // });
-    //
-    // existCommunity.members.map((m) => {
-    //   delete m.password;
-    //   return m;
-    // });
-    //
-    // return existCommunity;
   }
 
   async unsubscribe(communityId: string, userId: string) {
@@ -154,45 +117,5 @@ export class CommunityService {
       this.userRepository,
       'unsubscribe',
     );
-
-    //   const community = await this.communityRepository.findOne({
-    //     where: { id: communityId },
-    //     relations: ['members'],
-    //   });
-    //
-    //   if (!community) {
-    //     throw new NotFoundException(`Community with id ${communityId} not found`);
-    //   }
-    //
-    //   const user = await this.userRepository.findOneBy({ id: userId });
-    //   if (!user) {
-    //     throw new NotFoundException(`User with id ${userId} not found`);
-    //   }
-    //
-    //   const isMember = community.members.find(
-    //     (c) => String(c.id) === String(userId),
-    //   );
-    //   if (!isMember) {
-    //     throw new ForbiddenException(
-    //       'This user does not exist in this community',
-    //     );
-    //   }
-    //
-    //   community.members = community.members.filter(
-    //     (member) => member.id !== user.id,
-    //   );
-    //   await this.communityRepository.save(community);
-    //
-    //   const existCommunity = await this.communityRepository.findOne({
-    //     where: { id: communityId },
-    //     relations: ['members'],
-    //   });
-    //
-    //   existCommunity.members.map((m) => {
-    //     delete m.password;
-    //     return m;
-    //   });
-    //
-    //   return existCommunity;
   }
 }

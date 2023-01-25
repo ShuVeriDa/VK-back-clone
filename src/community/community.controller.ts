@@ -37,7 +37,6 @@ export class CommunityController {
     return this.communityService.create(dto, userId);
   }
 
-  @Put(':id')
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   @Auth('user')

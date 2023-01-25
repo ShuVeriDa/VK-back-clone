@@ -2,6 +2,7 @@ import { Repository } from 'typeorm';
 import { CommunityEntity } from '../../community/entity/community.entity';
 import { UserEntity } from '../../user/entity/user.entity';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { validationCommunity } from './validationCommunity';
 
 export const subscribeAndUnSubscribe = async (
   communityId: string,
@@ -10,19 +11,26 @@ export const subscribeAndUnSubscribe = async (
   userRepos: Repository<UserEntity>,
   flag: 'subscribe' | 'unsubscribe',
 ) => {
-  const community = await communityRepos.findOne({
-    where: { id: communityId },
-    relations: ['members'],
-  });
+  // const community = await communityRepos.findOne({
+  //   where: { id: communityId },
+  //   relations: ['members'],
+  // });
+  //
+  // if (!community) {
+  //   throw new NotFoundException(`Community with id ${communityId} not found`);
+  // }
+  //
+  // const user = await userRepos.findOneBy({ id: userId });
+  // if (!user) {
+  //   throw new NotFoundException(`User with id ${userId} not found`);
+  // }
 
-  if (!community) {
-    throw new NotFoundException(`Community with id ${communityId} not found`);
-  }
-
-  const user = await userRepos.findOneBy({ id: userId });
-  if (!user) {
-    throw new NotFoundException(`User with id ${userId} not found`);
-  }
+  const { community, user } = await validationCommunity(
+    communityId,
+    communityRepos,
+    userId,
+    userRepos,
+  );
 
   const isMember = community.members.find(
     (c) => String(c.id) === String(userId),
