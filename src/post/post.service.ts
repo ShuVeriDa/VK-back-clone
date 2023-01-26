@@ -137,24 +137,6 @@ export class PostService {
   }
 
   async removeFromFavorites(id: string, userId: string) {
-    // const post = await getOnePost(id, this.postRepository);
-    //
-    // const user = await this.userRepository.findOne({
-    //   where: { id: userId },
-    //   relations: ['favorites'],
-    // });
-    //
-    // const postIndex = user.favorites.findIndex((obj) => obj.id === post.id);
-    //
-    // if (postIndex >= 0) {
-    //   user.favorites.splice(postIndex, 1);
-    //   post.favorites--;
-    //   await this.userRepository.save(user);
-    //   await this.postRepository.save(post);
-    // }
-    //
-    // return post;
-
     return removeFromFavoritesAndReposts(
       id,
       userId,
@@ -175,25 +157,6 @@ export class PostService {
   }
 
   async removeFromRepost(id: string, userId: string) {
-    //   const post = await getOnePost(id, this.postRepository);
-    //
-    //   const user = await this.userRepository.findOne({
-    //     where: { id: userId },
-    //     relations: ['reposts'],
-    //   });
-    //
-    //   const postIndex = user.reposts.findIndex((obj) => obj.id === post.id);
-    //
-    //   if (postIndex >= 0) {
-    //     user.reposts.splice(postIndex, 1);
-    //     post.reposts--;
-    //     await this.userRepository.save(user);
-    //     await this.postRepository.save(post);
-    //   }
-    //
-    //   return post;
-    // }
-
     return removeFromFavoritesAndReposts(
       id,
       userId,
