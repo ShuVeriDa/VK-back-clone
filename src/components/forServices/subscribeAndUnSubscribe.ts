@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { CommunityEntity } from '../../community/entity/community.entity';
 import { UserEntity } from '../../user/entity/user.entity';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { ForbiddenException } from '@nestjs/common';
 import { validationCommunity } from './validationCommunity';
 
 export const subscribeAndUnSubscribe = async (

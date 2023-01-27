@@ -14,6 +14,8 @@ import { FriendModule } from './friend/friend.module';
 import { FriendEntity } from './friend/entity/friend.entity';
 import { CommunityModule } from './community/community.module';
 import { CommunityEntity } from './community/entity/community.entity';
+import { MessageModule } from './message/message.module';
+import { MessageEntity } from './message/entity/message.entity';
 
 @Module({
   imports: [
@@ -30,6 +32,7 @@ import { CommunityEntity } from './community/entity/community.entity';
         CommentEntity,
         FriendEntity,
         CommunityEntity,
+        MessageEntity,
       ],
       synchronize: true,
     }),
@@ -40,6 +43,7 @@ import { CommunityEntity } from './community/entity/community.entity';
     CommentModule,
     FriendModule,
     CommunityModule,
+    MessageModule,
   ],
   controllers: [AppController],
   providers: [AppService],
