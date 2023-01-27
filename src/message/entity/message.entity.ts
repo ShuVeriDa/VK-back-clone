@@ -26,7 +26,7 @@ export class MessageEntity {
   recipient: UserEntity;
 
   @CreateDateColumn({ type: 'timestamp' })
-  sentAt: Date;
+  createdAt: Date;
 
   @UpdateDateColumn({ type: 'timestamp' })
   updateAt: Date;
