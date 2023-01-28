@@ -101,4 +101,18 @@ export class MessageService {
 
     return message;
   }
+
+  async delete(messageId: string, userId: string) {
+    const message = await this.messageRepository.findOne({
+      where: { id: messageId },
+    });
+
+    if (!message) throw new NotFoundException('Message not found');
+
+    if (message.sender.id !== userId) {
+      throw new ForbiddenException('You do not have access to this message');
+    }
+
+    return this.messageRepository.delete(message);
+  }
 }

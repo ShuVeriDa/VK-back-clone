@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Param,
@@ -44,5 +45,11 @@ export class MessageController {
   @Auth('user')
   create(@Body() dto: CreateMessageDto, @User('id') userId: string) {
     return this.messageService.create(dto, userId);
+  }
+
+  @Delete(':id')
+  @Auth('user')
+  delete(@Param('id') messageId: string, @User('id') userId: string) {
+    return this.messageService.delete(messageId, userId);
   }
 }
