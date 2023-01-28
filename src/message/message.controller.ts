@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpCode,
+  Param,
   Post,
   UsePipes,
   ValidationPipe,
@@ -20,6 +21,15 @@ export class MessageController {
   @Auth('user')
   getAll(@User('id') userId: string) {
     return this.messageService.getAll(userId);
+  }
+
+  @Get(':id')
+  @Auth()
+  getAllByRecipientId(
+    @Param('id') recipientId: string,
+    @User('id') userId: string,
+  ) {
+    return this.messageService.getAllByRecipientId(recipientId, userId);
   }
 
   @UsePipes(new ValidationPipe())

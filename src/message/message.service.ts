@@ -1,13 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MessageEntity } from './entity/message.entity';
 import { Repository } from 'typeorm';
 import { CreateMessageDto } from './dto/create.dto';
+import { UserEntity } from '../user/entity/user.entity';
 
 @Injectable()
 export class MessageService {
   @InjectRepository(MessageEntity)
   private readonly messageRepository: Repository<MessageEntity>;
+
+  @InjectRepository(UserEntity)
+  private readonly userRepository: Repository<UserEntity>;
 
   async getAll(userId: string) {
     const messages = await this.messageRepository.find({
@@ -19,6 +23,44 @@ export class MessageService {
       delete m.recipient.password;
       return m;
     });
+  }
+
+  async getAllByRecipientId(recipientId: string, userId: string) {
+    const recipient = await this.userRepository.findOne({
+      where: { id: recipientId },
+    });
+
+    if (!recipient) throw new NotFoundException('Recipient not found');
+
+    const myMessages = await this.messageRepository.find({
+      where: { recipient: { id: recipientId }, sender: { id: userId } },
+    });
+
+    const hisMessages = await this.messageRepository.find({
+      where: { recipient: { id: userId }, sender: { id: recipientId } },
+    });
+
+    myMessages.map((m) => {
+      delete m.sender.password;
+      delete m.recipient.password;
+      return m;
+    });
+
+    hisMessages.map((m) => {
+      delete m.sender.password;
+      delete m.recipient.password;
+      return m;
+    });
+
+    const allOurSorteredMessages = myMessages
+      .concat(hisMessages)
+      .sort((a, b) => {
+        if (a.createdAt > b.createdAt) return 1;
+        if (a.createdAt < b.createdAt) return -1;
+        return 0;
+      });
+
+    return allOurSorteredMessages;
   }
 
   async create(dto: CreateMessageDto, userId: string) {
