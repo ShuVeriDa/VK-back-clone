@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostEntity } from './entity/post.entity';
 import { Repository } from 'typeorm';
@@ -120,8 +124,8 @@ export class PostService {
     const post = await this.postRepository.findOneBy({ id });
     if (!post) throw new NotFoundException('Post not found');
 
-    if (post.user.id !== userId)
-      throw new NotFoundException("You don't have not access to this post");
+    if (String(post.user.id) !== String(userId))
+      throw new ForbiddenException("You don't have not access to this post");
 
     return this.postRepository.delete(id);
   }

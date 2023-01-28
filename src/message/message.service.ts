@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MessageEntity } from './entity/message.entity';
 import { Repository } from 'typeorm';
@@ -61,6 +65,23 @@ export class MessageService {
       });
 
     return allOurSorteredMessages;
+  }
+
+  async getOneById(messageId: string, userId: string) {
+    const message = await this.messageRepository.findOne({
+      where: { id: messageId },
+    });
+
+    if (!message) throw new NotFoundException('Message not found');
+
+    if (message.sender.id !== userId) {
+      throw new ForbiddenException('You do not have access to this message');
+    }
+
+    delete message.sender.password;
+    delete message.recipient.password;
+
+    return message;
   }
 
   async create(dto: CreateMessageDto, userId: string) {
