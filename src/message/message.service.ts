@@ -9,6 +9,18 @@ export class MessageService {
   @InjectRepository(MessageEntity)
   private readonly messageRepository: Repository<MessageEntity>;
 
+  async getAll(userId: string) {
+    const messages = await this.messageRepository.find({
+      where: { sender: { id: userId } },
+    });
+
+    return messages.map((m) => {
+      delete m.sender.password;
+      delete m.recipient.password;
+      return m;
+    });
+  }
+
   async create(dto: CreateMessageDto, userId: string) {
     const createMessage = await this.messageRepository.save({
       message: dto.message,

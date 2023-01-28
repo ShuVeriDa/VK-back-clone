@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   Post,
   UsePipes,
@@ -14,6 +15,12 @@ import { CreateMessageDto } from './dto/create.dto';
 @Controller('messages')
 export class MessageController {
   constructor(private readonly messageService: MessageService) {}
+
+  @Get()
+  @Auth('user')
+  getAll(@User('id') userId: string) {
+    return this.messageService.getAll(userId);
+  }
 
   @UsePipes(new ValidationPipe())
   @Post()
