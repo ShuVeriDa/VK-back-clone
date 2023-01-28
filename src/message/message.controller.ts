@@ -6,6 +6,7 @@ import {
   HttpCode,
   Param,
   Post,
+  Put,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -13,6 +14,7 @@ import { Auth } from '../auth/decorators/auth.decorator';
 import { User } from '../user/decorators/user.decorator';
 import { MessageService } from './message.service';
 import { CreateMessageDto } from './dto/create.dto';
+import { UpdateMessageDto } from './dto/update.dto';
 
 @Controller('messages')
 export class MessageController {
@@ -45,6 +47,18 @@ export class MessageController {
   @Auth('user')
   create(@Body() dto: CreateMessageDto, @User('id') userId: string) {
     return this.messageService.create(dto, userId);
+  }
+
+  @UsePipes(new ValidationPipe())
+  @Put(':id')
+  @HttpCode(200)
+  @Auth('user')
+  update(
+    @Body() dto: UpdateMessageDto,
+    @Param('id') messageId: string,
+    @User('id') userId: string,
+  ) {
+    return this.messageService.update(dto, messageId, userId);
   }
 
   @Delete(':id')

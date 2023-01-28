@@ -8,6 +8,7 @@ import { MessageEntity } from './entity/message.entity';
 import { Repository } from 'typeorm';
 import { CreateMessageDto } from './dto/create.dto';
 import { UserEntity } from '../user/entity/user.entity';
+import { UpdateMessageDto } from './dto/update.dto';
 
 @Injectable()
 export class MessageService {
@@ -100,6 +101,36 @@ export class MessageService {
     delete message.sender.password;
 
     return message;
+  }
+
+  async update(dto: UpdateMessageDto, messageId: string, userId: string) {
+    const message = await this.messageRepository.findOne({
+      where: { id: messageId },
+    });
+
+    if (!message) throw new NotFoundException('Message not found');
+
+    if (message.sender.id !== userId) {
+      throw new ForbiddenException('You do not have access to this message');
+    }
+
+    await this.messageRepository.update(
+      {
+        id: message.id,
+      },
+      {
+        message: dto.message,
+      },
+    );
+
+    const updatedMessage = await this.messageRepository.findOne({
+      where: { id: messageId },
+    });
+
+    delete updatedMessage.recipient.password;
+    delete updatedMessage.sender.password;
+
+    return updatedMessage;
   }
 
   async delete(messageId: string, userId: string) {
