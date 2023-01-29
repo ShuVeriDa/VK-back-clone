@@ -54,12 +54,26 @@ export class MessageService {
 
     hisMessages.map((m) => {
       delete m.sender.password;
+      m.read = true;
+      m.readAt = new Date();
+      delete m.recipient.password;
+      return m;
+    });
+
+    await this.messageRepository.save(hisMessages);
+
+    const markHisMessages = await this.messageRepository.find({
+      where: { recipient: { id: userId }, sender: { id: recipientId } },
+    });
+
+    markHisMessages.map((m) => {
+      delete m.sender.password;
       delete m.recipient.password;
       return m;
     });
 
     const allOurSorteredMessages = myMessages
-      .concat(hisMessages)
+      .concat(markHisMessages)
       .sort((a, b) => {
         if (a.createdAt > b.createdAt) return 1;
         if (a.createdAt < b.createdAt) return -1;

@@ -7,7 +7,10 @@ export const markAsRead = async (
 ) => {
   await messageRepos.update(
     { id: messageId },
-    { read: true, readAt: new Date() },
+    {
+      read: true,
+      readAt: new Date(),
+    },
   );
   const readMessage = await messageRepos.findOne({
     where: { id: messageId },
