@@ -10,6 +10,7 @@ import { CreateMessageDto } from './dto/create.dto';
 import { UserEntity } from '../user/entity/user.entity';
 import { UpdateMessageDto } from './dto/update.dto';
 import { markAsRead } from '../components/forServices/markAsRead';
+import { validationMessage } from '../components/forServices/validationMessage';
 
 @Injectable()
 export class MessageService {
@@ -84,13 +85,12 @@ export class MessageService {
   }
 
   async getOneById(messageId: string, userId: string) {
-    const message = await this.messageRepository.findOne({
-      where: { id: messageId },
-    });
+    const { message } = await validationMessage(
+      messageId,
+      this.messageRepository,
+    );
 
-    if (!message) throw new NotFoundException('Message not found');
-
-    // if (message.sender.id !== userId) {
+    // if (message.sender.id !== userId ) {
     //   throw new ForbiddenException('You do not have access to this message');
     // }
 
@@ -125,11 +125,10 @@ export class MessageService {
   }
 
   async update(dto: UpdateMessageDto, messageId: string, userId: string) {
-    const message = await this.messageRepository.findOne({
-      where: { id: messageId },
-    });
-
-    if (!message) throw new NotFoundException('Message not found');
+    const { message } = await validationMessage(
+      messageId,
+      this.messageRepository,
+    );
 
     if (message.sender.id !== userId) {
       throw new ForbiddenException('You do not have access to this message');
@@ -155,16 +154,19 @@ export class MessageService {
   }
 
   async delete(messageId: string, userId: string) {
-    const message = await this.messageRepository.findOne({
-      where: { id: messageId },
-    });
-
-    if (!message) throw new NotFoundException('Message not found');
+    const { message } = await validationMessage(
+      messageId,
+      this.messageRepository,
+    );
 
     if (message.sender.id !== userId) {
       throw new ForbiddenException('You do not have access to this message');
     }
 
-    return this.messageRepository.delete(message);
+    delete message.sender.password;
+    delete message.recipient.password;
+
+    await this.messageRepository.remove(message);
+    return message;
   }
 }

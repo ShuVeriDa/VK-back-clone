@@ -25,15 +25,15 @@ export class MessageEntity {
   @JoinColumn({ name: 'recipientId' })
   recipient: UserEntity;
 
-  @CreateDateColumn({ type: 'timestamp' })
-  createdAt: Date;
-
-  @UpdateDateColumn({ type: 'timestamp' })
-  updateAt: Date;
-
   @Column({ default: false })
   read: boolean;
 
   @UpdateDateColumn()
   readAt: Date;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updateAt: Date;
 }
