@@ -36,10 +36,4 @@ export class MessageEntity {
 
   @UpdateDateColumn()
   readAt: Date;
-
-  @Column({ default: false })
-  deleted: boolean;
-
-  @UpdateDateColumn()
-  deletedAt: Date;
 }

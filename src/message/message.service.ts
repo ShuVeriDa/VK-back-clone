@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { CreateMessageDto } from './dto/create.dto';
 import { UserEntity } from '../user/entity/user.entity';
 import { UpdateMessageDto } from './dto/update.dto';
+import { markAsRead } from '../components/forServices/markAsRead';
 
 @Injectable()
 export class MessageService {
@@ -75,8 +76,14 @@ export class MessageService {
 
     if (!message) throw new NotFoundException('Message not found');
 
+    // if (message.sender.id !== userId) {
+    //   throw new ForbiddenException('You do not have access to this message');
+    // }
+
     if (message.sender.id !== userId) {
-      throw new ForbiddenException('You do not have access to this message');
+      if (!message.read) {
+        return await markAsRead(messageId, this.messageRepository);
+      }
     }
 
     delete message.sender.password;
