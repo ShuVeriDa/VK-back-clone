@@ -11,6 +11,7 @@ import { UserEntity } from '../user/entity/user.entity';
 import { subscribeAndUnSubscribe } from '../components/forServices/subscribeAndUnSubscribe';
 import { validationCommunity } from '../components/forServices/validationCommunity';
 import { AddAdminCommunityDto } from './dto/addAdmin.dto';
+import { addAndRemoveAdmin } from '../components/forServices/addAndRemoveAdmin';
 
 @Injectable()
 export class CommunityService {
@@ -131,56 +132,14 @@ export class CommunityService {
     communityId: string,
     userId: string,
   ) {
-    const community = await this.communityRepository.findOne({
-      where: { id: communityId },
-      relations: ['members', 'admins'],
-    });
-
-    if (!community) throw new NotFoundException('Community not found');
-
-    const isMember = community.members.find(
-      (member) => String(member.id) === dto.memberId,
+    return await addAndRemoveAdmin(
+      dto,
+      communityId,
+      this.communityRepository,
+      userId,
+      this.userRepository,
+      'add',
     );
-
-    if (!isMember) throw new NotFoundException('Member not found');
-
-    const memberIsAdmin = community.admins.find(
-      (admin) => String(admin.id) === dto.memberId,
-    );
-
-    if (memberIsAdmin)
-      throw new ForbiddenException('The member is already an admin');
-
-    const userIsAdmin = community.admins.find(
-      (admin) => String(admin.id) === String(userId),
-    );
-
-    if (!userIsAdmin)
-      throw new ForbiddenException('You do not have permission');
-
-    await this.communityRepository.save({
-      ...community,
-      admins: [...community.admins, { id: dto.memberId }],
-    });
-
-    const existAdmin = await this.communityRepository.findOne({
-      where: { id: communityId },
-      relations: ['members', 'admins'],
-    });
-
-    delete existAdmin.author.password;
-
-    existAdmin.admins.map((a) => {
-      delete a.password;
-      return a;
-    });
-
-    existAdmin.members.map((m) => {
-      delete m.password;
-      return m;
-    });
-
-    return existAdmin;
   }
 
   async removeFromAdmin(
@@ -188,54 +147,13 @@ export class CommunityService {
     communityId: string,
     userId: string,
   ) {
-    const community = await this.communityRepository.findOne({
-      where: { id: communityId },
-      relations: ['members', 'admins'],
-    });
-
-    if (!community) throw new NotFoundException('Community not found');
-
-    const isMember = community.members.find(
-      (member) => String(member.id) === dto.memberId,
+    return await addAndRemoveAdmin(
+      dto,
+      communityId,
+      this.communityRepository,
+      userId,
+      this.userRepository,
+      'remove',
     );
-
-    if (!isMember) throw new NotFoundException('Member not found');
-
-    const memberIsAdmin = community.admins.find(
-      (admin) => String(admin.id) === dto.memberId,
-    );
-
-    if (!memberIsAdmin) throw new ForbiddenException('The member is not admin');
-
-    const userIsAdmin = community.admins.find(
-      (admin) => String(admin.id) === String(userId),
-    );
-
-    if (!userIsAdmin)
-      throw new ForbiddenException('You do not have permission');
-
-    community.admins = community.admins.filter(
-      (admin) => String(admin.id) !== dto.memberId,
-    );
-    await this.communityRepository.save(community);
-
-    const existAdmin = await this.communityRepository.findOne({
-      where: { id: communityId },
-      relations: ['members', 'admins'],
-    });
-
-    delete existAdmin.author.password;
-
-    existAdmin.admins.map((a) => {
-      delete a.password;
-      return a;
-    });
-
-    existAdmin.members.map((m) => {
-      delete m.password;
-      return m;
-    });
-
-    return existAdmin;
   }
 }
