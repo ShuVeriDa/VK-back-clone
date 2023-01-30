@@ -58,7 +58,7 @@ export class CommunityController {
     return this.communityService.unsubscribe(communityId, userId);
   }
 
-  @Post('addadmin/:id')
+  @Post('admin/:id')
   @UseGuards(JwtAuthGuard)
   @Auth('user')
   addAdmin(
@@ -67,5 +67,16 @@ export class CommunityController {
     @User('id') userId: string,
   ) {
     return this.communityService.addAdmin(dto, communityId, userId);
+  }
+
+  @Delete('admin/:id')
+  @UseGuards(JwtAuthGuard)
+  @Auth('user')
+  removeFromAdmin(
+    @Body() dto: AddAdminCommunityDto,
+    @Param('id') communityId: string,
+    @User('id') userId: string,
+  ) {
+    return this.communityService.removeFromAdmin(dto, communityId, userId);
   }
 }

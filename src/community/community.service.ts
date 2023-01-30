@@ -138,12 +138,10 @@ export class CommunityService {
 
     if (!community) throw new NotFoundException('Community not found');
 
-    console.log(dto.memberId);
-
     const isMember = community.members.find(
       (member) => String(member.id) === dto.memberId,
     );
-    console.log(isMember);
+
     if (!isMember) throw new NotFoundException('Member not found');
 
     const memberIsAdmin = community.admins.find(
@@ -158,14 +156,68 @@ export class CommunityService {
     );
 
     if (!userIsAdmin)
-      throw new ForbiddenException(
-        'You do not have permission to add the member to admins',
-      );
+      throw new ForbiddenException('You do not have permission');
 
     await this.communityRepository.save({
       ...community,
       admins: [...community.admins, { id: dto.memberId }],
     });
+
+    const existAdmin = await this.communityRepository.findOne({
+      where: { id: communityId },
+      relations: ['members', 'admins'],
+    });
+
+    delete existAdmin.author.password;
+
+    existAdmin.admins.map((a) => {
+      delete a.password;
+      return a;
+    });
+
+    existAdmin.members.map((m) => {
+      delete m.password;
+      return m;
+    });
+
+    return existAdmin;
+  }
+
+  async removeFromAdmin(
+    dto: AddAdminCommunityDto,
+    communityId: string,
+    userId: string,
+  ) {
+    const community = await this.communityRepository.findOne({
+      where: { id: communityId },
+      relations: ['members', 'admins'],
+    });
+
+    if (!community) throw new NotFoundException('Community not found');
+
+    const isMember = community.members.find(
+      (member) => String(member.id) === dto.memberId,
+    );
+
+    if (!isMember) throw new NotFoundException('Member not found');
+
+    const memberIsAdmin = community.admins.find(
+      (admin) => String(admin.id) === dto.memberId,
+    );
+
+    if (!memberIsAdmin) throw new ForbiddenException('The member is not admin');
+
+    const userIsAdmin = community.admins.find(
+      (admin) => String(admin.id) === String(userId),
+    );
+
+    if (!userIsAdmin)
+      throw new ForbiddenException('You do not have permission');
+
+    community.admins = community.admins.filter(
+      (admin) => String(admin.id) !== dto.memberId,
+    );
+    await this.communityRepository.save(community);
 
     const existAdmin = await this.communityRepository.findOne({
       where: { id: communityId },
