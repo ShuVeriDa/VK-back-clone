@@ -62,15 +62,21 @@ export class CommunityService {
       imageUrl: dto.imageUrl,
       isAdmin: true,
       members: [{ id: userId }],
+      admins: [{ id: userId }],
       author: { id: userId },
     });
 
     const existedCommunity = await this.communityRepository.findOne({
       where: { id: community.id },
-      relations: ['members'],
+      relations: ['members', 'admins'],
     });
 
     existedCommunity.members.map((m) => {
+      delete m.password;
+      return m;
+    });
+
+    existedCommunity.admins.map((m) => {
       delete m.password;
       return m;
     });

@@ -231,6 +231,11 @@ export class PostService {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) throw new NotFoundException(`User with id ${userId} not found`);
 
+    // const isAdmin = community.admins.includes(user);
+    // console.log(isAdmin);
+    //
+    // if (!isAdmin) throw new ForbiddenException('You have no rights!');
+
     const post = await this.postRepository.save({
       text: dto.text,
       user: { id: user.id },

@@ -28,8 +28,8 @@ export class CommunityEntity {
   @Column()
   imageUrl: string;
 
-  @Column({ default: false })
-  isAdmin: boolean;
+  // @Column({ default: false })
+  // isAdmin: boolean;
 
   @OneToMany(() => PostEntity, (post) => post.community)
   posts: PostEntity[];
@@ -42,7 +42,14 @@ export class CommunityEntity {
   @JoinColumn({ name: 'memberId' })
   members: UserEntity[];
 
-  @ManyToOne(() => UserEntity, { eager: true, nullable: false })
+  @ManyToMany(() => UserEntity, (user) => user.communities, {
+    eager: true,
+    nullable: false,
+  })
+  @JoinTable({ name: 'adminId' })
+  admins: UserEntity[];
+
+  @ManyToOne(() => UserEntity, { eager: true })
   @JoinColumn({ name: 'authorId' })
   author: UserEntity;
 
