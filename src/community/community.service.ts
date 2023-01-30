@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommunityEntity } from './entity/community.entity';
 import { Repository } from 'typeorm';
@@ -6,6 +10,7 @@ import { CreateCommunityDto } from './dto/create.dto';
 import { UserEntity } from '../user/entity/user.entity';
 import { subscribeAndUnSubscribe } from '../components/forServices/subscribeAndUnSubscribe';
 import { validationCommunity } from '../components/forServices/validationCommunity';
+import { AddAdminCommunityDto } from './dto/addAdmin.dto';
 
 @Injectable()
 export class CommunityService {
@@ -119,5 +124,66 @@ export class CommunityService {
       this.userRepository,
       'unsubscribe',
     );
+  }
+
+  async addAdmin(
+    dto: AddAdminCommunityDto,
+    communityId: string,
+    userId: string,
+  ) {
+    const community = await this.communityRepository.findOne({
+      where: { id: communityId },
+      relations: ['members', 'admins'],
+    });
+
+    if (!community) throw new NotFoundException('Community not found');
+
+    console.log(dto.memberId);
+
+    const isMember = community.members.find(
+      (member) => String(member.id) === dto.memberId,
+    );
+    console.log(isMember);
+    if (!isMember) throw new NotFoundException('Member not found');
+
+    const memberIsAdmin = community.admins.find(
+      (admin) => String(admin.id) === dto.memberId,
+    );
+
+    if (memberIsAdmin)
+      throw new ForbiddenException('The member is already an admin');
+
+    const userIsAdmin = community.admins.find(
+      (admin) => String(admin.id) === String(userId),
+    );
+
+    if (!userIsAdmin)
+      throw new ForbiddenException(
+        'You do not have permission to add the member to admins',
+      );
+
+    await this.communityRepository.save({
+      ...community,
+      admins: [...community.admins, { id: dto.memberId }],
+    });
+
+    const existAdmin = await this.communityRepository.findOne({
+      where: { id: communityId },
+      relations: ['members', 'admins'],
+    });
+
+    delete existAdmin.author.password;
+
+    existAdmin.admins.map((a) => {
+      delete a.password;
+      return a;
+    });
+
+    existAdmin.members.map((m) => {
+      delete m.password;
+      return m;
+    });
+
+    return existAdmin;
   }
 }

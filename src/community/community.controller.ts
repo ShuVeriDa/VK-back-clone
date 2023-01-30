@@ -16,6 +16,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { CreateCommunityDto } from './dto/create.dto';
 import { CreatePostDto } from '../post/dto/create.dto';
+import { AddAdminCommunityDto } from './dto/addAdmin.dto';
 
 @Controller('community')
 export class CommunityController {
@@ -55,5 +56,16 @@ export class CommunityController {
   @Auth('user')
   unsubscribe(@Param('id') communityId: string, @User('id') userId: string) {
     return this.communityService.unsubscribe(communityId, userId);
+  }
+
+  @Post('addadmin/:id')
+  @UseGuards(JwtAuthGuard)
+  @Auth('user')
+  addAdmin(
+    @Body() dto: AddAdminCommunityDto,
+    @Param('id') communityId: string,
+    @User('id') userId: string,
+  ) {
+    return this.communityService.addAdmin(dto, communityId, userId);
   }
 }

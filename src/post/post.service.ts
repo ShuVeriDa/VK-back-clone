@@ -231,10 +231,10 @@ export class PostService {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) throw new NotFoundException(`User with id ${userId} not found`);
 
-    // const isAdmin = community.admins.includes(user);
-    // console.log(isAdmin);
-    //
-    // if (!isAdmin) throw new ForbiddenException('You have no rights!');
+    const isAdmin = community.admins.find((admin) => admin.id === user.id);
+    console.log(isAdmin);
+
+    if (!isAdmin) throw new ForbiddenException('You have no rights!');
 
     const post = await this.postRepository.save({
       text: dto.text,
@@ -248,6 +248,17 @@ export class PostService {
     });
 
     delete fetchPost.user.password;
+    delete fetchPost.community.author.password;
+
+    fetchPost.community.members.map((m) => {
+      delete m.password;
+      return m;
+    });
+
+    fetchPost.community.admins.map((a) => {
+      delete a.password;
+      return a;
+    });
 
     return fetchPost;
   }
