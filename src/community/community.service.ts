@@ -18,7 +18,6 @@ export class CommunityService {
   constructor(
     @InjectRepository(CommunityEntity)
     private readonly communityRepository: Repository<CommunityEntity>,
-
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
   ) {}
@@ -61,6 +60,7 @@ export class CommunityService {
 
     return community;
   }
+
   async create(dto: CreateCommunityDto, userId: string) {
     const community = await this.communityRepository.save({
       name: dto.name,
@@ -93,18 +93,45 @@ export class CommunityService {
   }
 
   async delete(communityId: string, userId: string) {
-    const { community } = await validationCommunity(
-      communityId,
-      this.communityRepository,
-    );
+    await this.communityRepository.manager.transaction(async (manager) => {
+      const community = await manager.findOne(CommunityEntity, {
+        where: { id: communityId },
+        relations: ['posts', 'posts.comments'],
+      });
 
-    if (String(community.author.id) !== String(userId)) {
-      throw new ForbiddenException(
-        'This user does not have permission to delete this community',
-      );
-    }
+      if (!community) {
+        throw new NotFoundException('Community not found');
+      }
 
-    return this.communityRepository.remove(community);
+      if (String(community.author.id) !== String(userId)) {
+        throw new ForbiddenException(
+          'This user does not have permission to delete this community',
+        );
+      }
+
+      const posts = community.posts;
+      for (const post of posts) {
+        const comments = await manager.find(CommunityEntity, {
+          where: { posts: post },
+        });
+        await manager.remove(comments);
+        await manager.remove(post);
+      }
+      await manager.remove(community);
+    });
+
+    // const { community } = await validationCommunity(
+    //   communityId,
+    //   this.communityRepository,
+    // );
+    //
+    // if (String(community.author.id) !== String(userId)) {
+    //   throw new ForbiddenException(
+    //     'This user does not have permission to delete this community',
+    //   );
+    // }
+    //
+    // return this.communityRepository.remove(community);
   }
 
   async subscribe(communityId: string, userId: string) {
