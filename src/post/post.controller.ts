@@ -58,8 +58,8 @@ export class PostController {
 
   @Delete(':id')
   @Auth('user')
-  delete(@Param('id') id: string, @User('id') userId: string) {
-    return this.postService.delete(id, userId);
+  delete(@Param('id') postId: string, @User('id') userId: string) {
+    return this.postService.delete(postId, userId);
   }
 
   @Post(':id/favorites')

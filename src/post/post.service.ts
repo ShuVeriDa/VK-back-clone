@@ -120,14 +120,33 @@ export class PostService {
     return fetchPost;
   }
 
-  async delete(id: string, userId: string) {
-    const post = await this.postRepository.findOneBy({ id });
-    if (!post) throw new NotFoundException('Post not found');
+  async delete(postId: string, userId: string) {
+    await this.communityRepository.manager.transaction(async (manager) => {
+      const post = await manager.findOne(PostEntity, {
+        where: { id: postId },
+        relations: ['comments'],
+      });
 
-    if (String(post.user.id) !== String(userId))
-      throw new ForbiddenException("You don't have not access to this post");
+      if (!post) throw new NotFoundException('Post not found');
 
-    return this.postRepository.delete(id);
+      if (String(post.user.id) !== String(userId))
+        throw new ForbiddenException("You don't have not access to this post");
+
+      const comments = post.comments;
+      for (const comment of comments) {
+        await manager.remove(comment);
+      }
+
+      await manager.remove(post);
+    });
+
+    // const post = await this.postRepository.findOneBy({ id: postId });
+    // if (!post) throw new NotFoundException('Post not found');
+    //
+    // if (String(post.user.id) !== String(userId))
+    //   throw new ForbiddenException("You don't have not access to this post");
+    //
+    // return this.postRepository.delete(postId);
   }
 
   async addToFavorites(id: string, userId: string) {
