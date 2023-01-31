@@ -317,26 +317,62 @@ export class PostService {
   }
 
   async postDeleteInCommunity(postId: string, userId: string) {
-    const post = await this.postRepository.findOne({
-      where: { id: postId },
-      relations: ['community'],
+    await this.communityRepository.manager.transaction(async (manager) => {
+      const post = await manager.findOne(PostEntity, {
+        where: { id: postId },
+        relations: ['community'],
+      });
+
+      if (!post) throw new NotFoundException(`Post not found`);
+
+      const community = await this.communityRepository.findOne({
+        where: { id: post.community.id },
+        relations: ['members', 'admins'],
+      });
+
+      if (!community) throw new NotFoundException(`Community not found`);
+
+      const user = await this.userRepository.findOne({ where: { id: userId } });
+
+      if (!user)
+        throw new NotFoundException(`User with id ${userId} not found`);
+
+      const isAdmin = community.admins.find((admin) => admin.id === user.id);
+
+      if (post.user.id !== userId || !isAdmin)
+        throw new NotFoundException("You don't have not access to this post");
+
+      const comments = post.comments;
+      for (const comment of comments) {
+        await manager.remove(comment);
+      }
+
+      await manager.remove(post);
     });
-
-    if (!post) throw new NotFoundException(`Post not found`);
-
-    const community = await this.communityRepository.findOne({
-      where: { id: post.community.id },
-      relations: ['members'],
-    });
-
-    if (!community) throw new NotFoundException(`Community not found`);
-
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-    if (!user) throw new NotFoundException(`User with id ${userId} not found`);
-
-    if (post.user.id !== userId)
-      throw new NotFoundException("You don't have not access to this post");
-
-    return await this.postRepository.delete(postId);
   }
+  //   const post = await this.postRepository.findOne({
+  //     where: { id: postId },
+  //     relations: ['community'],
+  //   });
+  //
+  //   if (!post) throw new NotFoundException(`Post not found`);
+  //
+  //   const community = await this.communityRepository.findOne({
+  //     where: { id: post.community.id },
+  //     relations: ['members', 'admins'],
+  //   });
+  //
+  //   if (!community) throw new NotFoundException(`Community not found`);
+  //
+  //   const user = await this.userRepository.findOne({ where: { id: userId } });
+  //
+  //   if (!user) throw new NotFoundException(`User with id ${userId} not found`);
+  //
+  //   const isAdmin = community.admins.find((admin) => admin.id === user.id);
+  //
+  //   if (post.user.id !== userId || !isAdmin)
+  //     throw new NotFoundException("You don't have not access to this post");
+  //
+  //   return await this.postRepository.delete(postId);
+  // }
 }
