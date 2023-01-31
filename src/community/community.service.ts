@@ -37,6 +37,10 @@ export class CommunityService {
         delete p.user.password;
         return p;
       });
+      c.admins.map((a) => {
+        delete a.password;
+        return a;
+      });
       return c;
     });
   }
@@ -55,10 +59,14 @@ export class CommunityService {
       delete p.user.password;
       return p;
     });
+    community.admins.map((a) => {
+      delete a.password;
+      return a;
+    });
 
     delete community.author.password;
 
-    return community;
+    return community.admins;
   }
 
   async create(dto: CreateCommunityDto, userId: string) {
