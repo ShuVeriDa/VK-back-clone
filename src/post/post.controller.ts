@@ -105,7 +105,6 @@ export class PostController {
   }
 
   @Post('community')
-  @UseGuards(JwtAuthGuard)
   @Auth('user')
   postCreateInCommunity(
     @Body() dto: CreatePostDto,
@@ -115,7 +114,6 @@ export class PostController {
   }
 
   @Put('community/:id')
-  @UseGuards(JwtAuthGuard)
   @Auth('user')
   postUpdateInCommunity(
     @Body() dto: UpdatePostDto,
@@ -126,7 +124,6 @@ export class PostController {
   }
 
   @Delete('community/:id')
-  @UseGuards(JwtAuthGuard)
   @Auth('user')
   postDeleteInCommunity(
     @Param('id') postId: string,

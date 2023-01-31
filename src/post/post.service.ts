@@ -232,7 +232,6 @@ export class PostService {
     if (!user) throw new NotFoundException(`User with id ${userId} not found`);
 
     const isAdmin = community.admins.find((admin) => admin.id === user.id);
-    console.log(isAdmin);
 
     if (!isAdmin) throw new ForbiddenException('You have no rights!');
 

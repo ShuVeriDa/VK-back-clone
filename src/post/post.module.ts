@@ -6,6 +6,7 @@ import { PostEntity } from './entity/post.entity';
 import { UserEntity } from '../user/entity/user.entity';
 import { UserModule } from '../user/user.module';
 import { CommunityEntity } from '../community/entity/community.entity';
+import { CommunityService } from '../community/community.service';
 
 @Module({
   imports: [
@@ -13,6 +14,6 @@ import { CommunityEntity } from '../community/entity/community.entity';
     // UserModule,
   ],
   controllers: [PostController],
-  providers: [PostService],
+  providers: [PostService, CommunityService],
 })
 export class PostModule {}

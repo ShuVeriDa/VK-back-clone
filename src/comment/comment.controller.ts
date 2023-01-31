@@ -35,14 +35,12 @@ export class CommentController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard)
   @Auth('user')
   create(@Body() dto: CreateCommentDto, @User('id') userId: string) {
     return this.commentService.create(dto, userId);
   }
 
   @Put(':id')
-  @UseGuards(JwtAuthGuard)
   @Auth('user')
   update(
     @Param('id') id: string,
@@ -53,8 +51,7 @@ export class CommentController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
-  @Auth()
+  @Auth('user')
   remove(@Param('id') id: string, @User('id') userId: string) {
     return this.commentService.remove(id, userId);
   }

@@ -53,7 +53,6 @@ export class FriendController {
   }
 
   @UsePipes(new ValidationPipe())
-  @UseGuards(JwtAuthGuard)
   @Post(':id')
   @HttpCode(200)
   @Auth('user')
