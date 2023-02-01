@@ -124,12 +124,14 @@ export class PostService {
     await this.communityRepository.manager.transaction(async (manager) => {
       const post = await manager.findOne(PostEntity, {
         where: { id: postId },
-        relations: ['comments'],
+        relations: ['comments', 'community'],
       });
 
       if (!post) throw new NotFoundException('Post not found');
 
-      if (String(post.user.id) !== String(userId))
+      const isCommunity = post.community;
+
+      if (String(post.user.id) !== String(userId) || isCommunity)
         throw new ForbiddenException("You don't have not access to this post");
 
       const comments = post.comments;

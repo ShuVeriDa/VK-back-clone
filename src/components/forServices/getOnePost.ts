@@ -5,8 +5,12 @@ import { NotFoundException } from '@nestjs/common';
 export const getOnePost = async (
   id: string,
   postRepos: Repository<PostEntity>,
+  userId?: string,
 ) => {
-  const post = await postRepos.findOneBy({ id });
+  const post = await postRepos.findOne({
+    where: { id },
+    relations: ['community'],
+  });
 
   if (!post) throw new NotFoundException('Post not found');
 
