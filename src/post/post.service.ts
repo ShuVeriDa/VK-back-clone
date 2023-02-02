@@ -41,6 +41,39 @@ export class PostService {
     });
   }
 
+  async getMyPosts(userId: string) {
+    const posts = await this.postRepository.find({
+      where: { user: { id: userId } },
+      relations: ['community'],
+    });
+
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['reposts'],
+    });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    posts.map((p) => {
+      delete p.user.password;
+      return p;
+    });
+
+    const reposts = user.reposts.map((post) => {
+      delete post.user.password;
+      return post;
+    });
+
+    const filteredPosts = posts.filter((post) => post.community === null);
+    const combinedPosts = filteredPosts.concat(reposts).sort((a, b) => {
+      if (a.createdAt > b.createdAt) return 1;
+      if (a.createdAt < b.createdAt) return -1;
+      return 0;
+    });
+
+    return combinedPosts;
+  }
+
   async search(dto: SearchPostDto) {
     const qb = this.postRepository.createQueryBuilder('posts');
 

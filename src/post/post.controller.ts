@@ -30,6 +30,11 @@ export class PostController {
     return this.postService.findAll();
   }
 
+  @Get('myposts/:id')
+  getMyPosts(@Param('id') userId: string) {
+    return this.postService.getMyPosts(userId);
+  }
+
   @Get('/search')
   search(@Query() dto: SearchPostDto) {
     return this.postService.search(dto);

@@ -18,6 +18,7 @@ export class CommunityController {
   getOne(@Param('id') communityId: string) {
     return this.communityService.getOne(communityId);
   }
+
   @Post()
   @Auth('user')
   create(@Body() dto: CreateCommunityDto, @User('id') userId: string) {
