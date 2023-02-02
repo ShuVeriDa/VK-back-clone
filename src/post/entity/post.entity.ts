@@ -20,6 +20,15 @@ export class PostEntity {
   @Column()
   text: string;
 
+  @Column({ nullable: true })
+  imageUrl: string | null;
+
+  @Column({ nullable: true })
+  musicUrl: string | null;
+
+  @Column({ nullable: true })
+  videoUrl: string | null;
+
   @ManyToOne(() => UserEntity, { eager: true, nullable: false })
   user: UserEntity;
 

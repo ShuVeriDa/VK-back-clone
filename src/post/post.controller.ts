@@ -8,7 +8,6 @@ import {
   Post,
   Put,
   Query,
-  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -18,7 +17,6 @@ import { CreatePostDto } from './dto/create.dto';
 import { User } from '../user/decorators/user.decorator';
 import { SearchPostDto } from './dto/search.dto';
 import { UpdatePostDto } from './dto/update.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { FetchPostDto } from './dto/fetch.dto';
 
 @Controller('posts')

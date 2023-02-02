@@ -124,6 +124,9 @@ export class PostService {
   async create(dto: CreatePostDto, userId: string) {
     const post = await this.postRepository.save({
       text: dto.text,
+      imageUrl: dto.imageUrl,
+      musicUrl: dto.musicUrl,
+      videoUrl: dto.videoUrl,
       user: { id: userId },
     });
 
@@ -143,7 +146,12 @@ export class PostService {
       {
         id: id,
       },
-      { text: dto.text },
+      {
+        text: dto.text,
+        imageUrl: dto.imageUrl,
+        musicUrl: dto.musicUrl,
+        videoUrl: dto.videoUrl,
+      },
     );
 
     const fetchPost = await this.postRepository.findOneBy({ id: id });
@@ -291,6 +299,9 @@ export class PostService {
 
     const post = await this.postRepository.save({
       text: dto.text,
+      imageUrl: dto.imageUrl,
+      musicUrl: dto.musicUrl,
+      videoUrl: dto.videoUrl,
       user: { id: user.id },
       community: { id: community.id },
     });
@@ -338,6 +349,9 @@ export class PostService {
       { id: postId },
       {
         text: dto.text,
+        imageUrl: dto.imageUrl,
+        musicUrl: dto.musicUrl,
+        videoUrl: dto.videoUrl,
       },
     );
 
