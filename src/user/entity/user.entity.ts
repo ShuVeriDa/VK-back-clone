@@ -81,6 +81,12 @@ export class UserEntity {
   @JoinTable()
   music: MusicEntity[];
 
+  // @OneToMany(() => MusicEntity, (music) => music.user, {
+  //   eager: false,
+  //   nullable: true,
+  // })
+  // music: MusicEntity[];
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 

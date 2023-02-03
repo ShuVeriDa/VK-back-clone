@@ -91,4 +91,17 @@ export class MusicService {
 
     return await this.getOne(music.id);
   }
+
+  async delete(musicId: string, userId: string) {
+    const music = await this.getOne(musicId);
+
+    if (!music) throw new NotFoundException(music);
+
+    const isAuthor = music.user.id === userId;
+
+    if (!isAuthor)
+      throw new ForbiddenException("You don't have access to this message");
+
+    return await this.musicRepository.delete(music.id);
+  }
 }

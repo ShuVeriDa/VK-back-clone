@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Param,
@@ -47,5 +48,11 @@ export class MusicController {
     @User('id') userId: string,
   ) {
     return this.musicService.update(dto, musicId, userId);
+  }
+
+  @Delete(':id')
+  @Auth('user')
+  delete(@Param('id') musicId: string, @User('id') userId: string) {
+    return this.musicService.delete(musicId, userId);
   }
 }
