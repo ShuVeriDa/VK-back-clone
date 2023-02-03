@@ -1,6 +1,6 @@
 import { IsOptional, IsString } from 'class-validator';
 
-export class CreateMusicDto {
+export class UpdateMusicDto {
   @IsOptional()
   @IsString()
   title?: string;
