@@ -9,9 +9,6 @@ export class UpdateMusicDto {
   @IsString()
   artist?: string;
 
-  @IsString()
-  musicUrl: string;
-
   @IsOptional()
   @IsString()
   communityId?: string;

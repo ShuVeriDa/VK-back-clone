@@ -37,15 +37,15 @@ export class MusicController {
     return this.musicService.create(dto, userId);
   }
 
-  // @UsePipes(new ValidationPipe())
-  // @Put(':id')
-  // @HttpCode(200)
-  // @Auth('user')
-  // update(
-  //   @Body() dto: UpdateMusicDto,
-  //   @Param('id') musicId: string,
-  //   @User('id') userId: string,
-  // ) {
-  //   return this.musicService.update(dto, musicId, userId);
-  // }
+  @UsePipes(new ValidationPipe())
+  @Put(':id')
+  @HttpCode(200)
+  @Auth('user')
+  update(
+    @Body() dto: UpdateMusicDto,
+    @Param('id') musicId: string,
+    @User('id') userId: string,
+  ) {
+    return this.musicService.update(dto, musicId, userId);
+  }
 }

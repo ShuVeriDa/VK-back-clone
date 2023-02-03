@@ -173,7 +173,7 @@ export class PostService {
       const isCommunity = post.community;
 
       if (String(post.user.id) !== String(userId) || isCommunity)
-        throw new ForbiddenException("You don't have not access to this post");
+        throw new ForbiddenException("You don't have access to this post");
 
       const comments = post.comments;
       for (const comment of comments) {
@@ -187,7 +187,7 @@ export class PostService {
     // if (!post) throw new NotFoundException('Post not found');
     //
     // if (String(post.user.id) !== String(userId))
-    //   throw new ForbiddenException("You don't have not access to this post");
+    //   throw new ForbiddenException("You don't have access to this post");
     //
     // return this.postRepository.delete(postId);
   }
@@ -389,7 +389,7 @@ export class PostService {
       const isAdmin = community.admins.find((admin) => admin.id === user.id);
 
       if (post.user.id !== userId || !isAdmin)
-        throw new NotFoundException("You don't have not access to this post");
+        throw new NotFoundException("You don't have access to this post");
 
       const comments = post.comments;
       for (const comment of comments) {
@@ -420,7 +420,7 @@ export class PostService {
   //   const isAdmin = community.admins.find((admin) => admin.id === user.id);
   //
   //   if (post.user.id !== userId || !isAdmin)
-  //     throw new NotFoundException("You don't have not access to this post");
+  //     throw new NotFoundException("You don't have access to this post");
   //
   //   return await this.postRepository.delete(postId);
   // }
