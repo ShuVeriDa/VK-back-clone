@@ -11,6 +11,18 @@ export class MusicService {
 
   async getAll() {
     const music = await this.musicRepository.find();
+
+    music.map((music) => {
+      delete music.user.password;
+
+      music.musicAdders.map((m) => {
+        delete m.password;
+        return m;
+      });
+
+      return music;
+    });
+
     return music;
   }
 
