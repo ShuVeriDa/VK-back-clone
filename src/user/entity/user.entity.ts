@@ -13,6 +13,7 @@ import { PostEntity } from '../../post/entity/post.entity';
 import { CommentEntity } from '../../comment/entity/comment.entity';
 import { FriendEntity } from '../../friend/entity/friend.entity';
 import { CommunityEntity } from '../../community/entity/community.entity';
+import { MusicEntity } from '../../music/entity/music.entity';
 
 @Entity('user')
 export class UserEntity {
@@ -75,6 +76,10 @@ export class UserEntity {
   @ManyToMany(() => CommunityEntity, (community) => community.members)
   @JoinTable()
   communities: CommunityEntity[];
+
+  @ManyToMany(() => MusicEntity, (music) => music.musicAdders)
+  @JoinTable()
+  music: MusicEntity[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

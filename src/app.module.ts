@@ -16,6 +16,8 @@ import { CommunityModule } from './community/community.module';
 import { CommunityEntity } from './community/entity/community.entity';
 import { MessageModule } from './message/message.module';
 import { MessageEntity } from './message/entity/message.entity';
+import { MusicModule } from './music/music.module';
+import { MusicEntity } from './music/entity/music.entity';
 
 @Module({
   imports: [
@@ -33,6 +35,7 @@ import { MessageEntity } from './message/entity/message.entity';
         FriendEntity,
         CommunityEntity,
         MessageEntity,
+        MusicEntity,
       ],
       synchronize: true,
     }),
@@ -44,6 +47,7 @@ import { MessageEntity } from './message/entity/message.entity';
     FriendModule,
     CommunityModule,
     MessageModule,
+    MusicModule,
   ],
   controllers: [AppController],
   providers: [AppService],
