@@ -35,11 +35,23 @@ export class MusicService {
   }
 
   async getMyMusic(userId: string) {
-    const music = await this.getAll();
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['music'],
+    });
 
-    const myMusic = music.filter((music) => music.user.id === userId);
+    user.music.map((music) => {
+      delete music.user.password;
 
-    return myMusic;
+      music.musicAdders.map((adder) => {
+        delete adder.password;
+        return adder;
+      });
+
+      return music;
+    });
+
+    return user.music;
   }
 
   async getOne(musicId: string) {
