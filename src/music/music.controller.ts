@@ -25,6 +25,12 @@ export class MusicController {
     return this.musicService.getAll();
   }
 
+  @Get('mymusic')
+  @Auth('user')
+  getMyMusic(@User('id') userId: string) {
+    return this.musicService.getMyMusic(userId);
+  }
+
   @Get(':id')
   getOne(@Param('id') musicId: string) {
     return this.musicService.getOne(musicId);
@@ -54,5 +60,13 @@ export class MusicController {
   @Auth('user')
   delete(@Param('id') musicId: string, @User('id') userId: string) {
     return this.musicService.delete(musicId, userId);
+  }
+
+  @UsePipes(new ValidationPipe())
+  @Post('add/:id')
+  @HttpCode(200)
+  @Auth('user')
+  addMusic(@Param('id') musicId: string, @User('id') userId: string) {
+    return this.musicService.addMusic(musicId, userId);
   }
 }

@@ -34,6 +34,14 @@ export class MusicService {
     return music;
   }
 
+  async getMyMusic(userId: string) {
+    const music = await this.getAll();
+
+    const myMusic = music.filter((music) => music.user.id === userId);
+
+    return myMusic;
+  }
+
   async getOne(musicId: string) {
     const music = await this.musicRepository.findOne({
       where: { id: musicId },
@@ -103,5 +111,26 @@ export class MusicService {
       throw new ForbiddenException("You don't have access to this message");
 
     return await this.musicRepository.delete(music.id);
+  }
+
+  async addMusic(musicId: string, userId: string) {
+    const music = await this.getOne(musicId);
+
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    delete user.password;
+
+    const isAdd = music.musicAdders.find((music) => music.id === user.id);
+
+    if (isAdd) throw new ForbiddenException('The user already has this music.');
+
+    const addMusic = await this.musicRepository.save({
+      ...music,
+      musicAdders: [...music.musicAdders, { id: userId }],
+    });
+
+    return addMusic;
   }
 }
