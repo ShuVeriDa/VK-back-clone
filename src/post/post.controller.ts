@@ -101,10 +101,10 @@ export class PostController {
   }
   @Get('/community/post/:id')
   getOnePostInCommunity(
-    @Param('id') postId: string,
     @Body() dto: FetchPostDto,
+    @Param('id') postId: string,
   ) {
-    return this.postService.getOnePostInCommunity(postId, dto);
+    return this.postService.getOnePostInCommunity(dto, postId);
   }
 
   @Post('community/post/')

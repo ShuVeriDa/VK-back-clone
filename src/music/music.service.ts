@@ -13,6 +13,8 @@ import { SearchMusicDto } from './dto/search.dto';
 import { addAndRemoveAdderMusic } from '../components/forServices/addAndRemoveAdderMusic';
 import { CommunityEntity } from '../community/entity/community.entity';
 import { validationCRUDInCommunity } from '../components/forServices/validationCRUDInCommunity';
+import { FetchMusicDto } from './dto/fetch.dto';
+import { validationCommunity } from '../components/forServices/validationCommunity';
 
 @Injectable()
 export class MusicService {
@@ -188,21 +190,27 @@ export class MusicService {
     );
   }
 
-  //for community
-  async createInCommunity(dto: CreateMusicDto, userId: string) {
-    // const community = await this.communityRepository.findOne({
-    //   where: { id: dto.communityId },
-    //   relations: ['music', 'admins'],
-    // });
-    //
-    // if (!community)
-    //   throw new NotFoundException(
-    //     `Community with id ${dto.communityId} not found`,
-    //   );
-    //
-    // const user = await this.userRepository.findOne({ where: { id: userId } });
-    // if (!user) throw new NotFoundException(`User with id ${userId} not found`);
+  //FOR COMMUNITY
 
+  async getOneInCommunity(dto: FetchMusicDto, musicId: string) {
+    const findMusic = await this.getOne(musicId);
+
+    const { community } = await validationCommunity(
+      dto.communityId,
+      this.communityRepository,
+    );
+
+    const isExistMusic = community.music.find(
+      (music) => music.id === findMusic.id,
+    );
+
+    if (!isExistMusic)
+      throw new NotFoundException('Music not found in this community');
+
+    return findMusic;
+  }
+
+  async createInCommunity(dto: CreateMusicDto, userId: string) {
     const { community, user } = await validationCRUDInCommunity(
       dto.communityId,
       this.communityRepository,
@@ -221,5 +229,35 @@ export class MusicService {
     });
 
     return await this.getOne(music.id);
+  }
+
+  async updateInCommunity(
+    dto: UpdateMusicDto,
+    musicId: string,
+    userId: string,
+  ) {
+    const { community, user } = await validationCRUDInCommunity(
+      dto.communityId,
+      this.communityRepository,
+      userId,
+      this.userRepository,
+    );
+
+    const isExistMusic = community.music.find((music) => music.id === musicId);
+
+    if (!isExistMusic)
+      throw new NotFoundException('Post not found in this community');
+
+    await this.musicRepository.update(
+      {
+        id: musicId,
+      },
+      {
+        title: dto.title,
+        artist: dto.artist,
+      },
+    );
+
+    return this.getOne(musicId);
   }
 }

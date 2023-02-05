@@ -249,7 +249,7 @@ export class PostService {
     });
   }
 
-  async getOnePostInCommunity(postId: string, dto: FetchPostDto) {
+  async getOnePostInCommunity(dto: FetchPostDto, postId: string) {
     const post = await this.postRepository.findOne({
       where: { id: postId },
       relations: ['community'],

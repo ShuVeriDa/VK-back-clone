@@ -17,6 +17,7 @@ import { User } from '../user/decorators/user.decorator';
 import { CreateMusicDto } from './dto/create.dto';
 import { UpdateMusicDto } from './dto/update.dto';
 import { SearchMusicDto } from './dto/search.dto';
+import { FetchMusicDto } from './dto/fetch.dto';
 
 @Controller('music')
 export class MusicController {
@@ -86,11 +87,28 @@ export class MusicController {
   }
 
   // for community
+  @Get('community/music/:id')
+  getOneInCommunity(@Body() dto: FetchMusicDto, @Param('id') musicId: string) {
+    return this.musicService.getOneInCommunity(dto, musicId);
+  }
+
   @UsePipes(new ValidationPipe())
   @Post('community/music')
   @HttpCode(200)
   @Auth('user')
   createInCommunity(@Body() dto: CreateMusicDto, @User('id') userId: string) {
     return this.musicService.createInCommunity(dto, userId);
+  }
+
+  @UsePipes(new ValidationPipe())
+  @Put('community/music/:id')
+  @HttpCode(200)
+  @Auth('user')
+  updateInCommunity(
+    @Body() dto: UpdateMusicDto,
+    @Param('id') musicId: string,
+    @User('id') userId: string,
+  ) {
+    return this.musicService.updateInCommunity(dto, musicId, userId);
   }
 }

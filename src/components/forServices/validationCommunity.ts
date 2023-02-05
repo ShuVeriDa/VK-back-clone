@@ -11,7 +11,7 @@ export const validationCommunity = async (
 ) => {
   const community = await communityRepos.findOne({
     where: { id: communityId },
-    relations: ['members', 'posts'],
+    relations: ['members', 'posts', 'music'],
   });
 
   if (!community) {
