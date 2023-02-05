@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -15,6 +16,7 @@ import { Auth } from '../auth/decorators/auth.decorator';
 import { User } from '../user/decorators/user.decorator';
 import { CreateMusicDto } from './dto/create.dto';
 import { UpdateMusicDto } from './dto/update.dto';
+import { SearchMusicDto } from './dto/search.dto';
 
 @Controller('music')
 export class MusicController {
@@ -29,6 +31,11 @@ export class MusicController {
   @Auth('user')
   getMyMusic(@User('id') userId: string) {
     return this.musicService.getMyMusic(userId);
+  }
+
+  @Get('search')
+  search(@Query() dto: SearchMusicDto) {
+    return this.musicService.search(dto);
   }
 
   @Get(':id')

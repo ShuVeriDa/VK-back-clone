@@ -5,10 +5,11 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MusicEntity } from './entity/music.entity';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { CreateMusicDto } from './dto/create.dto';
 import { UpdateMusicDto } from './dto/update.dto';
 import { UserEntity } from '../user/entity/user.entity';
+import { SearchMusicDto } from './dto/search.dto';
 
 @Injectable()
 export class MusicService {
@@ -52,6 +53,43 @@ export class MusicService {
     });
 
     return user.music;
+  }
+
+  async search(dto: SearchMusicDto) {
+    const qb = this.musicRepository.createQueryBuilder('music');
+
+    qb.limit(dto.limit || 0);
+    qb.take(dto.take || 100);
+
+    if (dto.title) {
+      qb.andWhere('music.title ILIKE :title');
+    }
+
+    if (dto.artist) {
+      qb.andWhere('music.artist ILIKE :artist');
+    }
+
+    qb.setParameters({
+      title: `%${dto.title}%`,
+      artist: `%${dto.artist}%`,
+    });
+
+    const [music, total] = await qb
+      .leftJoinAndSelect('music.user', 'user')
+      .leftJoinAndSelect('music.musicAdders', 'musicAdders')
+      .getManyAndCount();
+
+    music.map((music) => {
+      delete music.user.password;
+
+      music.musicAdders.map((music) => {
+        delete music.password;
+        return music;
+      });
+      return music;
+    });
+
+    return { music, total };
   }
 
   async getOne(musicId: string) {
