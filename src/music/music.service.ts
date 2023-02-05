@@ -5,12 +5,13 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MusicEntity } from './entity/music.entity';
-import { Like, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateMusicDto } from './dto/create.dto';
 import { UpdateMusicDto } from './dto/update.dto';
 import { UserEntity } from '../user/entity/user.entity';
 import { SearchMusicDto } from './dto/search.dto';
 import { addAndRemoveAdderMusic } from '../components/forServices/addAndRemoveAdderMusic';
+import { CommunityEntity } from '../community/entity/community.entity';
 
 @Injectable()
 export class MusicService {
@@ -18,6 +19,9 @@ export class MusicService {
   private readonly musicRepository: Repository<MusicEntity>;
   @InjectRepository(UserEntity)
   private readonly userRepository: Repository<UserEntity>;
+
+  @InjectRepository(CommunityEntity)
+  private readonly communityRepository: Repository<CommunityEntity>;
 
   async getAll() {
     const music = await this.musicRepository.find();
@@ -96,6 +100,7 @@ export class MusicService {
   async getOne(musicId: string) {
     const music = await this.musicRepository.findOne({
       where: { id: musicId },
+      relations: ['communities'],
     });
 
     if (!music) throw new NotFoundException('Music not found');
@@ -169,25 +174,6 @@ export class MusicService {
       this.getOne(musicId),
       'add',
     );
-
-    // const music = await this.getOne(musicId);
-    //
-    // const user = await this.userRepository.findOne({ where: { id: userId } });
-    //
-    // if (!user) throw new NotFoundException('User not found');
-    //
-    // delete user.password;
-    //
-    // const isAdd = music.musicAdders.find((music) => music.id === user.id);
-    //
-    // if (isAdd) throw new ForbiddenException('The user already has this music.');
-    //
-    // const addMusic = await this.musicRepository.save({
-    //   ...music,
-    //   musicAdders: [...music.musicAdders, user],
-    // });
-    //
-    // return addMusic;
   }
 
   async removeFromAdders(musicId: string, userId: string) {
@@ -199,23 +185,33 @@ export class MusicService {
       this.getOne(musicId),
       'remove',
     );
+  }
 
-    // const music = await this.getOne(musicId);
-    //
-    // const user = await this.userRepository.findOne({ where: { id: userId } });
-    //
-    // if (!user) throw new NotFoundException('User not found');
-    //
-    // delete user.password;
-    //
-    // const isAdd = music.musicAdders.find((music) => music.id === user.id);
-    //
-    // if (!isAdd)
-    //   throw new ForbiddenException('The user no longer has this music.');
-    //
-    // music.musicAdders = music.musicAdders.filter(
-    //   (adder) => adder.id !== user.id,
-    // );
-    // return await this.musicRepository.save(music);
+  //for community
+  async createInCommunity(dto: CreateMusicDto, userId: string) {
+    const community = await this.communityRepository.findOne({
+      where: { id: dto.communityId },
+      relations: ['music', 'admins'],
+    });
+
+    if (!community)
+      throw new NotFoundException(
+        `Community with id ${dto.communityId} not found`,
+      );
+
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) throw new NotFoundException(`User with id ${userId} not found`);
+
+    const isAdmin = community.admins.find((admin) => admin.id === user.id);
+
+    if (!isAdmin) throw new ForbiddenException('You have no rights!');
+
+    const music = await this.musicRepository.save({
+      musicUrl: dto.musicUrl,
+      user: { id: user.id },
+      communities: [{ id: community.id }],
+    });
+
+    return await this.getOne(music.id);
   }
 }

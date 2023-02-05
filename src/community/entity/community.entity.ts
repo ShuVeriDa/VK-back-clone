@@ -7,12 +7,12 @@ import {
   ManyToMany,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { PostEntity } from '../../post/entity/post.entity';
 import { UserEntity } from '../../user/entity/user.entity';
+import { MusicEntity } from '../../music/entity/music.entity';
 
 @Entity('communities')
 export class CommunityEntity {
@@ -48,6 +48,10 @@ export class CommunityEntity {
   })
   @JoinTable({ name: 'adminId' })
   admins: UserEntity[];
+
+  @ManyToMany(() => MusicEntity, (music) => music.communities)
+  @JoinTable()
+  music: MusicEntity[];
 
   @ManyToOne(() => UserEntity, { eager: true })
   @JoinColumn({ name: 'authorId' })

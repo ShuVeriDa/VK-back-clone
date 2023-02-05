@@ -84,4 +84,13 @@ export class MusicController {
   removeFromAdders(@Param('id') musicId: string, @User('id') userId: string) {
     return this.musicService.removeFromAdders(musicId, userId);
   }
+
+  // for community
+  @UsePipes(new ValidationPipe())
+  @Post('community/music')
+  @HttpCode(200)
+  @Auth('user')
+  createInCommunity(@Body() dto: CreateMusicDto, @User('id') userId: string) {
+    return this.musicService.createInCommunity(dto, userId);
+  }
 }

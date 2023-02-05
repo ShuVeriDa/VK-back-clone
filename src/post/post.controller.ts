@@ -95,7 +95,7 @@ export class PostController {
 
   //for community
 
-  @Get('/community/:id')
+  @Get('/community/post/:id')
   getAllPostsInCommunity(@Param('id') communityId: string) {
     return this.postService.getAllPostsInCommunity(communityId);
   }
@@ -107,7 +107,7 @@ export class PostController {
     return this.postService.getOnePostInCommunity(postId, dto);
   }
 
-  @Post('community')
+  @Post('community/post/')
   @Auth('user')
   postCreateInCommunity(
     @Body() dto: CreatePostDto,
@@ -116,7 +116,7 @@ export class PostController {
     return this.postService.postCreateInCommunity(dto, userId);
   }
 
-  @Put('community/:id')
+  @Put('community/post/:id')
   @Auth('user')
   postUpdateInCommunity(
     @Body() dto: UpdatePostDto,
@@ -126,7 +126,7 @@ export class PostController {
     return this.postService.postUpdateInCommunity(dto, postId, userId);
   }
 
-  @Delete('community/:id')
+  @Delete('community/post/:id')
   @Auth('user')
   postDeleteInCommunity(
     @Param('id') postId: string,
