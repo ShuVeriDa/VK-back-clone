@@ -87,6 +87,11 @@ export class MusicController {
   }
 
   // for community
+
+  @Get('community/music')
+  getAllInCommunity(@Body() dto: FetchMusicDto) {
+    return this.musicService.getAllInCommunity(dto);
+  }
   @Get('community/music/:id')
   getOneInCommunity(@Body() dto: FetchMusicDto, @Param('id') musicId: string) {
     return this.musicService.getOneInCommunity(dto, musicId);

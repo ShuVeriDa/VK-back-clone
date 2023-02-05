@@ -192,6 +192,23 @@ export class MusicService {
 
   //FOR COMMUNITY
 
+  async getAllInCommunity(dto: FetchMusicDto) {
+    const { community } = await validationCommunity(
+      dto.communityId,
+      this.communityRepository,
+    );
+
+    return community.music.map((music) => {
+      delete music.user.password;
+
+      music.musicAdders.map((adder) => {
+        delete adder.password;
+        return adder;
+      });
+
+      return music;
+    });
+  }
   async getOneInCommunity(dto: FetchMusicDto, musicId: string) {
     const findMusic = await this.getOne(musicId);
 

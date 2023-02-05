@@ -95,7 +95,8 @@ export class PostController {
 
   //for community
 
-  @Get('/community/post/:id')
+  //ИЗМЕНИТЬ!!!!!!!
+  @Get('/community/post/:id') //ИЗМЕНИТЬ!!!!!!!
   getAllPostsInCommunity(@Param('id') communityId: string) {
     return this.postService.getAllPostsInCommunity(communityId);
   }
