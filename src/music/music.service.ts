@@ -158,14 +158,30 @@ export class MusicService {
   }
 
   async delete(musicId: string, userId: string) {
-    const music = await this.getOne(musicId);
+    await this.musicRepository.manager.transaction(async (manager) => {
+      const music = await manager.findOne(MusicEntity, {
+        where: { id: musicId },
+        relations: ['communities'],
+      });
 
-    const isAuthor = music.user.id === userId;
+      if (!music) throw new NotFoundException('Music not found');
 
-    if (!isAuthor)
-      throw new ForbiddenException("You don't have access to this message");
+      const isCommunity = music.communities.length > 0;
 
-    return await this.musicRepository.delete(music.id);
+      if (music.user.id !== userId || isCommunity) {
+        throw new ForbiddenException("You don't have access to this music");
+      }
+
+      await manager.remove(music);
+    });
+    // const music = await this.getOne(musicId);
+    //
+    // const isAuthor = music.user.id === userId;
+    //
+    // if (!isAuthor)
+    //   throw new ForbiddenException("You don't have access to this message");
+    //
+    // return await this.musicRepository.delete(music.id);
   }
 
   async addMusic(musicId: string, userId: string) {
