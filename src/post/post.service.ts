@@ -235,9 +235,9 @@ export class PostService {
 
   //for community
 
-  async getAllPostsInCommunity(communityId: string) {
+  async getAllPostsInCommunity(dto: FetchPostDto) {
     const community = await this.communityRepository.findOne({
-      where: { id: communityId },
+      where: { id: dto.communityId },
       relations: ['posts', 'posts.comments'],
     });
 
