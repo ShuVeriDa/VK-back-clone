@@ -183,4 +183,26 @@ export class MusicService {
 
     return addMusic;
   }
+
+  async removeFromAdders(musicId: string, userId: string) {
+    const music = await this.getOne(musicId);
+
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    delete user.password;
+
+    const isAdd = music.musicAdders.find((music) => music.id === user.id);
+
+    if (!isAdd)
+      throw new ForbiddenException('The user no longer has this music.');
+
+    music.musicAdders = music.musicAdders.filter(
+      (adder) => adder.id !== user.id,
+    );
+    await this.musicRepository.save(music);
+
+    await this.getOne(music.id);
+  }
 }

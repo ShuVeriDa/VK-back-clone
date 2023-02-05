@@ -76,4 +76,12 @@ export class MusicController {
   addMusic(@Param('id') musicId: string, @User('id') userId: string) {
     return this.musicService.addMusic(musicId, userId);
   }
+
+  @UsePipes(new ValidationPipe())
+  @Delete('remove/:id')
+  @HttpCode(200)
+  @Auth('user')
+  removeFromAdders(@Param('id') musicId: string, @User('id') userId: string) {
+    return this.musicService.removeFromAdders(musicId, userId);
+  }
 }
