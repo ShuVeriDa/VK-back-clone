@@ -15,6 +15,7 @@ import { favoritesAndReposts } from '../components/forServices/favoritesAndRepos
 import { removeFromFavoritesAndReposts } from '../components/forServices/removeFromFavoritesAndReposts';
 import { CommunityEntity } from '../community/entity/community.entity';
 import { FetchPostDto } from './dto/fetch.dto';
+import { validationCRUDInCommunity } from '../components/forServices/validationCRUDInCommunity';
 
 @Injectable()
 export class PostService {
@@ -280,22 +281,12 @@ export class PostService {
     return post;
   }
   async postCreateInCommunity(dto: CreatePostDto, userId: string) {
-    const community = await this.communityRepository.findOne({
-      where: { id: dto.communityId },
-      relations: ['members'],
-    });
-
-    if (!community)
-      throw new NotFoundException(
-        `Community with id ${dto.communityId} not found`,
-      );
-
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-    if (!user) throw new NotFoundException(`User with id ${userId} not found`);
-
-    const isAdmin = community.admins.find((admin) => admin.id === user.id);
-
-    if (!isAdmin) throw new ForbiddenException('You have no rights!');
+    const { community, user } = await validationCRUDInCommunity(
+      dto.communityId,
+      this.communityRepository,
+      userId,
+      this.userRepository,
+    );
 
     const post = await this.postRepository.save({
       text: dto.text,
@@ -332,18 +323,17 @@ export class PostService {
     postId: string,
     userId: string,
   ) {
-    const community = await this.communityRepository.findOne({
-      where: { id: dto.communityId },
-      relations: ['members'],
-    });
+    const { community, user } = await validationCRUDInCommunity(
+      dto.communityId,
+      this.communityRepository,
+      userId,
+      this.userRepository,
+    );
 
-    if (!community)
-      throw new NotFoundException(
-        `Community with id ${dto.communityId} not found`,
-      );
+    const isExistPost = community.posts.find((post) => post.id === postId);
 
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-    if (!user) throw new NotFoundException(`User with id ${userId} not found`);
+    if (!isExistPost)
+      throw new NotFoundException('Post not found in this community');
 
     await this.postRepository.update(
       { id: postId },

@@ -12,6 +12,7 @@ import { UserEntity } from '../user/entity/user.entity';
 import { SearchMusicDto } from './dto/search.dto';
 import { addAndRemoveAdderMusic } from '../components/forServices/addAndRemoveAdderMusic';
 import { CommunityEntity } from '../community/entity/community.entity';
+import { validationCRUDInCommunity } from '../components/forServices/validationCRUDInCommunity';
 
 @Injectable()
 export class MusicService {
@@ -189,18 +190,25 @@ export class MusicService {
 
   //for community
   async createInCommunity(dto: CreateMusicDto, userId: string) {
-    const community = await this.communityRepository.findOne({
-      where: { id: dto.communityId },
-      relations: ['music', 'admins'],
-    });
+    // const community = await this.communityRepository.findOne({
+    //   where: { id: dto.communityId },
+    //   relations: ['music', 'admins'],
+    // });
+    //
+    // if (!community)
+    //   throw new NotFoundException(
+    //     `Community with id ${dto.communityId} not found`,
+    //   );
+    //
+    // const user = await this.userRepository.findOne({ where: { id: userId } });
+    // if (!user) throw new NotFoundException(`User with id ${userId} not found`);
 
-    if (!community)
-      throw new NotFoundException(
-        `Community with id ${dto.communityId} not found`,
-      );
-
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-    if (!user) throw new NotFoundException(`User with id ${userId} not found`);
+    const { community, user } = await validationCRUDInCommunity(
+      dto.communityId,
+      this.communityRepository,
+      userId,
+      this.userRepository,
+    );
 
     const isAdmin = community.admins.find((admin) => admin.id === user.id);
 
