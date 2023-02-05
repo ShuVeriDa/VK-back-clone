@@ -10,6 +10,7 @@ import { CreateMusicDto } from './dto/create.dto';
 import { UpdateMusicDto } from './dto/update.dto';
 import { UserEntity } from '../user/entity/user.entity';
 import { SearchMusicDto } from './dto/search.dto';
+import { addAndRemoveAdderMusic } from '../components/forServices/addAndRemoveAdderMusic';
 
 @Injectable()
 export class MusicService {
@@ -132,8 +133,6 @@ export class MusicService {
   async update(dto: UpdateMusicDto, musicId: string, userId: string) {
     const music = await this.getOne(musicId);
 
-    if (!music) throw new NotFoundException(music);
-
     const isAuthor = music.user.id === userId;
 
     if (!isAuthor)
@@ -153,8 +152,6 @@ export class MusicService {
   async delete(musicId: string, userId: string) {
     const music = await this.getOne(musicId);
 
-    if (!music) throw new NotFoundException(music);
-
     const isAuthor = music.user.id === userId;
 
     if (!isAuthor)
@@ -164,45 +161,61 @@ export class MusicService {
   }
 
   async addMusic(musicId: string, userId: string) {
-    const music = await this.getOne(musicId);
+    return await addAndRemoveAdderMusic(
+      musicId,
+      this.musicRepository,
+      userId,
+      this.userRepository,
+      this.getOne(musicId),
+      'add',
+    );
 
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-
-    if (!user) throw new NotFoundException('User not found');
-
-    delete user.password;
-
-    const isAdd = music.musicAdders.find((music) => music.id === user.id);
-
-    if (isAdd) throw new ForbiddenException('The user already has this music.');
-
-    const addMusic = await this.musicRepository.save({
-      ...music,
-      musicAdders: [...music.musicAdders, { id: userId }],
-    });
-
-    return addMusic;
+    // const music = await this.getOne(musicId);
+    //
+    // const user = await this.userRepository.findOne({ where: { id: userId } });
+    //
+    // if (!user) throw new NotFoundException('User not found');
+    //
+    // delete user.password;
+    //
+    // const isAdd = music.musicAdders.find((music) => music.id === user.id);
+    //
+    // if (isAdd) throw new ForbiddenException('The user already has this music.');
+    //
+    // const addMusic = await this.musicRepository.save({
+    //   ...music,
+    //   musicAdders: [...music.musicAdders, user],
+    // });
+    //
+    // return addMusic;
   }
 
   async removeFromAdders(musicId: string, userId: string) {
-    const music = await this.getOne(musicId);
-
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-
-    if (!user) throw new NotFoundException('User not found');
-
-    delete user.password;
-
-    const isAdd = music.musicAdders.find((music) => music.id === user.id);
-
-    if (!isAdd)
-      throw new ForbiddenException('The user no longer has this music.');
-
-    music.musicAdders = music.musicAdders.filter(
-      (adder) => adder.id !== user.id,
+    return await addAndRemoveAdderMusic(
+      musicId,
+      this.musicRepository,
+      userId,
+      this.userRepository,
+      this.getOne(musicId),
+      'remove',
     );
-    await this.musicRepository.save(music);
 
-    await this.getOne(music.id);
+    // const music = await this.getOne(musicId);
+    //
+    // const user = await this.userRepository.findOne({ where: { id: userId } });
+    //
+    // if (!user) throw new NotFoundException('User not found');
+    //
+    // delete user.password;
+    //
+    // const isAdd = music.musicAdders.find((music) => music.id === user.id);
+    //
+    // if (!isAdd)
+    //   throw new ForbiddenException('The user no longer has this music.');
+    //
+    // music.musicAdders = music.musicAdders.filter(
+    //   (adder) => adder.id !== user.id,
+    // );
+    // return await this.musicRepository.save(music);
   }
 }
