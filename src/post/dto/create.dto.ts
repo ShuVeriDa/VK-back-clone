@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import { Column, IsNull } from 'typeorm';
 
 export class CreatePostDto {
@@ -16,6 +16,10 @@ export class CreatePostDto {
   @IsString()
   @IsOptional()
   videoUrl?: string | null;
+
+  @IsBoolean()
+  @IsOptional()
+  turnOffComments?: boolean;
 
   @IsOptional()
   @IsString()

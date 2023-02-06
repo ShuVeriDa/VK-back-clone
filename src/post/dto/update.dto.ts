@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class UpdatePostDto {
   @IsString()
@@ -15,6 +15,10 @@ export class UpdatePostDto {
   @IsString()
   @IsOptional()
   videoUrl?: string | null;
+
+  @IsBoolean()
+  @IsOptional()
+  turnOffComments?: boolean;
 
   @IsOptional()
   @IsString()

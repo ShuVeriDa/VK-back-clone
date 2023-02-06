@@ -128,6 +128,7 @@ export class PostService {
       imageUrl: dto.imageUrl,
       musicUrl: dto.musicUrl,
       videoUrl: dto.videoUrl,
+      turnOffComments: dto.turnOffComments,
       user: { id: userId },
     });
 
@@ -152,6 +153,7 @@ export class PostService {
         imageUrl: dto.imageUrl,
         musicUrl: dto.musicUrl,
         videoUrl: dto.videoUrl,
+        turnOffComments: dto.turnOffComments,
       },
     );
 
@@ -293,6 +295,7 @@ export class PostService {
       imageUrl: dto.imageUrl,
       musicUrl: dto.musicUrl,
       videoUrl: dto.videoUrl,
+      turnOffComments: dto.turnOffComments,
       user: { id: user.id },
       community: { id: community.id },
     });
@@ -342,6 +345,7 @@ export class PostService {
         imageUrl: dto.imageUrl,
         musicUrl: dto.musicUrl,
         videoUrl: dto.videoUrl,
+        turnOffComments: dto.turnOffComments,
       },
     );
 

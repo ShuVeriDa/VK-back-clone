@@ -48,6 +48,11 @@ export class PostEntity {
   @Column({ default: 4.0 })
   rating?: number;
 
+  @Column({
+    default: false,
+  })
+  turnOffComments: boolean;
+
   @OneToMany(() => CommentEntity, (comment) => comment.post, { eager: true })
   @JoinColumn()
   comments: CommentEntity[];

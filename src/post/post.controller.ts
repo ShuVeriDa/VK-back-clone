@@ -93,7 +93,7 @@ export class PostController {
     return this.postService.removeFromRepost(id, userId);
   }
 
-  //for community
+  //FOR COMMUNITY
 
   @Get('/community/post')
   getAllPostsInCommunity(@Body() dto: FetchPostDto) {
