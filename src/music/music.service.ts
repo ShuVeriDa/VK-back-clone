@@ -315,17 +315,17 @@ export class MusicService {
         true,
       );
 
-      const isAdmin = community.admins.find((admin) => admin.id === user.id);
-
-      if (music.user.id !== userId || !isAdmin)
-        throw new NotFoundException("You don't have access to this music");
-
-      const communityMusic = community.music;
-
       const isMusic = community.music.find((music) => music.id === musicId);
 
       if (!isMusic)
         throw new NotFoundException('Music not found in this community');
+
+      const isAdmin = community.admins.find((admin) => admin.id === user.id);
+
+      if (/*music.user.id !== userId ||*/ !isAdmin)
+        throw new ForbiddenException("You don't have access to this music");
+
+      const communityMusic = community.music;
 
       await manager.remove(music);
     });
