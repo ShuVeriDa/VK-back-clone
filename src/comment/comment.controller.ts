@@ -7,10 +7,8 @@ import {
   Post,
   Put,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
-import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { CreateCommentDto } from './dto/comment.dto';
 import { User } from '../user/decorators/user.decorator';
@@ -54,5 +52,16 @@ export class CommentController {
   @Auth('user')
   remove(@Param('id') id: string, @User('id') userId: string) {
     return this.commentService.remove(id, userId);
+  }
+
+  //FOR COMMUNITY
+
+  @Post('community/comment')
+  @Auth('user')
+  commentCreateInCommunity(
+    @Body() dto: CreateCommentDto,
+    @User('id') userId: string,
+  ) {
+    return this.commentService.commentCreateInCommunity(dto, userId);
   }
 }

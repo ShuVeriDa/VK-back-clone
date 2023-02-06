@@ -1,18 +1,31 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CommentEntity } from './entity/comment.entity';
 import { CreateCommentDto } from './dto/comment.dto';
 import { UserEntity } from '../user/entity/user.entity';
 import { validationUserForComments } from '../components/forServices/validationUserForComments';
+import { validationCRUDInCommunity } from '../components/forServices/validationCRUDInCommunity';
+import { CommunityEntity } from '../community/entity/community.entity';
+import { PostEntity } from '../post/entity/post.entity';
 
 @Injectable()
 export class CommentService {
   constructor(
     @InjectRepository(CommentEntity)
-    private commentRepository: Repository<CommentEntity>,
+    private readonly commentRepository: Repository<CommentEntity>,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+
+    @InjectRepository(PostEntity)
+    private readonly postRepository: Repository<PostEntity>,
+
+    @InjectRepository(CommunityEntity)
+    private readonly communityRepository: Repository<CommunityEntity>,
   ) {}
 
   async findAll(postId: number) {
@@ -78,6 +91,14 @@ export class CommentService {
   }
 
   async create(dto: CreateCommentDto, userId: string) {
+    const post = await this.postRepository.findOne({
+      where: { id: dto.postId },
+      relations: ['comments'],
+    });
+
+    if (post.turnOffComments)
+      throw new ForbiddenException('This post has comments turned off');
+
     const comment = await this.commentRepository.save({
       text: dto.text,
       post: { id: dto.postId },
@@ -111,5 +132,30 @@ export class CommentService {
     await validationUserForComments(id, userId, this, user.isAdmin);
 
     return this.commentRepository.delete(id);
+  }
+
+  //FOR COMMUNITY
+  async commentCreateInCommunity(dto: CreateCommentDto, userId: string) {
+    const { community, user } = await validationCRUDInCommunity(
+      dto.communityId,
+      this.communityRepository,
+      userId,
+      this.userRepository,
+    );
+
+    const post = community.posts.find((post) => post.id === dto.postId);
+
+    if (!post) throw new NotFoundException('Post not found');
+
+    if (post.turnOffComments)
+      throw new ForbiddenException('This post has comments turned off.');
+
+    const comment = await this.commentRepository.save({
+      text: dto.text,
+      post: { id: post.id },
+      user: { id: userId },
+    });
+
+    return await this.findOneById(comment.id);
   }
 }
