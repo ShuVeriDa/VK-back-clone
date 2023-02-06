@@ -293,4 +293,41 @@ export class MusicService {
 
     return this.getOne(musicId);
   }
+
+  async deleteFromCommunity(
+    dto: FetchMusicDto,
+    musicId: string,
+    userId: string,
+  ) {
+    await this.musicRepository.manager.transaction(async (manager) => {
+      const music = await manager.findOne(MusicEntity, {
+        where: { id: musicId },
+        relations: ['communities'],
+      });
+
+      if (!music) throw new NotFoundException('Music not found');
+
+      const { community, user } = await validationCRUDInCommunity(
+        dto.communityId,
+        this.communityRepository,
+        userId,
+        this.userRepository,
+        true,
+      );
+
+      const isAdmin = community.admins.find((admin) => admin.id === user.id);
+
+      if (music.user.id !== userId || !isAdmin)
+        throw new NotFoundException("You don't have access to this music");
+
+      const communityMusic = community.music;
+
+      const isMusic = community.music.find((music) => music.id === musicId);
+
+      if (!isMusic)
+        throw new NotFoundException('Music not found in this community');
+
+      await manager.remove(music);
+    });
+  }
 }

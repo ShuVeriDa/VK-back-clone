@@ -116,4 +116,14 @@ export class MusicController {
   ) {
     return this.musicService.updateInCommunity(dto, musicId, userId);
   }
+
+  @Delete('community/music/:id')
+  @Auth('user')
+  deleteFromCommunity(
+    @Body() dto: FetchMusicDto,
+    @Param('id') musicId: string,
+    @User('id') userId: string,
+  ) {
+    return this.musicService.deleteFromCommunity(dto, musicId, userId);
+  }
 }

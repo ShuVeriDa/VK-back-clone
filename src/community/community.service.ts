@@ -66,7 +66,7 @@ export class CommunityService {
 
     delete community.author.password;
 
-    return community.admins;
+    return community;
   }
 
   async create(dto: CreateCommunityDto, userId: string) {

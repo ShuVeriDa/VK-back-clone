@@ -238,7 +238,7 @@ export class PostService {
   async getAllPostsInCommunity(dto: FetchPostDto) {
     const community = await this.communityRepository.findOne({
       where: { id: dto.communityId },
-      relations: ['posts', 'posts.comments'],
+      relations: ['posts', 'posts.comments', 'posts.community'],
     });
 
     if (!community) throw new NotFoundException('Community not found');
@@ -252,7 +252,7 @@ export class PostService {
   async getOnePostInCommunity(dto: FetchPostDto, postId: string) {
     const post = await this.postRepository.findOne({
       where: { id: postId },
-      relations: ['community'],
+      relations: ['community', 'community.admins'],
     });
 
     if (!post) throw new NotFoundException('Post not found');
@@ -273,11 +273,11 @@ export class PostService {
       throw new NotFoundException('Post not found in this community');
 
     delete post.user.password;
-    delete post.community.author.password;
-    post.community.members.map((m) => {
-      delete m.password;
-      return m;
-    });
+    // delete post.community.author.password;
+    // post.community.members.map((m) => {
+    //   delete m.password;
+    //   return m;
+    // });
     return post;
   }
   async postCreateInCommunity(dto: CreatePostDto, userId: string) {
@@ -364,17 +364,13 @@ export class PostService {
 
       if (!post) throw new NotFoundException(`Post not found`);
 
-      const community = await this.communityRepository.findOne({
-        where: { id: post.community.id },
-        relations: ['members', 'admins'],
-      });
-
-      if (!community) throw new NotFoundException(`Community not found`);
-
-      const user = await this.userRepository.findOne({ where: { id: userId } });
-
-      if (!user)
-        throw new NotFoundException(`User with id ${userId} not found`);
+      const { community, user } = await validationCRUDInCommunity(
+        post.community.id,
+        this.communityRepository,
+        userId,
+        this.userRepository,
+        true,
+      );
 
       const isAdmin = community.admins.find((admin) => admin.id === user.id);
 
