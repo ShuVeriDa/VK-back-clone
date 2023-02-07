@@ -58,6 +58,18 @@ export class CommentController {
 
   //FOR COMMUNITY
 
+  @Get('community/comment')
+  getAllCommentsInCommunity(@Body() dto: FetchCommentDto) {
+    return this.commentService.getAllCommentsInCommunity(dto);
+  }
+
+  @Get('community/comment/:id')
+  getOneCommentInCommunity(
+    @Body() dto: FetchCommentDto,
+    @Param('id') commentId: string,
+  ) {
+    return this.commentService.getOneCommentInCommunity(dto, commentId);
+  }
   @Post('community/comment')
   @Auth('user')
   commentCreateInCommunity(

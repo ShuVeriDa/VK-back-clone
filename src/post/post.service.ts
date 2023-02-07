@@ -16,6 +16,7 @@ import { removeFromFavoritesAndReposts } from '../components/forServices/removeF
 import { CommunityEntity } from '../community/entity/community.entity';
 import { FetchPostDto } from './dto/fetch.dto';
 import { validationCRUDInCommunity } from '../components/forServices/validationCRUDInCommunity';
+import { getOnePostInCommunity } from '../components/forServices/getOnePostInCommunity';
 
 @Injectable()
 export class PostService {
@@ -252,35 +253,44 @@ export class PostService {
   }
 
   async getOnePostInCommunity(dto: FetchPostDto, postId: string) {
-    const post = await this.postRepository.findOne({
-      where: { id: postId },
-      relations: ['community', 'community.admins'],
-    });
+    const { post } = await getOnePostInCommunity(
+      postId,
+      this.postRepository,
+      dto.communityId,
+      this.communityRepository,
+    );
 
-    if (!post) throw new NotFoundException('Post not found');
-
-    const community = await this.communityRepository.findOne({
-      where: { id: dto.communityId },
-      relations: ['members', 'posts'],
-    });
-
-    if (!community)
-      throw new NotFoundException(
-        `Community with id ${dto.communityId} not found`,
-      );
-
-    const isExistPost = community.posts.find((post) => post.id === postId);
-
-    if (!isExistPost)
-      throw new NotFoundException('Post not found in this community');
-
-    delete post.user.password;
-    // delete post.community.author.password;
-    // post.community.members.map((m) => {
-    //   delete m.password;
-    //   return m;
-    // });
     return post;
+
+    // const post = await this.postRepository.findOne({
+    //   where: { id: postId },
+    //   relations: ['community', 'community.admins'],
+    // });
+    //
+    // if (!post) throw new NotFoundException('Post not found');
+    //
+    // const community = await this.communityRepository.findOne({
+    //   where: { id: dto.communityId },
+    //   relations: ['members', 'posts'],
+    // });
+    //
+    // if (!community)
+    //   throw new NotFoundException(
+    //     `Community with id ${dto.communityId} not found`,
+    //   );
+    //
+    // const isExistPost = community.posts.find((post) => post.id === postId);
+    //
+    // if (!isExistPost)
+    //   throw new NotFoundException('Post not found in this community');
+    //
+    // delete post.user.password;
+    // // delete post.community.author.password;
+    // // post.community.members.map((m) => {
+    // //   delete m.password;
+    // //   return m;
+    // // });
+    // return post;
   }
   async postCreateInCommunity(dto: CreatePostDto, userId: string) {
     const { community, user } = await validationCRUDInCommunity(

@@ -14,6 +14,7 @@ import { CommunityEntity } from '../community/entity/community.entity';
 import { PostEntity } from '../post/entity/post.entity';
 import { FetchCommentDto } from './dto/fetch.dto';
 import { UpdateCommentDto } from './dto/update.dto';
+import { getOnePostInCommunity } from '../components/forServices/getOnePostInCommunity';
 
 @Injectable()
 export class CommentService {
@@ -137,6 +138,49 @@ export class CommentService {
   }
 
   //FOR COMMUNITY
+
+  async getOneCommentInCommunity(dto: FetchCommentDto, commentId: string) {
+    const { post } = await getOnePostInCommunity(
+      dto.postId,
+      this.postRepository,
+      dto.communityId,
+      this.communityRepository,
+    );
+
+    const comment = post.comments.find((comment) => comment.id === commentId);
+    return comment;
+  }
+  async getAllCommentsInCommunity(dto: FetchCommentDto) {
+    const community = await this.communityRepository.findOne({
+      where: { id: dto.communityId },
+      relations: ['posts', 'posts.comments', 'posts.community'],
+    });
+
+    if (!community) throw new NotFoundException('Community not found');
+
+    community.posts.map((p) => {
+      delete p.user.password;
+      return p;
+    });
+
+    const post = await this.postRepository.findOne({
+      where: { id: dto.postId },
+      relations: ['comments', 'community'],
+    });
+
+    if (!post) throw new NotFoundException('Post not found');
+
+    delete post.community.admins;
+    delete post.community.members;
+    delete post.community.posts;
+    delete post.community.music;
+    delete post.community.admins;
+    delete post.community.author;
+    delete post.user.password;
+
+    return post;
+  }
+
   async commentCreateInCommunity(dto: CreateCommentDto, userId: string) {
     const { community, user } = await validationCRUDInCommunity(
       dto.communityId,
