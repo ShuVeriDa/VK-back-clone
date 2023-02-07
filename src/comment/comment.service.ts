@@ -6,12 +6,14 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CommentEntity } from './entity/comment.entity';
-import { CreateCommentDto } from './dto/comment.dto';
+import { CreateCommentDto } from './dto/create.dto';
 import { UserEntity } from '../user/entity/user.entity';
 import { validationUserForComments } from '../components/forServices/validationUserForComments';
 import { validationCRUDInCommunity } from '../components/forServices/validationCRUDInCommunity';
 import { CommunityEntity } from '../community/entity/community.entity';
 import { PostEntity } from '../post/entity/post.entity';
+import { FetchCommentDto } from './dto/fetch.dto';
+import { UpdateCommentDto } from './dto/update.dto';
 
 @Injectable()
 export class CommentService {
@@ -109,12 +111,12 @@ export class CommentService {
     return this.findOneById(comment.id);
   }
 
-  async update(id: string, userId: string, dto: CreateCommentDto) {
-    await validationUserForComments(id, userId, this);
+  async update(dto: UpdateCommentDto, commentId: string, userId: string) {
+    await validationUserForComments(commentId, userId, this);
 
     const comment = await this.commentRepository.update(
       {
-        id,
+        id: commentId,
       },
       {
         text: dto.text,
@@ -123,7 +125,7 @@ export class CommentService {
       },
     );
 
-    return this.findOneById(id);
+    return this.findOneById(commentId);
   }
 
   async remove(id: string, userId: string) {
@@ -160,7 +162,7 @@ export class CommentService {
   }
 
   async commentUpdateInCommunity(
-    dto: CreateCommentDto,
+    dto: UpdateCommentDto,
     commentId: string,
     userId: string,
   ) {
@@ -192,5 +194,35 @@ export class CommentService {
     );
 
     return await this.findOneById(comment.id);
+  }
+
+  async commentDeleteFromCommunity(
+    dto: FetchCommentDto,
+    commentId: string,
+    userId: string,
+  ) {
+    await this.communityRepository.manager.transaction(async (manager) => {
+      const comment = await manager.findOne(CommentEntity, {
+        where: { id: commentId },
+        relations: ['post', 'post.community'],
+      });
+
+      if (!comment) throw new NotFoundException('Comment not found');
+
+      const { community, user } = await validationCRUDInCommunity(
+        comment.post.community.id,
+        this.communityRepository,
+        userId,
+        this.userRepository,
+        true,
+      );
+
+      const isAdmin = community.admins.find((admin) => admin.id === user.id);
+
+      if (/*post.user.id !== userId ||*/ !isAdmin)
+        throw new ForbiddenException("You don't have access to this comment");
+
+      await manager.remove(comment);
+    });
   }
 }

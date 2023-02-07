@@ -10,8 +10,10 @@ import {
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { Auth } from '../auth/decorators/auth.decorator';
-import { CreateCommentDto } from './dto/comment.dto';
+import { CreateCommentDto } from './dto/create.dto';
 import { User } from '../user/decorators/user.decorator';
+import { FetchCommentDto } from './dto/fetch.dto';
+import { UpdateCommentDto } from './dto/update.dto';
 
 @Controller('comments')
 export class CommentController {
@@ -41,11 +43,11 @@ export class CommentController {
   @Put(':id')
   @Auth('user')
   update(
-    @Param('id') id: string,
-    @Body() dto: CreateCommentDto,
+    @Param('id') commentId: string,
+    @Body() dto: UpdateCommentDto,
     @User('id') userId: string,
   ) {
-    return this.commentService.update(id, userId, dto);
+    return this.commentService.update(dto, commentId, userId);
   }
 
   @Delete(':id')
@@ -68,10 +70,24 @@ export class CommentController {
   @Put('community/comment/:id')
   @Auth('user')
   commentUpdateInCommunity(
-    @Body() dto: CreateCommentDto,
+    @Body() dto: UpdateCommentDto,
     @Param('id') commentId: string,
     @User('id') userId: string,
   ) {
     return this.commentService.commentUpdateInCommunity(dto, commentId, userId);
+  }
+
+  @Delete('community/comment/:id')
+  @Auth('user')
+  commentDeleteFromCommunity(
+    @Body() dto: FetchCommentDto,
+    @Param('id') commentId: string,
+    @User('id') userId: string,
+  ) {
+    return this.commentService.commentDeleteFromCommunity(
+      dto,
+      commentId,
+      userId,
+    );
   }
 }
