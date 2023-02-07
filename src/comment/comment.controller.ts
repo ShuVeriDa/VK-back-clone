@@ -64,4 +64,14 @@ export class CommentController {
   ) {
     return this.commentService.commentCreateInCommunity(dto, userId);
   }
+
+  @Put('community/comment/:id')
+  @Auth('user')
+  commentUpdateInCommunity(
+    @Body() dto: CreateCommentDto,
+    @Param('id') commentId: string,
+    @User('id') userId: string,
+  ) {
+    return this.commentService.commentUpdateInCommunity(dto, commentId, userId);
+  }
 }

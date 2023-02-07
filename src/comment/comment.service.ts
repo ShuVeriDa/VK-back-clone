@@ -158,4 +158,39 @@ export class CommentService {
 
     return await this.findOneById(comment.id);
   }
+
+  async commentUpdateInCommunity(
+    dto: CreateCommentDto,
+    commentId: string,
+    userId: string,
+  ) {
+    const { community, user } = await validationCRUDInCommunity(
+      dto.communityId,
+      this.communityRepository,
+      userId,
+      this.userRepository,
+    );
+
+    const post = community.posts.find((post) => post.id === dto.postId);
+
+    if (!post) throw new NotFoundException('Post not found');
+
+    if (post.turnOffComments)
+      throw new ForbiddenException('This post has comments turned off.');
+
+    const comment = await this.findOneById(commentId);
+
+    if (!comment) throw new NotFoundException('Comment not found');
+
+    await this.commentRepository.update(
+      { id: commentId },
+      {
+        text: dto.text,
+        post: { id: dto.postId },
+        user: { id: user.id },
+      },
+    );
+
+    return await this.findOneById(comment.id);
+  }
 }

@@ -9,7 +9,9 @@ export const validationUserForComments = async (
 ) => {
   const comment = await current.findOneById(id);
 
-  if (comment.user.id !== userId && !isAdmin) {
+  if (/*comment.user.id !== userId &&*/ !isAdmin) {
     throw new ForbiddenException('No access to this comment');
   }
+
+  return { comment };
 };
