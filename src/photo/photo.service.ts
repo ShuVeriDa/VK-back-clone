@@ -12,6 +12,8 @@ import { UpdatePhotoDto } from './dto/update.dto';
 import * as http from 'http';
 import { CommunityEntity } from '../community/entity/community.entity';
 import { validationCRUDInCommunity } from '../components/forServices/validationCRUDInCommunity';
+import { FetchPhotoDto } from './dto/fetch.dto';
+import { validationCommunity } from '../components/forServices/validationCommunity';
 
 @Injectable()
 export class PhotoService {
@@ -120,6 +122,43 @@ export class PhotoService {
   }
 
   // FOR COMMUNITY
+  async getAllInCommunity(dto: FetchPhotoDto) {
+    const { community } = await validationCommunity(
+      dto.communityId,
+      this.communityRepository,
+    );
+
+    const photos = await this.photoRepository.find({
+      where: { community: { id: community.id } },
+      relations: ['community'],
+    });
+
+    return photos.map((photo) => {
+      photo.community.admins.map((admin) => {
+        delete admin.password;
+        return admin;
+      });
+      delete photo.community.author;
+      delete photo.community.members;
+
+      delete photo.user.password;
+      return photo;
+    });
+
+    // return community.photos.map((photo) => {
+    //   delete photo.user.password;
+    //   // delete photo.community.author;
+    //   // delete photo.community.members;
+    //
+    //   // photo.community.admins.map((admin) => {
+    //   //   delete admin.password;
+    //   //   return admin;
+    //   // });
+    //
+    //   return photo;
+    // }
+    // );
+  }
   async createInCommunity(dto: CreatePhotoDto, userId: string) {
     const { community, user } = await validationCRUDInCommunity(
       dto.communityId,

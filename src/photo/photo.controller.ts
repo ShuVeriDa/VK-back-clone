@@ -15,6 +15,7 @@ import { Auth } from '../auth/decorators/auth.decorator';
 import { User } from '../user/decorators/user.decorator';
 import { CreatePhotoDto } from './dto/create.dto';
 import { UpdatePhotoDto } from './dto/update.dto';
+import { FetchPhotoDto } from './dto/fetch.dto';
 
 @Controller('photos')
 export class PhotoController {
@@ -58,6 +59,11 @@ export class PhotoController {
   }
 
   // FOR COMMUNITY
+
+  @Get('community/photo')
+  getAllInCommunity(@Body() dto: FetchPhotoDto) {
+    return this.photoService.getAllInCommunity(dto);
+  }
   @UsePipes(new ValidationPipe())
   @Post('community/photo')
   @HttpCode(200)

@@ -36,7 +36,7 @@ export class CommunityEntity {
   posts: PostEntity[];
 
   @OneToMany(() => PhotoEntity, (photo) => photo.community)
-  photos: PostEntity[];
+  photos: PhotoEntity[];
 
   @ManyToMany(() => UserEntity, (user) => user.communities, {
     eager: true,
