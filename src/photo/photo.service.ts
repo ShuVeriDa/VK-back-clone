@@ -75,4 +75,23 @@ export class PhotoService {
 
     return await this.getOne(photo.id);
   }
+
+  async delete(photoId: string, userId: string) {
+    const photo = await this.getOne(photoId);
+
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    const isAuthor = photo.user.id === userId;
+
+    const isCommunity = photo.communities; // null
+
+    if (!isAuthor || isCommunity)
+      throw new ForbiddenException("You don't have access to this photo");
+
+    await this.photoRepository.delete(photo.id);
+  }
 }

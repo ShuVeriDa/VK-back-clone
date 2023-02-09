@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Param,
@@ -47,5 +48,11 @@ export class PhotoController {
     @User('id') userId: string,
   ) {
     return this.photoService.update(dto, photoId, userId);
+  }
+
+  @Delete(':id')
+  @Auth('user')
+  delete(@Param('id') photoId: string, @User('id') userId: string) {
+    return this.photoService.delete(photoId, userId);
   }
 }

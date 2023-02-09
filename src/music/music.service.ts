@@ -27,7 +27,9 @@ export class MusicService {
   private readonly communityRepository: Repository<CommunityEntity>;
 
   async getAll() {
-    const music = await this.musicRepository.find();
+    const music = await this.musicRepository.find({
+      relations: ['communities'],
+    });
 
     music.map((music) => {
       delete music.user.password;
@@ -167,6 +169,8 @@ export class MusicService {
       if (!music) throw new NotFoundException('Music not found');
 
       const isCommunity = music.communities.length > 0;
+
+      const isAuthor = music.user.id === userId;
 
       if (music.user.id !== userId || isCommunity) {
         throw new ForbiddenException("You don't have access to this music");
