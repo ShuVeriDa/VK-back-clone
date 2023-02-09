@@ -56,4 +56,13 @@ export class PhotoController {
   delete(@Param('id') photoId: string, @User('id') userId: string) {
     return this.photoService.delete(photoId, userId);
   }
+
+  // FOR COMMUNITY
+  @UsePipes(new ValidationPipe())
+  @Post('community/photo')
+  @HttpCode(200)
+  @Auth('user')
+  createInCommunity(@Body() dto: CreatePhotoDto, @User('id') userId: string) {
+    return this.photoService.createInCommunity(dto, userId);
+  }
 }

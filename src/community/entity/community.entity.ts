@@ -35,7 +35,7 @@ export class CommunityEntity {
   @OneToMany(() => PostEntity, (post) => post.community)
   posts: PostEntity[];
 
-  @OneToMany(() => PhotoEntity, (photo) => photo.communities)
+  @OneToMany(() => PhotoEntity, (photo) => photo.community)
   photos: PostEntity[];
 
   @ManyToMany(() => UserEntity, (user) => user.communities, {

@@ -22,11 +22,8 @@ export class PhotoEntity {
   @ManyToOne(() => UserEntity, { eager: true, nullable: false })
   user: UserEntity;
 
-  @ManyToOne(() => CommunityEntity, (community) => community.photos, {
-    eager: true,
-    nullable: true,
-  })
-  communities: CommunityEntity[];
+  @ManyToOne(() => CommunityEntity, (community) => community.photos)
+  community: CommunityEntity;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

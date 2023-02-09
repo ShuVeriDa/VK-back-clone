@@ -10,6 +10,8 @@ import { CreatePhotoDto } from './dto/create.dto';
 import { UserEntity } from '../user/entity/user.entity';
 import { UpdatePhotoDto } from './dto/update.dto';
 import * as http from 'http';
+import { CommunityEntity } from '../community/entity/community.entity';
+import { validationCRUDInCommunity } from '../components/forServices/validationCRUDInCommunity';
 
 @Injectable()
 export class PhotoService {
@@ -18,6 +20,9 @@ export class PhotoService {
 
   @InjectRepository(UserEntity)
   private readonly userRepository: Repository<UserEntity>;
+
+  @InjectRepository(CommunityEntity)
+  private readonly communityRepository: Repository<CommunityEntity>;
 
   async getAll(userId: string) {
     const user = await this.userRepository.findOne({
@@ -42,12 +47,19 @@ export class PhotoService {
   async getOne(photoId: string) {
     const photo = await this.photoRepository.findOne({
       where: { id: photoId },
-      relations: ['communities'],
+      relations: ['community'],
     });
 
     if (!photo) throw new NotFoundException('Photo not found');
 
     delete photo.user.password;
+    delete photo?.community.members;
+    delete photo?.community.author;
+
+    photo?.community.admins.map((admin) => {
+      delete admin.password;
+      return admin;
+    });
 
     return photo;
   }
@@ -99,11 +111,28 @@ export class PhotoService {
 
     const isAuthor = photo.user.id === userId;
 
-    const isCommunity = photo.communities; // null
+    const isCommunity = photo.community; // null
 
     if (!isAuthor || isCommunity)
       throw new ForbiddenException("You don't have access to this photo");
 
     await this.photoRepository.delete(photo.id);
+  }
+
+  // FOR COMMUNITY
+  async createInCommunity(dto: CreatePhotoDto, userId: string) {
+    const { community, user } = await validationCRUDInCommunity(
+      dto.communityId,
+      this.communityRepository,
+      userId,
+      this.userRepository,
+    );
+
+    const photo = await this.photoRepository.save({
+      user: { id: user.id },
+      community: { id: community.id },
+    });
+
+    return await this.getOne(photo.id);
   }
 }

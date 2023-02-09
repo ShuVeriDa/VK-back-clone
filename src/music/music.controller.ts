@@ -18,6 +18,7 @@ import { CreateMusicDto } from './dto/create.dto';
 import { UpdateMusicDto } from './dto/update.dto';
 import { SearchMusicDto } from './dto/search.dto';
 import { FetchMusicDto } from './dto/fetch.dto';
+import { CreatePhotoDto } from '../photo/dto/create.dto';
 
 @Controller('music')
 export class MusicController {
