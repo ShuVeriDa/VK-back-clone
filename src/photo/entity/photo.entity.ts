@@ -11,33 +11,21 @@ import {
 import { UserEntity } from '../../user/entity/user.entity';
 import { CommunityEntity } from '../../community/entity/community.entity';
 
-@Entity('music')
-export class MusicEntity {
+@Entity('photos')
+export class PhotoEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ default: 'Без названия' })
-  title: string;
-
-  @Column({ default: 'Неизвестен' })
-  artist: string;
-
   @Column()
-  musicUrl: string;
+  description: string;
 
   @ManyToOne(() => UserEntity, { eager: true, nullable: false })
-  // @JoinColumn({ name: 'userId' })
   user: UserEntity;
 
-  @ManyToMany(() => UserEntity, (user) => user.music, {
+  @ManyToOne(() => CommunityEntity, (community) => community.photos, {
     eager: true,
     nullable: false,
   })
-  @JoinColumn({ name: 'musicAddersId' })
-  musicAdders: UserEntity[];
-
-  @ManyToMany(() => CommunityEntity, (community) => community.music)
-  @JoinColumn({ name: 'communityId' })
   communities: CommunityEntity[];
 
   @CreateDateColumn({ type: 'timestamp' })

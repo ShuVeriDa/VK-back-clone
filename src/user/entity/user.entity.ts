@@ -14,6 +14,7 @@ import { CommentEntity } from '../../comment/entity/comment.entity';
 import { FriendEntity } from '../../friend/entity/friend.entity';
 import { CommunityEntity } from '../../community/entity/community.entity';
 import { MusicEntity } from '../../music/entity/music.entity';
+import { PhotoEntity } from '../../photo/entity/photo.entity';
 
 @Entity('user')
 export class UserEntity {
@@ -52,6 +53,12 @@ export class UserEntity {
     nullable: true,
   })
   posts: PostEntity[];
+
+  @OneToMany(() => PhotoEntity, (photo) => photo.user, {
+    eager: false,
+    nullable: true,
+  })
+  photos: PhotoEntity[];
 
   @ManyToMany(() => PostEntity)
   @JoinTable()

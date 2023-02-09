@@ -13,6 +13,7 @@ import {
 import { PostEntity } from '../../post/entity/post.entity';
 import { UserEntity } from '../../user/entity/user.entity';
 import { MusicEntity } from '../../music/entity/music.entity';
+import { PhotoEntity } from '../../photo/entity/photo.entity';
 
 @Entity('communities')
 export class CommunityEntity {
@@ -33,6 +34,9 @@ export class CommunityEntity {
 
   @OneToMany(() => PostEntity, (post) => post.community)
   posts: PostEntity[];
+
+  @OneToMany(() => PhotoEntity, (photo) => photo.communities)
+  photos: PostEntity[];
 
   @ManyToMany(() => UserEntity, (user) => user.communities, {
     eager: true,
