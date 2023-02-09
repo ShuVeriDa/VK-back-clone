@@ -140,8 +140,8 @@ export class PhotoService {
       });
       delete photo.community.author;
       delete photo.community.members;
-
       delete photo.user.password;
+
       return photo;
     });
 

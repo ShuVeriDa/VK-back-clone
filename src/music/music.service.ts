@@ -228,16 +228,39 @@ export class MusicService {
       this.communityRepository,
     );
 
-    return community.music.map((music) => {
+    const music = await this.musicRepository.find({
+      where: { communities: { id: community.id } },
+      relations: ['communities'],
+    });
+
+    return music.map((music) => {
       delete music.user.password;
 
-      music.musicAdders.map((adder) => {
-        delete adder.password;
-        return adder;
+      music.communities.map((community) => {
+        community.admins.map((a) => {
+          delete a.password;
+          return a;
+        });
+
+        delete community.author.password;
+        delete community.members;
+
+        return community;
       });
 
       return music;
     });
+
+    // return community.music.map((music) => {
+    //   delete music.user.password;
+    //
+    //   music.musicAdders.map((adder) => {
+    //     delete adder.password;
+    //     return adder;
+    //   });
+    //
+    //   return music;
+    // });
   }
   async getOneInCommunity(dto: FetchMusicDto, musicId: string) {
     const findMusic = await this.getOne(musicId);
