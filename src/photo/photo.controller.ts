@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpCode,
+  Param,
   Post,
   UsePipes,
   ValidationPipe,
@@ -19,6 +20,11 @@ export class PhotoController {
   @Get()
   getAll() {
     return this.photoService.getAll();
+  }
+
+  @Get(':id')
+  getOne(@Param('id') photoId: string) {
+    return this.photoService.getOne(photoId);
   }
 
   @UsePipes(new ValidationPipe())

@@ -21,6 +21,19 @@ export class PhotoService {
     return photos;
   }
 
+  async getOne(photoId: string) {
+    const photo = await this.photoRepository.findOne({
+      where: { id: photoId },
+      relations: ['communities'],
+    });
+
+    if (!photo) throw new NotFoundException('Photo not found');
+
+    delete photo.user.password;
+
+    return photo;
+  }
+
   async create(dto: CreatePhotoDto, userId: string) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
@@ -32,6 +45,6 @@ export class PhotoService {
       user: { id: userId },
     });
 
-    return await this.photoRepository.findOne({ where: { id: photo.id } });
+    return this.getOne(photo.id);
   }
 }
