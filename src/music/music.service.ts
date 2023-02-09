@@ -29,15 +29,20 @@ export class MusicService {
   async getAll() {
     const music = await this.musicRepository.find({
       relations: ['communities'],
+      order: { createdAt: 'DESC' },
     });
 
     music.map((music) => {
       delete music.user.password;
 
-      music.musicAdders.map((m) => {
-        delete m.password;
-        return m;
+      music.communities.map((c) => {
+        delete c.admins;
+        delete c.members;
+        delete c.author;
+        return c;
       });
+
+      delete music.musicAdders;
 
       return music;
     });
@@ -55,6 +60,7 @@ export class MusicService {
 
     const music = await this.musicRepository.find({
       where: { user: { id: user.id } },
+      order: { createdAt: 'DESC' },
     });
 
     return music.map((music) => {

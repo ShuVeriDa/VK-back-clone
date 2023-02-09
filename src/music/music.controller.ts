@@ -23,12 +23,12 @@ import { FetchMusicDto } from './dto/fetch.dto';
 export class MusicController {
   constructor(private readonly musicService: MusicService) {}
 
-  @Get()
+  @Get('all')
   getAll() {
     return this.musicService.getAll();
   }
 
-  @Get('mymusic')
+  @Get()
   @Auth('user')
   getMyMusic(@User('id') userId: string) {
     return this.musicService.getMyMusic(userId);
