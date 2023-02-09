@@ -3,9 +3,10 @@ import { PhotoService } from './photo.service';
 import { PhotoController } from './photo.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PhotoEntity } from './entity/photo.entity';
+import { UserEntity } from '../user/entity/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([PhotoEntity])],
+  imports: [TypeOrmModule.forFeature([PhotoEntity, UserEntity])],
   providers: [PhotoService],
   controllers: [PhotoController],
 })

@@ -16,15 +16,15 @@ export class PhotoEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
-  description: string;
+  @Column({ nullable: true })
+  description: string | null;
 
   @ManyToOne(() => UserEntity, { eager: true, nullable: false })
   user: UserEntity;
 
   @ManyToOne(() => CommunityEntity, (community) => community.photos, {
     eager: true,
-    nullable: false,
+    nullable: true,
   })
   communities: CommunityEntity[];
 
