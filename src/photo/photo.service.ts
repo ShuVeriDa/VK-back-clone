@@ -1,9 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PhotoEntity } from './entity/photo.entity';
 import { Repository } from 'typeorm';
 import { CreatePhotoDto } from './dto/create.dto';
 import { UserEntity } from '../user/entity/user.entity';
+import { UpdatePhotoDto } from './dto/update.dto';
+import * as http from 'http';
 
 @Injectable()
 export class PhotoService {
@@ -46,5 +52,27 @@ export class PhotoService {
     });
 
     return this.getOne(photo.id);
+  }
+
+  async update(dto: UpdatePhotoDto, photoId: string, userId: string) {
+    const photo = await this.getOne(photoId);
+
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    const isAuthor = photo.user.id === userId;
+
+    if (!isAuthor)
+      throw new ForbiddenException("You don't have access to this photo");
+
+    await this.photoRepository.update(
+      { id: photo.id },
+      { description: dto.description },
+    );
+
+    return await this.getOne(photo.id);
   }
 }

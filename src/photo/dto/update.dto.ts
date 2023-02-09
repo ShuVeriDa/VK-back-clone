@@ -1,12 +1,9 @@
 import { IsOptional, IsString } from 'class-validator';
 
-export class UpdatePhotosDto {
+export class UpdatePhotoDto {
   @IsOptional()
   @IsString()
   description: string;
-
-  @IsString()
-  photoUrl: string;
 
   @IsOptional()
   @IsString()
