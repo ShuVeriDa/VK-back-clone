@@ -21,8 +21,9 @@ export class PhotoController {
   constructor(private readonly photoService: PhotoService) {}
 
   @Get()
-  getAll() {
-    return this.photoService.getAll();
+  @Auth('user')
+  getAll(@User('id') userId: string) {
+    return this.photoService.getAll(userId);
   }
 
   @Get(':id')

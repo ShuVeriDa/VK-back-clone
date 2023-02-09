@@ -19,11 +19,15 @@ export class PhotoService {
   @InjectRepository(UserEntity)
   private readonly userRepository: Repository<UserEntity>;
 
-  async getAll() {
+  async getAll(userId: string) {
     const photos = await this.photoRepository.find({
+      where: { user: { id: userId } },
       order: { createdAt: 'DESC' },
     });
-
+    photos.map((p) => {
+      delete p.user.password;
+      return p;
+    });
     return photos;
   }
 
