@@ -51,7 +51,13 @@ export class MusicService {
       relations: ['music'],
     });
 
-    user.music.map((music) => {
+    if (!user) throw new NotFoundException('User not found');
+
+    const music = await this.musicRepository.find({
+      where: { user: { id: user.id } },
+    });
+
+    return music.map((music) => {
       delete music.user.password;
 
       music.musicAdders.map((adder) => {
@@ -61,8 +67,6 @@ export class MusicService {
 
       return music;
     });
-
-    return user.music;
   }
 
   async search(dto: SearchMusicDto) {

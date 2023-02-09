@@ -20,10 +20,18 @@ export class PhotoService {
   private readonly userRepository: Repository<UserEntity>;
 
   async getAll(userId: string) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['music'],
+    });
+
+    if (!user) throw new NotFoundException('User not found');
+
     const photos = await this.photoRepository.find({
-      where: { user: { id: userId } },
+      where: { user: { id: user.id } },
       order: { createdAt: 'DESC' },
     });
+
     photos.map((p) => {
       delete p.user.password;
       return p;
