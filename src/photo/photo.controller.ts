@@ -69,11 +69,24 @@ export class PhotoController {
   getOneInCommunity(@Body() dto: FetchPhotoDto, @Param('id') photoId: string) {
     return this.photoService.getOneInCommunity(dto, photoId);
   }
+
   @UsePipes(new ValidationPipe())
   @Post('community/photo')
   @HttpCode(200)
   @Auth('user')
   createInCommunity(@Body() dto: CreatePhotoDto, @User('id') userId: string) {
     return this.photoService.createInCommunity(dto, userId);
+  }
+
+  @UsePipes(new ValidationPipe())
+  @Put('community/photo/:id')
+  @HttpCode(200)
+  @Auth('user')
+  updateInCommunity(
+    @Body() dto: UpdatePhotoDto,
+    @Param('id') photoId: string,
+    @User('id') userId: string,
+  ) {
+    return this.photoService.updateInCommunity(dto, photoId, userId);
   }
 }

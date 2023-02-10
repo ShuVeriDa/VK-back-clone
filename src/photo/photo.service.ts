@@ -184,4 +184,33 @@ export class PhotoService {
 
     return await this.getOne(photo.id);
   }
+
+  async updateInCommunity(
+    dto: UpdatePhotoDto,
+    photoId: string,
+    userId: string,
+  ) {
+    const { community, user } = await validationCRUDInCommunity(
+      dto.communityId,
+      this.communityRepository,
+      userId,
+      this.userRepository,
+    );
+
+    const photo = community.photos.find((photo) => photo.id === photoId);
+
+    if (!photo)
+      throw new NotFoundException('Photo not found in this community');
+
+    await this.photoRepository.update(
+      {
+        id: photo.id,
+      },
+      {
+        description: dto.description,
+      },
+    );
+
+    return await this.getOne(photo.id);
+  }
 }
