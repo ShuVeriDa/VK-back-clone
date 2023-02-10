@@ -19,6 +19,9 @@ export class PhotoEntity {
   @Column({ nullable: true })
   description: string | null;
 
+  @Column({ nullable: true })
+  photoUrl: string | null;
+
   @ManyToOne(() => UserEntity, { eager: true, nullable: false })
   user: UserEntity;
 

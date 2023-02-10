@@ -54,10 +54,10 @@ export class PhotoService {
     if (!photo) throw new NotFoundException('Photo not found');
 
     delete photo.user.password;
-    delete photo?.community.members;
-    delete photo?.community.author;
+    delete photo?.community?.members;
+    delete photo?.community?.author;
 
-    photo?.community.admins.map((admin) => {
+    photo?.community?.admins.map((admin) => {
       delete admin.password;
       return admin;
     });
@@ -73,6 +73,7 @@ export class PhotoService {
     if (!user) throw new NotFoundException('User not found');
 
     const photo = await this.photoRepository.save({
+      photoUrl: dto.photoUrl,
       user: { id: userId },
     });
 
@@ -178,6 +179,7 @@ export class PhotoService {
     );
 
     const photo = await this.photoRepository.save({
+      photoUrl: dto.photoUrl,
       user: { id: user.id },
       community: { id: community.id },
     });
