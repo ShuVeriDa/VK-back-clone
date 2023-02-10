@@ -8,7 +8,7 @@ export const validationCRUDInCommunity = async (
   communityRepos: Repository<CommunityEntity>,
   userId: string,
   userRepos: Repository<UserEntity>,
-  manager = false,
+  isManager = false,
 ) => {
   const community = await communityRepos.findOne({
     where: { id: communityId },
@@ -21,7 +21,7 @@ export const validationCRUDInCommunity = async (
   const user = await userRepos.findOne({ where: { id: userId } });
   if (!user) throw new NotFoundException(`User with id ${userId} not found`);
 
-  if (!manager) {
+  if (!isManager) {
     const isAdmin = community.admins.find((admin) => admin.id === user.id);
 
     if (!isAdmin) throw new ForbiddenException('You have no rights!');

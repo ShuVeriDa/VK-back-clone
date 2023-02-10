@@ -9,7 +9,6 @@ import { Repository } from 'typeorm';
 import { CreatePhotoDto } from './dto/create.dto';
 import { UserEntity } from '../user/entity/user.entity';
 import { UpdatePhotoDto } from './dto/update.dto';
-import * as http from 'http';
 import { CommunityEntity } from '../community/entity/community.entity';
 import { validationCRUDInCommunity } from '../components/forServices/validationCRUDInCommunity';
 import { FetchPhotoDto } from './dto/fetch.dto';
@@ -158,6 +157,17 @@ export class PhotoService {
     //   return photo;
     // }
     // );
+  }
+
+  async getOneInCommunity(dto: FetchPhotoDto, photoId: string) {
+    const photo = await this.getOne(photoId);
+
+    const { community, user } = await validationCommunity(
+      dto.communityId,
+      this.communityRepository,
+    );
+
+    return photo;
   }
   async createInCommunity(dto: CreatePhotoDto, userId: string) {
     const { community, user } = await validationCRUDInCommunity(

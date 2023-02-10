@@ -64,6 +64,11 @@ export class PhotoController {
   getAllInCommunity(@Body() dto: FetchPhotoDto) {
     return this.photoService.getAllInCommunity(dto);
   }
+
+  @Get('community/photo/:id')
+  getOneInCommunity(@Body() dto: FetchPhotoDto, @Param('id') photoId: string) {
+    return this.photoService.getOneInCommunity(dto, photoId);
+  }
   @UsePipes(new ValidationPipe())
   @Post('community/photo')
   @HttpCode(200)
