@@ -44,12 +44,10 @@ export class CommentService {
         ...comment,
         user: {
           id: comment.user.id,
-          email: comment.user.email,
           firstName: comment.user.firstName,
           lastName: comment.user.lastName,
           avatar: comment.user.avatar,
         },
-
         post: comment.post
           ? { id: comment.post.id, text: comment.post.text }
           : null,
@@ -83,24 +81,45 @@ export class CommentService {
     // });
   }
   async findByPostId(postId: string) {
-    const qb = await this.commentRepository.createQueryBuilder('c');
+    const comments = await this.commentRepository.find({
+      where: { post: { id: postId } },
+      relations: ['post', 'user'],
+    });
 
-    const arr = await qb
-      .leftJoinAndSelect('c.post', 'post')
-      .leftJoinAndSelect('c.user', 'user')
-      .getMany();
-
-    const posts = arr
-      .filter((obj) => obj.post.id === postId)
-      .map((obj) => {
-        delete obj.user.password;
+    return comments
+      .filter((comment) => comment.post.id === postId)
+      .map((comment) => {
+        delete comment.user.password;
         return {
-          ...obj,
-          post: { id: obj.post.id, text: obj.post.text },
+          ...comment,
+          post: { id: comment.post.id, text: comment.post.text },
+          user: {
+            id: comment.user.id,
+            firstName: comment.user.firstName,
+            lastName: comment.user.lastName,
+            avatar: comment.user.avatar,
+          },
         };
       });
 
-    return posts;
+    // const qb = await this.commentRepository.createQueryBuilder('c');
+    //
+    // const arr = await qb
+    //   .leftJoinAndSelect('c.post', 'post')
+    //   .leftJoinAndSelect('c.user', 'user')
+    //   .getMany();
+    //
+    // const posts = arr
+    //   .filter((obj) => obj.post.id === postId)
+    //   .map((obj) => {
+    //     delete obj.user.password;
+    //     return {
+    //       ...obj,
+    //       post: { id: obj.post.id, text: obj.post.text },
+    //     };
+    //   });
+    //
+    // return posts;
   }
 
   async findOneById(id: string) {

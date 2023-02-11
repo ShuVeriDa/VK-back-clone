@@ -27,15 +27,20 @@ export class CommentController {
   //   return this.commentService.findAll(+query.postId);
   // }
 
+  @Get('/post')
+  findAllByPostId(@Body('postId') postId: string) {
+    return this.commentService.findByPostId(postId);
+  }
+
   @Get(':id')
   findOneById(@Param('id') id: string) {
     return this.commentService.findOneById(id);
   }
 
-  @Get('post/:id')
-  findByPostId(@Param('id') postId: string) {
-    return this.commentService.findByPostId(postId);
-  }
+  // @Get('photo')
+  // findAllByPhotoId(@Param('id') postId: string) {
+  //   return this.commentService.findByPostId(postId);
+  // }
 
   @Post()
   @Auth('user')
