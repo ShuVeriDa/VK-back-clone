@@ -103,20 +103,8 @@ export class CommentService {
         user: { id: userId },
       });
 
-      const newComment = await this.commentRepository.findOne({
-        where: { id: comment.id },
-        relations: ['user', 'post', 'photo'],
-      });
-
-      delete newComment.user.password;
-      delete newComment.photo.user.password;
-      delete newComment.photo.comments;
-      delete newComment.post;
-
-      return newComment;
+      return this.findOneById(comment.id);
     }
-
-    // return await this.commentRepository.findOneBy({ id: comment.id });
   }
 
   async update(dto: UpdateCommentDto, commentId: string, userId: string) {
@@ -157,22 +145,7 @@ export class CommentService {
       relations: ['photo', 'user'],
     });
 
-    return comments.map((comment) => {
-      return {
-        ...comment,
-        user: {
-          id: comment.user.id,
-          firstName: comment.user.firstName,
-          lastName: comment.user.lastName,
-          avatar: comment.user.avatar,
-        },
-        photo: {
-          id: comment.photo.id,
-          description: comment.photo.description,
-          photoUrl: comment.photo.photoUrl,
-        },
-      };
-    });
+    return returnCommentsFields(comments);
   }
 
   //FOR COMMUNITY
