@@ -16,6 +16,8 @@ import { FetchCommentDto } from './dto/fetch.dto';
 import { UpdateCommentDto } from './dto/update.dto';
 import { getOnePostInCommunity } from '../components/forServices/getOnePostInCommunity';
 import { PhotoEntity } from '../photo/entity/photo.entity';
+import { returnCommentFields } from '../components/forServices/returnCommentFields';
+import { returnCommentsFields } from '../components/forServices/returnCommentsFields';
 
 @Injectable()
 export class CommentService {
@@ -39,46 +41,7 @@ export class CommentService {
       relations: ['user', 'post', 'photo'],
     });
 
-    return comments.map((comment) => {
-      return {
-        ...comment,
-        user: {
-          id: comment.user.id,
-          firstName: comment.user.firstName,
-          lastName: comment.user.lastName,
-          avatar: comment.user.avatar,
-        },
-        post: comment.post
-          ? { id: comment.post.id, text: comment.post.text }
-          : null,
-        photo: comment.photo
-          ? {
-              id: comment.photo.id,
-              description: comment.photo.description,
-              photoUrl: comment.photo.photoUrl,
-            }
-          : null,
-      };
-    });
-
-    // const qb = this.commentRepository.createQueryBuilder('c');
-    //
-    // if (postId) {
-    //   qb.where('c.postId = :postId', { postId });
-    // }
-    //
-    // const arr = await qb
-    //   .leftJoinAndSelect('c.post', 'post')
-    //   .leftJoinAndSelect('c.user', 'user')
-    //   .getMany();
-    //
-    // return arr.map((obj) => {
-    //   delete obj.user.password;
-    //   return {
-    //     ...obj,
-    //     post: { id: obj.post.id, title: obj.post.text },
-    //   };
-    // });
+    return returnCommentsFields(comments);
   }
   async findAllByPostId(dto: FetchCommentDto) {
     const post = await this.postRepository.findOne({
@@ -92,58 +55,18 @@ export class CommentService {
       relations: ['post', 'user'],
     });
 
-    return comments.map((comment) => {
-      return {
-        ...comment,
-        user: {
-          id: comment.user.id,
-          firstName: comment.user.firstName,
-          lastName: comment.user.lastName,
-          avatar: comment.user.avatar,
-        },
-        post: { id: comment.post.id, text: comment.post.text },
-      };
-    });
-
-    // const qb = await this.commentRepository.createQueryBuilder('c');
-    //
-    // const arr = await qb
-    //   .leftJoinAndSelect('c.post', 'post')
-    //   .leftJoinAndSelect('c.user', 'user')
-    //   .getMany();
-    //
-    // const posts = arr
-    //   .filter((obj) => obj.post.id === postId)
-    //   .map((obj) => {
-    //     delete obj.user.password;
-    //     return {
-    //       ...obj,
-    //       post: { id: obj.post.id, text: obj.post.text },
-    //     };
-    //   });
-    //
-    // return posts;
+    return returnCommentsFields(comments);
   }
 
-  async findOneById(id: string) {
-    const qb = this.commentRepository.createQueryBuilder('c');
+  async findOneById(commentId: string) {
+    const comment = await this.commentRepository.findOne({
+      where: { id: commentId },
+      relations: ['post', 'user', 'photo'],
+    });
 
-    const arr = await qb
-      .leftJoinAndSelect('c.post', 'post')
-      .leftJoinAndSelect('c.user', 'user')
-      .getMany();
+    if (!comment) throw new NotFoundException('Comment not found');
 
-    const comment = arr.find((obj) => obj.id === id);
-
-    if (!comment) {
-      throw new NotFoundException('comment not found');
-    }
-
-    delete comment.user.password;
-    return {
-      ...comment,
-      post: { id: comment.post.id, text: comment.post.text },
-    };
+    return returnCommentFields(comment);
   }
 
   async create(dto: CreateCommentDto, userId: string) {
