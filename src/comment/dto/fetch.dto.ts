@@ -1,13 +1,13 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class FetchCommentDto {
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  postId: string;
+  postId?: string;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  photoId: string;
+  photoId?: string;
 
   @IsOptional()
   @IsString()

@@ -80,27 +80,30 @@ export class CommentService {
     //   };
     // });
   }
-  async findByPostId(postId: string) {
+  async findAllByPostId(dto: FetchCommentDto) {
+    const post = await this.postRepository.findOne({
+      where: { id: dto.postId },
+    });
+
+    if (!post) throw new NotFoundException('Post not found');
+
     const comments = await this.commentRepository.find({
-      where: { post: { id: postId } },
+      where: { post: { id: post.id } },
       relations: ['post', 'user'],
     });
 
-    return comments
-      .filter((comment) => comment.post.id === postId)
-      .map((comment) => {
-        delete comment.user.password;
-        return {
-          ...comment,
-          post: { id: comment.post.id, text: comment.post.text },
-          user: {
-            id: comment.user.id,
-            firstName: comment.user.firstName,
-            lastName: comment.user.lastName,
-            avatar: comment.user.avatar,
-          },
-        };
-      });
+    return comments.map((comment) => {
+      return {
+        ...comment,
+        user: {
+          id: comment.user.id,
+          firstName: comment.user.firstName,
+          lastName: comment.user.lastName,
+          avatar: comment.user.avatar,
+        },
+        post: { id: comment.post.id, text: comment.post.text },
+      };
+    });
 
     // const qb = await this.commentRepository.createQueryBuilder('c');
     //
@@ -216,6 +219,37 @@ export class CommentService {
     await validationUserForComments(id, userId, this, user.isAdmin);
 
     return this.commentRepository.delete(id);
+  }
+
+  //FOR PHOTO
+  async findAllByPhotoId(dto: FetchCommentDto) {
+    const photo = await this.photoRepository.findOne({
+      where: { id: dto.photoId },
+    });
+
+    if (!photo) throw new NotFoundException('Photo not found');
+
+    const comments = await this.commentRepository.find({
+      where: { photo: { id: photo.id } },
+      relations: ['photo', 'user'],
+    });
+
+    return comments.map((comment) => {
+      return {
+        ...comment,
+        user: {
+          id: comment.user.id,
+          firstName: comment.user.firstName,
+          lastName: comment.user.lastName,
+          avatar: comment.user.avatar,
+        },
+        photo: {
+          id: comment.photo.id,
+          description: comment.photo.description,
+          photoUrl: comment.photo.photoUrl,
+        },
+      };
+    });
   }
 
   //FOR COMMUNITY

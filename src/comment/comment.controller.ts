@@ -14,6 +14,7 @@ import { CreateCommentDto } from './dto/create.dto';
 import { User } from '../user/decorators/user.decorator';
 import { FetchCommentDto } from './dto/fetch.dto';
 import { UpdateCommentDto } from './dto/update.dto';
+import { FetchPhotoDto } from '../photo/dto/fetch.dto';
 
 @Controller('comments')
 export class CommentController {
@@ -27,20 +28,16 @@ export class CommentController {
   //   return this.commentService.findAll(+query.postId);
   // }
 
-  @Get('/post')
-  findAllByPostId(@Body('postId') postId: string) {
-    return this.commentService.findByPostId(postId);
+  //FOR POST
+  @Get('post')
+  findAllByPostId(@Body() dto: FetchCommentDto) {
+    return this.commentService.findAllByPostId(dto);
   }
 
   @Get(':id')
   findOneById(@Param('id') id: string) {
     return this.commentService.findOneById(id);
   }
-
-  // @Get('photo')
-  // findAllByPhotoId(@Param('id') postId: string) {
-  //   return this.commentService.findByPostId(postId);
-  // }
 
   @Post()
   @Auth('user')
@@ -62,6 +59,12 @@ export class CommentController {
   @Auth('user')
   remove(@Param('id') id: string, @User('id') userId: string) {
     return this.commentService.remove(id, userId);
+  }
+
+  //FOR PHOTO
+  @Get('photo')
+  findAllByPhotoId(@Body() dto: FetchCommentDto) {
+    return this.commentService.findAllByPhotoId(dto);
   }
 
   //FOR COMMUNITY
