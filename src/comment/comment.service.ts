@@ -34,25 +34,53 @@ export class CommentService {
     private readonly communityRepository: Repository<CommunityEntity>,
   ) {}
 
-  async findAll(postId: number) {
-    const qb = this.commentRepository.createQueryBuilder('c');
+  async findAll() {
+    const comments = await this.commentRepository.find({
+      relations: ['user', 'post', 'photo'],
+    });
 
-    if (postId) {
-      qb.where('c.postId = :postId', { postId });
-    }
-
-    const arr = await qb
-      .leftJoinAndSelect('c.post', 'post')
-      .leftJoinAndSelect('c.user', 'user')
-      .getMany();
-
-    return arr.map((obj) => {
-      delete obj.user.password;
+    return comments.map((comment) => {
       return {
-        ...obj,
-        post: { id: obj.post.id, title: obj.post.text },
+        ...comment,
+        user: {
+          id: comment.user.id,
+          email: comment.user.email,
+          firstName: comment.user.firstName,
+          lastName: comment.user.lastName,
+          avatar: comment.user.avatar,
+        },
+
+        post: comment.post
+          ? { id: comment.post.id, text: comment.post.text }
+          : null,
+        photo: comment.photo
+          ? {
+              id: comment.photo.id,
+              description: comment.photo.description,
+              photoUrl: comment.photo.photoUrl,
+            }
+          : null,
       };
     });
+
+    // const qb = this.commentRepository.createQueryBuilder('c');
+    //
+    // if (postId) {
+    //   qb.where('c.postId = :postId', { postId });
+    // }
+    //
+    // const arr = await qb
+    //   .leftJoinAndSelect('c.post', 'post')
+    //   .leftJoinAndSelect('c.user', 'user')
+    //   .getMany();
+    //
+    // return arr.map((obj) => {
+    //   delete obj.user.password;
+    //   return {
+    //     ...obj,
+    //     post: { id: obj.post.id, title: obj.post.text },
+    //   };
+    // });
   }
   async findByPostId(postId: string) {
     const qb = await this.commentRepository.createQueryBuilder('c');

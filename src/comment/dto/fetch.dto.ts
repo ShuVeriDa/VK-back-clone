@@ -5,6 +5,10 @@ export class FetchCommentDto {
   @IsNotEmpty()
   postId: string;
 
+  @IsString()
+  @IsNotEmpty()
+  photoId: string;
+
   @IsOptional()
   @IsString()
   communityId?: string;

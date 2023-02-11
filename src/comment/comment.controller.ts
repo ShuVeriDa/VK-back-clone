@@ -20,9 +20,12 @@ export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
   @Get()
-  findAll(@Query() query: { postId?: string }) {
-    return this.commentService.findAll(+query.postId);
+  findAll() {
+    return this.commentService.findAll();
   }
+  // findAll(@Query() query: { postId?: string }) {
+  //   return this.commentService.findAll(+query.postId);
+  // }
 
   @Get(':id')
   findOneById(@Param('id') id: string) {
