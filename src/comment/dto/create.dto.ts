@@ -6,8 +6,12 @@ export class CreateCommentDto {
   text: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   postId: string;
+
+  @IsString()
+  @IsOptional()
+  photoId: string;
 
   @IsOptional()
   @IsString()

@@ -15,6 +15,7 @@ import { PostEntity } from '../post/entity/post.entity';
 import { FetchCommentDto } from './dto/fetch.dto';
 import { UpdateCommentDto } from './dto/update.dto';
 import { getOnePostInCommunity } from '../components/forServices/getOnePostInCommunity';
+import { PhotoEntity } from '../photo/entity/photo.entity';
 
 @Injectable()
 export class CommentService {
@@ -26,6 +27,8 @@ export class CommentService {
 
     @InjectRepository(PostEntity)
     private readonly postRepository: Repository<PostEntity>,
+    @InjectRepository(PhotoEntity)
+    private readonly photoRepository: Repository<PhotoEntity>,
 
     @InjectRepository(CommunityEntity)
     private readonly communityRepository: Repository<CommunityEntity>,
@@ -94,22 +97,53 @@ export class CommentService {
   }
 
   async create(dto: CreateCommentDto, userId: string) {
-    const post = await this.postRepository.findOne({
-      where: { id: dto.postId },
-      relations: ['comments'],
-    });
+    if (dto.postId) {
+      const post = await this.postRepository.findOne({
+        where: { id: dto.postId },
+        relations: ['comments'],
+      });
 
-    if (post.turnOffComments)
-      throw new ForbiddenException('This post has comments turned off');
+      if (post.turnOffComments)
+        throw new ForbiddenException('This post has comments turned off');
 
-    const comment = await this.commentRepository.save({
-      text: dto.text,
-      post: { id: dto.postId },
-      user: { id: userId },
-    });
+      const comment = await this.commentRepository.save({
+        text: dto.text,
+        post: { id: post.id },
+        user: { id: userId },
+      });
+
+      return this.findOneById(comment.id);
+    }
+
+    if (dto.photoId) {
+      const photo = await this.photoRepository.findOne({
+        where: { id: dto.postId },
+        relations: ['comments'],
+      });
+
+      if (photo.turnOffComments)
+        throw new ForbiddenException('This photo has comments turned off');
+
+      const comment = await this.commentRepository.save({
+        text: dto.text,
+        photo: { id: photo.id },
+        user: { id: userId },
+      });
+
+      const newComment = await this.commentRepository.findOne({
+        where: { id: comment.id },
+        relations: ['user', 'post', 'photo'],
+      });
+
+      delete newComment.user.password;
+      delete newComment.photo.user.password;
+      delete newComment.photo.comments;
+      delete newComment.post;
+
+      return newComment;
+    }
 
     // return await this.commentRepository.findOneBy({ id: comment.id });
-    return this.findOneById(comment.id);
   }
 
   async update(dto: UpdateCommentDto, commentId: string, userId: string) {

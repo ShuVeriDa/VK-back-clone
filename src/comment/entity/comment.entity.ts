@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { UserEntity } from '../../user/entity/user.entity';
 import { PostEntity } from '../../post/entity/post.entity';
+import { PhotoEntity } from '../../photo/entity/photo.entity';
 
 @Entity('comments')
 export class CommentEntity {
@@ -28,10 +29,16 @@ export class CommentEntity {
   user: UserEntity;
 
   @ManyToOne(() => PostEntity, {
-    nullable: false,
+    nullable: true,
   })
   @JoinColumn({ name: 'postId' })
   post: PostEntity;
+
+  @ManyToOne(() => PhotoEntity, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'photoId' })
+  photo: PhotoEntity;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

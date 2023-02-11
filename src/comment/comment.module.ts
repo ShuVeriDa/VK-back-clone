@@ -8,6 +8,7 @@ import { UserModule } from '../user/user.module';
 import { PostModule } from '../post/post.module';
 import { CommunityEntity } from '../community/entity/community.entity';
 import { PostEntity } from '../post/entity/post.entity';
+import { PhotoEntity } from '../photo/entity/photo.entity';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { PostEntity } from '../post/entity/post.entity';
       UserEntity,
       CommunityEntity,
       PostEntity,
+      PhotoEntity,
     ]),
     // UserModule,
     // PostModule,
