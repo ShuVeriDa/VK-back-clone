@@ -42,23 +42,23 @@ export class CommentController {
     return this.commentService.findOneById(commentId);
   }
 
-  @Post()
+  @Post('post')
   @Auth('user')
-  create(@Body() dto: CreateCommentDto, @User('id') userId: string) {
-    return this.commentService.create(dto, userId);
+  createPostComment(@Body() dto: CreateCommentDto, @User('id') userId: string) {
+    return this.commentService.createPostComment(dto, userId);
   }
 
-  @Put(':id')
+  @Put('post/:id')
   @Auth('user')
-  update(
+  updatePostComment(
     @Param('id') commentId: string,
     @Body() dto: UpdateCommentDto,
     @User('id') userId: string,
   ) {
-    return this.commentService.update(dto, commentId, userId);
+    return this.commentService.updatePostComment(dto, commentId, userId);
   }
 
-  @Delete(':id')
+  @Delete('post/:id')
   @Auth('user')
   remove(@Param('id') id: string, @User('id') userId: string) {
     return this.commentService.remove(id, userId);

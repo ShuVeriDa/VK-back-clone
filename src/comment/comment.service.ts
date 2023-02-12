@@ -43,6 +43,10 @@ export class CommentService {
 
     return returnCommentsFields(comments);
   }
+  //.........
+  // FOR POST
+  //.........
+
   async findAllByPostId(dto: FetchCommentDto) {
     const post = await this.postRepository.findOne({
       where: { id: dto.postId },
@@ -69,7 +73,7 @@ export class CommentService {
     return returnCommentFields(comment);
   }
 
-  async create(dto: CreateCommentDto, userId: string) {
+  async createPostComment(dto: CreateCommentDto, userId: string) {
     if (dto.postId) {
       const post = await this.postRepository.findOne({
         where: { id: dto.postId },
@@ -107,7 +111,11 @@ export class CommentService {
     }
   }
 
-  async update(dto: UpdateCommentDto, commentId: string, userId: string) {
+  async updatePostComment(
+    dto: UpdateCommentDto,
+    commentId: string,
+    userId: string,
+  ) {
     await validationUserForComments(commentId, userId, this);
 
     const comment = await this.commentRepository.update(
@@ -132,7 +140,10 @@ export class CommentService {
     return this.commentRepository.delete(id);
   }
 
-  //FOR PHOTO
+  //.........//
+  //FOR PHOTO//
+  //.........//
+
   async findAllByPhotoId(dto: FetchCommentDto) {
     const photo = await this.photoRepository.findOne({
       where: { id: dto.photoId },
@@ -148,7 +159,9 @@ export class CommentService {
     return returnCommentsFields(comments);
   }
 
-  //FOR COMMUNITY
+  //.............//
+  //FOR COMMUNITY//
+  //.............//
 
   async getOneCommentInCommunity(dto: FetchCommentDto, commentId: string) {
     const { post } = await getOnePostInCommunity(

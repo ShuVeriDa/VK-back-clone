@@ -186,14 +186,6 @@ export class PostService {
 
       await manager.remove(post);
     });
-
-    // const post = await this.postRepository.findOneBy({ id: postId });
-    // if (!post) throw new NotFoundException('Post not found');
-    //
-    // if (String(post.user.id) !== String(userId))
-    //   throw new ForbiddenException("You don't have access to this post");
-    //
-    // return this.postRepository.delete(postId);
   }
 
   async addToFavorites(id: string, userId: string) {
@@ -261,36 +253,6 @@ export class PostService {
     );
 
     return post;
-
-    // const post = await this.postRepository.findOne({
-    //   where: { id: postId },
-    //   relations: ['community', 'community.admins'],
-    // });
-    //
-    // if (!post) throw new NotFoundException('Post not found');
-    //
-    // const community = await this.communityRepository.findOne({
-    //   where: { id: dto.communityId },
-    //   relations: ['members', 'posts'],
-    // });
-    //
-    // if (!community)
-    //   throw new NotFoundException(
-    //     `Community with id ${dto.communityId} not found`,
-    //   );
-    //
-    // const isExistPost = community.posts.find((post) => post.id === postId);
-    //
-    // if (!isExistPost)
-    //   throw new NotFoundException('Post not found in this community');
-    //
-    // delete post.user.password;
-    // // delete post.community.author.password;
-    // // post.community.members.map((m) => {
-    // //   delete m.password;
-    // //   return m;
-    // // });
-    // return post;
   }
   async postCreateInCommunity(dto: CreatePostDto, userId: string) {
     const { community, user } = await validationCRUDInCommunity(
@@ -399,29 +361,4 @@ export class PostService {
       await manager.remove(post);
     });
   }
-  //   const post = await this.postRepository.findOne({
-  //     where: { id: postId },
-  //     relations: ['community'],
-  //   });
-  //
-  //   if (!post) throw new NotFoundException(`Post not found`);
-  //
-  //   const community = await this.communityRepository.findOne({
-  //     where: { id: post.community.id },
-  //     relations: ['members', 'admins'],
-  //   });
-  //
-  //   if (!community) throw new NotFoundException(`Community not found`);
-  //
-  //   const user = await this.userRepository.findOne({ where: { id: userId } });
-  //
-  //   if (!user) throw new NotFoundException(`User with id ${userId} not found`);
-  //
-  //   const isAdmin = community.admins.find((admin) => admin.id === user.id);
-  //
-  //   if (post.user.id !== userId || !isAdmin)
-  //     throw new NotFoundException("You don't have access to this post");
-  //
-  //   return await this.postRepository.delete(postId);
-  // }
 }
