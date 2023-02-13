@@ -6,8 +6,12 @@ export class UpdateCommentDto {
   text: string;
 
   @IsString()
-  @IsNotEmpty()
-  postId: string;
+  @IsOptional()
+  postId?: string;
+
+  @IsString()
+  @IsOptional()
+  photoId?: string;
 
   @IsOptional()
   @IsString()

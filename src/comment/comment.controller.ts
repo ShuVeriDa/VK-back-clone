@@ -37,18 +37,18 @@ export class CommentController {
     return this.commentService.findAllByPostId(dto);
   }
 
-  @Get('post/:id')
+  @Get(':id')
   findOneByPostId(@Param('id') commentId: string) {
     return this.commentService.findOneById(commentId);
   }
 
-  @Post('post')
+  @Post()
   @Auth('user')
   createPostComment(@Body() dto: CreateCommentDto, @User('id') userId: string) {
     return this.commentService.createPostComment(dto, userId);
   }
 
-  @Put('post/:id')
+  @Put(':id')
   @Auth('user')
   updatePostComment(
     @Param('id') commentId: string,
@@ -58,7 +58,7 @@ export class CommentController {
     return this.commentService.updatePostComment(dto, commentId, userId);
   }
 
-  @Delete('post/:id')
+  @Delete(':id')
   @Auth('user')
   remove(@Param('id') id: string, @User('id') userId: string) {
     return this.commentService.remove(id, userId);
@@ -72,11 +72,11 @@ export class CommentController {
   findAllByPhotoId(@Body() dto: FetchCommentDto) {
     return this.commentService.findAllByPhotoId(dto);
   }
-
-  @Get('photo/:id')
-  findOneByPhotoId(@Param('id') commentId: string) {
-    return this.commentService.findOneById(commentId);
-  }
+  //
+  // @Get('photo/:id')
+  // findOneByPhotoId(@Param('id') commentId: string) {
+  //   return this.commentService.findOneById(commentId);
+  // }
 
   //............
   //FOR COMMUNITY
