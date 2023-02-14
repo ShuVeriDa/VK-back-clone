@@ -18,6 +18,7 @@ import { getOnePostInCommunity } from '../components/forServices/getOnePostInCom
 import { PhotoEntity } from '../photo/entity/photo.entity';
 import { returnCommentFields } from '../components/forServices/returnCommentFields';
 import { returnCommentsFields } from '../components/forServices/returnCommentsFields';
+import { getOnePhotoInCommunity } from '../components/forServices/getOnePhotoInCommunity';
 
 @Injectable()
 export class CommentService {
@@ -226,17 +227,6 @@ export class CommentService {
   //FOR COMMUNITY//
   //.............//
 
-  async getOneCommentInCommunity(dto: FetchCommentDto, commentId: string) {
-    const { post } = await getOnePostInCommunity(
-      dto.postId,
-      this.postRepository,
-      dto.communityId,
-      this.communityRepository,
-    );
-
-    const comment = post.comments.find((comment) => comment.id === commentId);
-    return comment;
-  }
   async getAllCommentsInCommunity(dto: FetchCommentDto) {
     const community = await this.communityRepository.findOne({
       where: { id: dto.communityId },
@@ -268,28 +258,82 @@ export class CommentService {
     return post;
   }
 
+  async getOneCommentInCommunity(dto: FetchCommentDto, commentId: string) {
+    if (dto.postId) {
+      const { post } = await getOnePostInCommunity(
+        dto.postId,
+        this.postRepository,
+        dto.communityId,
+        this.communityRepository,
+      );
+
+      const comment = post.comments.find((comment) => comment.id === commentId);
+      return comment;
+    }
+
+    if (dto.photoId) {
+      const { photo } = await getOnePhotoInCommunity(
+        dto.photoId,
+        this.photoRepository,
+        dto.communityId,
+        this.communityRepository,
+      );
+
+      const comment = photo.comments.find(
+        (comment) => comment.id === commentId,
+      );
+      return comment;
+    }
+  }
+
   async commentCreateInCommunity(dto: CreateCommentDto, userId: string) {
-    const { community, user } = await validationCRUDInCommunity(
-      dto.communityId,
-      this.communityRepository,
-      userId,
-      this.userRepository,
-    );
+    if (dto.postId) {
+      const { community, user } = await validationCRUDInCommunity(
+        dto.communityId,
+        this.communityRepository,
+        userId,
+        this.userRepository,
+      );
 
-    const post = community.posts.find((post) => post.id === dto.postId);
+      const post = community.posts.find((post) => post.id === dto.postId);
 
-    if (!post) throw new NotFoundException('Post not found');
+      if (!post) throw new NotFoundException('Post not found');
 
-    if (post.turnOffComments)
-      throw new ForbiddenException('This post has comments turned off.');
+      if (post.turnOffComments)
+        throw new ForbiddenException('This post has comments turned off.');
 
-    const comment = await this.commentRepository.save({
-      text: dto.text,
-      post: { id: post.id },
-      user: { id: userId },
-    });
+      const comment = await this.commentRepository.save({
+        text: dto.text,
+        post: { id: post.id },
+        user: { id: user.id },
+      });
 
-    return await this.findOneById(comment.id);
+      return await this.findOneById(comment.id);
+    }
+
+    if (dto.photoId) {
+      const { community, user } = await validationCRUDInCommunity(
+        dto.communityId,
+        this.communityRepository,
+        userId,
+        this.userRepository,
+      );
+
+      const photo = community.photos.find((photo) => photo.id === dto.photoId);
+
+      if (!photo) throw new NotFoundException('Photo not found');
+
+      if (photo.turnOffComments)
+        throw new ForbiddenException('This photo has comments turned off.');
+
+      const comment = await this.commentRepository.save({
+        text: dto.text,
+        photo: { id: photo.id },
+        user: { id: user.id },
+      });
+
+      return await this.findOneById(comment.id);
+    }
   }
 
   async commentUpdateInCommunity(
