@@ -183,9 +183,6 @@ export class CommentService {
 
       if (!photo) throw new NotFoundException('Photo not found');
 
-      if (photo.turnOffComments)
-        throw new ForbiddenException('This photo has comments turned off');
-
       const comment = photo.comments.find(
         (comment) => comment.id === commentId,
       );
@@ -341,34 +338,64 @@ export class CommentService {
     commentId: string,
     userId: string,
   ) {
-    const { community, user } = await validationCRUDInCommunity(
-      dto.communityId,
-      this.communityRepository,
-      userId,
-      this.userRepository,
-    );
+    if (dto.postId) {
+      const { community, user } = await validationCRUDInCommunity(
+        dto.communityId,
+        this.communityRepository,
+        userId,
+        this.userRepository,
+      );
 
-    const post = community.posts.find((post) => post.id === dto.postId);
+      const post = community.posts.find((post) => post.id === dto.postId);
 
-    if (!post) throw new NotFoundException('Post not found');
+      if (!post) throw new NotFoundException('Post not found');
 
-    if (post.turnOffComments)
-      throw new ForbiddenException('This post has comments turned off.');
+      if (post.turnOffComments)
+        throw new ForbiddenException('This post has comments turned off.');
 
-    const comment = await this.findOneById(commentId);
+      const comment = await this.findOneById(commentId);
 
-    if (!comment) throw new NotFoundException('Comment not found');
+      if (!comment) throw new NotFoundException('Comment not found');
 
-    await this.commentRepository.update(
-      { id: commentId },
-      {
-        text: dto.text,
-        post: { id: dto.postId },
-        user: { id: user.id },
-      },
-    );
+      await this.commentRepository.update(
+        { id: commentId },
+        {
+          text: dto.text,
+          post: { id: dto.postId },
+          user: { id: user.id },
+        },
+      );
 
-    return await this.findOneById(comment.id);
+      return await this.findOneById(comment.id);
+    }
+
+    if (dto.photoId) {
+      const { community, user } = await validationCRUDInCommunity(
+        dto.communityId,
+        this.communityRepository,
+        userId,
+        this.userRepository,
+      );
+
+      const photo = community.photos.find((photo) => photo.id === dto.photoId);
+
+      if (!photo) throw new NotFoundException('Photo not found');
+
+      const comment = await this.findOneById(commentId);
+
+      if (!comment) throw new NotFoundException('Comment not found');
+
+      await this.commentRepository.update(
+        { id: comment.id },
+        {
+          text: dto.text,
+          photo: { id: dto.photoId },
+          user: { id: user.id },
+        },
+      );
+
+      return await this.findOneById(comment.id);
+    }
   }
 
   async commentDeleteFromCommunity(
