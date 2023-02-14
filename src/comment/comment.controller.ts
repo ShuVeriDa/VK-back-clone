@@ -28,13 +28,14 @@ export class CommentController {
   //   return this.commentService.findAll(+query.postId);
   // }
 
-  //............
-  //FOR POST
-  //............
-
   @Get('post')
   findAllByPostId(@Body() dto: FetchCommentDto) {
     return this.commentService.findAllByPostId(dto);
+  }
+
+  @Get('photo')
+  findAllByPhotoId(@Body() dto: FetchCommentDto) {
+    return this.commentService.findAllByPhotoId(dto);
   }
 
   @Get(':id')
@@ -62,15 +63,6 @@ export class CommentController {
   @Auth('user')
   remove(@Param('id') id: string, @User('id') userId: string) {
     return this.commentService.remove(id, userId);
-  }
-
-  //............
-  //FOR PHOTO
-  //............
-
-  @Get('photo')
-  findAllByPhotoId(@Body() dto: FetchCommentDto) {
-    return this.commentService.findAllByPhotoId(dto);
   }
   //
   // @Get('photo/:id')

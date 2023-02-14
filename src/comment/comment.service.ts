@@ -65,6 +65,21 @@ export class CommentService {
     }
   }
 
+  async findAllByPhotoId(dto: FetchCommentDto) {
+    const photo = await this.photoRepository.findOne({
+      where: { id: dto.photoId },
+    });
+
+    if (!photo) throw new NotFoundException('Photo not found');
+
+    const comments = await this.commentRepository.find({
+      where: { photo: { id: photo.id } },
+      relations: ['photo', 'user'],
+    });
+
+    return returnCommentsFields(comments);
+  }
+
   async findOneById(commentId: string) {
     const comment = await this.commentRepository.findOne({
       where: { id: commentId },
@@ -167,6 +182,9 @@ export class CommentService {
 
       if (!photo) throw new NotFoundException('Photo not found');
 
+      if (photo.turnOffComments)
+        throw new ForbiddenException('This photo has comments turned off');
+
       const comment = photo.comments.find(
         (comment) => comment.id === commentId,
       );
@@ -191,29 +209,17 @@ export class CommentService {
 
   async remove(id: string, userId: string) {
     const user = await this.userRepository.findOneBy({ id: userId });
+    const comment = await this.findOneById(id);
 
-    await validationUserForComments(id, user.id, this, 'DELETE', user.isAdmin);
+    await validationUserForComments(
+      comment.id,
+      user.id,
+      this,
+      'DELETE',
+      user.isAdmin,
+    );
 
-    return this.commentRepository.delete(id);
-  }
-
-  //.........//
-  //FOR PHOTO//
-  //.........//
-
-  async findAllByPhotoId(dto: FetchCommentDto) {
-    const photo = await this.photoRepository.findOne({
-      where: { id: dto.photoId },
-    });
-
-    if (!photo) throw new NotFoundException('Photo not found');
-
-    const comments = await this.commentRepository.find({
-      where: { photo: { id: photo.id } },
-      relations: ['photo', 'user'],
-    });
-
-    return returnCommentsFields(comments);
+    return this.commentRepository.delete(comment.id);
   }
 
   //.............//
