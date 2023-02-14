@@ -250,7 +250,7 @@ export class CommentService {
 
       const post = await this.postRepository.findOne({
         where: { id: dto.postId },
-        relations: ['comments', 'community'],
+        relations: ['comments', 'comments.user', 'community'],
       });
 
       if (!post) throw new NotFoundException('Post not found');
@@ -263,6 +263,11 @@ export class CommentService {
       delete post.community.author;
       delete post.user.password;
 
+      post.comments.map((comment) => {
+        delete comment.user.password;
+        return comment;
+      });
+
       return post;
     }
 
@@ -274,7 +279,7 @@ export class CommentService {
 
       const photo = await this.photoRepository.findOne({
         where: { id: dto.photoId },
-        relations: ['comments', 'community'],
+        relations: ['comments', 'comments.user', 'community'],
       });
 
       if (!photo) throw new NotFoundException('Photo not found');
@@ -286,6 +291,11 @@ export class CommentService {
       delete photo.community.admins;
       delete photo.community.author;
       delete photo.user.password;
+
+      photo.comments.map((comment) => {
+        delete comment.user.password;
+        return comment;
+      });
 
       return photo;
     }
@@ -303,7 +313,16 @@ export class CommentService {
         this.communityRepository,
       );
 
-      const comment = post.comments.find((comment) => comment.id === commentId);
+      // const comment = post.comments.find((comment) => comment.id === commentId);
+
+      const comment = await this.commentRepository.findOne({
+        where: { post: { comments: { id: commentId } } },
+        relations: ['user'],
+      });
+
+      if (!comment) throw new NotFoundException('Comment not found');
+
+      delete comment.user.password;
       return comment;
     }
 
@@ -315,9 +334,18 @@ export class CommentService {
         this.communityRepository,
       );
 
-      const comment = photo.comments.find(
-        (comment) => comment.id === commentId,
-      );
+      const comment = await this.commentRepository.findOne({
+        where: { photo: { comments: { id: commentId } } },
+        relations: ['user'],
+      });
+
+      if (!comment) throw new NotFoundException('Comment not found');
+
+      // const comment = photo.comments.find(
+      //   (comment) => comment.id === commentId,
+      // );
+
+      delete comment.user.password;
       return comment;
     }
   }
@@ -451,23 +479,50 @@ export class CommentService {
     await this.communityRepository.manager.transaction(async (manager) => {
       const comment = await manager.findOne(CommentEntity, {
         where: { id: commentId },
-        relations: ['post', 'post.community'],
+        relations: ['post', 'post.community', 'photo', 'photo.community'],
       });
 
       if (!comment) throw new NotFoundException('Comment not found');
 
-      const { community, user } = await validationCRUDInCommunity(
-        comment.post.community.id,
-        this.communityRepository,
-        userId,
-        this.userRepository,
-        true,
-      );
+      if (dto.postId) {
+        const { community, user } = await validationCRUDInCommunity(
+          comment.post.community.id,
+          this.communityRepository,
+          userId,
+          this.userRepository,
+          true,
+        );
 
-      const isAdmin = community.admins.find((admin) => admin.id === user.id);
+        const isAdmin = community.admins.find((admin) => admin.id === user.id);
 
-      if (/*post.user.id !== userId ||*/ !isAdmin)
-        throw new ForbiddenException("You don't have access to this comment");
+        const post = await this.postRepository.findOne({
+          where: { id: dto.postId },
+          relations: ['user'],
+        });
+
+        if (post.user.id !== userId || !isAdmin)
+          throw new ForbiddenException("You don't have access to this comment");
+      }
+
+      if (dto.photoId) {
+        const { community, user } = await validationCRUDInCommunity(
+          comment.photo.community.id,
+          this.communityRepository,
+          userId,
+          this.userRepository,
+          true,
+        );
+
+        const isAdmin = community.admins.find((admin) => admin.id === user.id);
+
+        const photo = await this.photoRepository.findOne({
+          where: { id: dto.photoId },
+          relations: ['user'],
+        });
+
+        if (photo.user.id !== userId || !isAdmin)
+          throw new ForbiddenException("You don't have access to this comment");
+      }
 
       await manager.remove(comment);
     });
