@@ -28,6 +28,11 @@ export class CommentController {
   //   return this.commentService.findAll(+query.postId);
   // }
 
+  @Get(':id')
+  findOneById(@Param('id') commentId: string) {
+    return this.commentService.findOneById(commentId);
+  }
+
   @Get('post')
   findAllByPostId(@Body() dto: FetchCommentDto) {
     return this.commentService.findAllByPostId(dto);
@@ -36,11 +41,6 @@ export class CommentController {
   @Get('photo')
   findAllByPhotoId(@Body() dto: FetchCommentDto) {
     return this.commentService.findAllByPhotoId(dto);
-  }
-
-  @Get(':id')
-  findOneByPostId(@Param('id') commentId: string) {
-    return this.commentService.findOneById(commentId);
   }
 
   @Post()
@@ -64,29 +64,25 @@ export class CommentController {
   remove(@Param('id') id: string, @User('id') userId: string) {
     return this.commentService.remove(id, userId);
   }
-  //
-  // @Get('photo/:id')
-  // findOneByPhotoId(@Param('id') commentId: string) {
-  //   return this.commentService.findOneById(commentId);
-  // }
 
   //............
   //FOR COMMUNITY
   //............
 
-  @Get('community/comment')
+  @Get('/community/all')
   getAllCommentsInCommunity(@Body() dto: FetchCommentDto) {
     return this.commentService.getAllCommentsInCommunity(dto);
   }
 
-  @Get('community/comment/:id')
+  @Get('community/:id')
   getOneCommentInCommunity(
     @Body() dto: FetchCommentDto,
     @Param('id') commentId: string,
   ) {
     return this.commentService.getOneCommentInCommunity(dto, commentId);
   }
-  @Post('community/comment')
+
+  @Post('community')
   @Auth('user')
   commentCreateInCommunity(
     @Body() dto: CreateCommentDto,
@@ -95,7 +91,7 @@ export class CommentController {
     return this.commentService.commentCreateInCommunity(dto, userId);
   }
 
-  @Put('community/comment/:id')
+  @Put('community:id')
   @Auth('user')
   commentUpdateInCommunity(
     @Body() dto: UpdateCommentDto,
@@ -105,7 +101,7 @@ export class CommentController {
     return this.commentService.commentUpdateInCommunity(dto, commentId, userId);
   }
 
-  @Delete('community/comment/:id')
+  @Delete('community/:id')
   @Auth('user')
   commentDeleteFromCommunity(
     @Body() dto: FetchCommentDto,

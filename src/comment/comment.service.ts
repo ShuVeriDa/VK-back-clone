@@ -45,9 +45,17 @@ export class CommentService {
 
     return returnCommentsFields(comments);
   }
-  //.........
-  // FOR POST
-  //.........
+
+  async findOneById(commentId: string) {
+    const comment = await this.commentRepository.findOne({
+      where: { id: commentId },
+      relations: ['post', 'user', 'photo'],
+    });
+
+    if (!comment) throw new NotFoundException('Comment not found');
+
+    return returnCommentFields(comment);
+  }
 
   async findAllByPostId(dto: FetchCommentDto) {
     if (dto.postId) {
@@ -79,17 +87,6 @@ export class CommentService {
     });
 
     return returnCommentsFields(comments);
-  }
-
-  async findOneById(commentId: string) {
-    const comment = await this.commentRepository.findOne({
-      where: { id: commentId },
-      relations: ['post', 'user', 'photo'],
-    });
-
-    if (!comment) throw new NotFoundException('Comment not found');
-
-    return returnCommentFields(comment);
   }
 
   async createPostComment(dto: CreateCommentDto, userId: string) {
@@ -142,6 +139,9 @@ export class CommentService {
     commentId: string,
     userId: string,
   ) {
+    if (dto.postId && dto.photoId)
+      throw new ForbiddenException('Enter only one id');
+
     const user = await this.userRepository.findOneBy({ id: userId });
 
     if (!user) throw new NotFoundException('User not found');
@@ -225,37 +225,76 @@ export class CommentService {
   //.............//
 
   async getAllCommentsInCommunity(dto: FetchCommentDto) {
+    if (dto.postId && dto.photoId)
+      throw new ForbiddenException('Enter only one id');
+
     const community = await this.communityRepository.findOne({
       where: { id: dto.communityId },
-      relations: ['posts', 'posts.comments', 'posts.community'],
+      relations: [
+        'posts',
+        'posts.comments',
+        'posts.community',
+        'photos',
+        'photos.comments',
+        'photos.community',
+      ],
     });
 
     if (!community) throw new NotFoundException('Community not found');
 
-    community.posts.map((p) => {
-      delete p.user.password;
-      return p;
-    });
+    if (dto.postId) {
+      community.posts.map((p) => {
+        delete p.user.password;
+        return p;
+      });
 
-    const post = await this.postRepository.findOne({
-      where: { id: dto.postId },
-      relations: ['comments', 'community'],
-    });
+      const post = await this.postRepository.findOne({
+        where: { id: dto.postId },
+        relations: ['comments', 'community'],
+      });
 
-    if (!post) throw new NotFoundException('Post not found');
+      if (!post) throw new NotFoundException('Post not found');
 
-    delete post.community.admins;
-    delete post.community.members;
-    delete post.community.posts;
-    delete post.community.music;
-    delete post.community.admins;
-    delete post.community.author;
-    delete post.user.password;
+      delete post.community.admins;
+      delete post.community.members;
+      delete post.community.posts;
+      delete post.community.music;
+      delete post.community.admins;
+      delete post.community.author;
+      delete post.user.password;
 
-    return post;
+      return post;
+    }
+
+    if (dto.photoId) {
+      community.photos.map((p) => {
+        delete p.user.password;
+        return p;
+      });
+
+      const photo = await this.photoRepository.findOne({
+        where: { id: dto.photoId },
+        relations: ['comments', 'community'],
+      });
+
+      if (!photo) throw new NotFoundException('Photo not found');
+
+      delete photo.community.admins;
+      delete photo.community.members;
+      delete photo.community.posts;
+      delete photo.community.music;
+      delete photo.community.admins;
+      delete photo.community.author;
+      delete photo.user.password;
+
+      return photo;
+    }
   }
 
   async getOneCommentInCommunity(dto: FetchCommentDto, commentId: string) {
+    if (dto.postId && dto.photoId)
+      throw new ForbiddenException('Enter only one id');
+
     if (dto.postId) {
       const { post } = await getOnePostInCommunity(
         dto.postId,
@@ -284,6 +323,9 @@ export class CommentService {
   }
 
   async commentCreateInCommunity(dto: CreateCommentDto, userId: string) {
+    if (dto.postId && dto.photoId)
+      throw new ForbiddenException('Enter only one id');
+
     if (dto.postId) {
       const { community, user } = await validationCRUDInCommunity(
         dto.communityId,
@@ -338,6 +380,9 @@ export class CommentService {
     commentId: string,
     userId: string,
   ) {
+    if (dto.postId && dto.photoId)
+      throw new ForbiddenException('Enter only one id');
+
     if (dto.postId) {
       const { community, user } = await validationCRUDInCommunity(
         dto.communityId,
