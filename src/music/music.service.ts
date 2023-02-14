@@ -349,7 +349,7 @@ export class MusicService {
         this.communityRepository,
         userId,
         this.userRepository,
-        true,
+        false,
       );
 
       const isMusic = community.music.find((music) => music.id === musicId);
@@ -357,10 +357,10 @@ export class MusicService {
       if (!isMusic)
         throw new NotFoundException('Music not found in this community');
 
-      const isAdmin = community.admins.find((admin) => admin.id === user.id);
-
-      if (/*music.user.id !== userId ||*/ !isAdmin)
-        throw new ForbiddenException("You don't have access to this music");
+      // const isAdmin = community.admins.find((admin) => admin.id === user.id);
+      //
+      // if (/*music.user.id !== userId ||*/ !isAdmin)
+      //   throw new ForbiddenException("You don't have access to this music");
 
       const communityMusic = community.music;
 

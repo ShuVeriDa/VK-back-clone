@@ -345,13 +345,14 @@ export class PostService {
         this.communityRepository,
         userId,
         this.userRepository,
-        true,
+        false,
+        post.user.id,
       );
 
-      const isAdmin = community.admins.find((admin) => admin.id === user.id);
-
-      if (/*post.user.id !== userId ||*/ !isAdmin)
-        throw new ForbiddenException("You don't have access to this post");
+      // const isAdmin = community.admins.find((admin) => admin.id === user.id);
+      //
+      // if (/*post.user.id !== userId ||*/ !isAdmin)
+      //   throw new ForbiddenException("You don't have access to this post");
 
       const comments = post.comments;
       for (const comment of comments) {

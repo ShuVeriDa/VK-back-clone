@@ -479,7 +479,13 @@ export class CommentService {
     await this.communityRepository.manager.transaction(async (manager) => {
       const comment = await manager.findOne(CommentEntity, {
         where: { id: commentId },
-        relations: ['post', 'post.community', 'photo', 'photo.community'],
+        relations: [
+          'post',
+          'post.community',
+          'photo',
+          'photo.community',
+          'user',
+        ],
       });
 
       if (!comment) throw new NotFoundException('Comment not found');
@@ -490,18 +496,16 @@ export class CommentService {
           this.communityRepository,
           userId,
           this.userRepository,
-          true,
+          false,
+          comment.user.id,
         );
 
-        const isAdmin = community.admins.find((admin) => admin.id === user.id);
+        const isComment = comment.post.comments.find(
+          (c) => c.id === comment.id,
+        );
 
-        const post = await this.postRepository.findOne({
-          where: { id: dto.postId },
-          relations: ['user'],
-        });
-
-        if (post.user.id !== userId || !isAdmin)
-          throw new ForbiddenException("You don't have access to this comment");
+        if (!isComment)
+          throw new NotFoundException('Comment not found in this post');
       }
 
       if (dto.photoId) {
@@ -510,21 +514,19 @@ export class CommentService {
           this.communityRepository,
           userId,
           this.userRepository,
-          true,
+          false,
+          comment.user.id,
         );
 
-        const isAdmin = community.admins.find((admin) => admin.id === user.id);
+        const isComment = comment.photo.comments.find(
+          (c) => c.id === comment.id,
+        );
 
-        const photo = await this.photoRepository.findOne({
-          where: { id: dto.photoId },
-          relations: ['user'],
-        });
-
-        if (photo.user.id !== userId || !isAdmin)
-          throw new ForbiddenException("You don't have access to this comment");
+        if (!isComment)
+          throw new NotFoundException('Comment not found in this photo');
       }
 
-      await manager.remove(comment);
+      return await manager.remove(comment);
     });
   }
 }
