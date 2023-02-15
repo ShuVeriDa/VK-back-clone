@@ -360,6 +360,7 @@ export class CommentService {
         this.communityRepository,
         userId,
         this.userRepository,
+        true,
       );
 
       const post = community.posts.find((post) => post.id === dto.postId);
@@ -384,6 +385,7 @@ export class CommentService {
         this.communityRepository,
         userId,
         this.userRepository,
+        true,
       );
 
       const photo = community.photos.find((photo) => photo.id === dto.photoId);

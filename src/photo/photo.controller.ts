@@ -89,4 +89,10 @@ export class PhotoController {
   ) {
     return this.photoService.updateInCommunity(dto, photoId, userId);
   }
+
+  @Delete('community/photo/:id')
+  @Auth('user')
+  deleteInCommunity(@Param('id') photoId: string, @User('id') userId: string) {
+    return this.photoService.deleteInCommunity(photoId, userId);
+  }
 }

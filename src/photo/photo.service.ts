@@ -215,4 +215,31 @@ export class PhotoService {
 
     return await this.getOne(photo.id);
   }
+
+  async deleteInCommunity(photoId: string, userId: string) {
+    await this.photoRepository.manager.transaction(async (manager) => {
+      const photo = await manager.findOne(PhotoEntity, {
+        where: { id: photoId },
+        relations: ['community'],
+      });
+
+      if (!photo) throw new NotFoundException('Photo not found');
+
+      const { community, user } = await validationCRUDInCommunity(
+        photo.community.id,
+        this.communityRepository,
+        userId,
+        this.userRepository,
+        false,
+        photo.user.id,
+      );
+
+      const comments = photo.comments;
+      for (const comment of comments) {
+        await manager.remove(comment);
+      }
+
+      await manager.remove(photo);
+    });
+  }
 }
