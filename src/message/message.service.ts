@@ -90,10 +90,6 @@ export class MessageService {
       this.messageRepository,
     );
 
-    // if (message.sender.id !== userId ) {
-    //   throw new ForbiddenException('You do not have access to this message');
-    // }
-
     if (message.sender.id !== userId) {
       if (!message.read) {
         return await markAsRead(messageId, this.messageRepository);
