@@ -345,9 +345,15 @@ export class PostService {
         this.communityRepository,
         userId,
         this.userRepository,
-        false,
+        true,
+        true,
         post.user.id,
       );
+
+      const isExistPost = community.posts.some((p) => p.id === post.id);
+
+      if (!isExistPost)
+        throw new NotFoundException('Post not found in this community');
 
       // const isAdmin = community.admins.find((admin) => admin.id === user.id);
       //

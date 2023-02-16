@@ -349,8 +349,7 @@ export class MusicService {
         this.communityRepository,
         userId,
         this.userRepository,
-        false,
-        music.user.id,
+        true,
       );
 
       const isMusic = community.music.find((music) => music.id === musicId);

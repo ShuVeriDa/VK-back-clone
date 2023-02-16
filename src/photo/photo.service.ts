@@ -230,8 +230,7 @@ export class PhotoService {
         this.communityRepository,
         userId,
         this.userRepository,
-        false,
-        photo.user.id,
+        true,
       );
 
       const comments = photo.comments;

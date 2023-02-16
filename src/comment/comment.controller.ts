@@ -91,7 +91,7 @@ export class CommentController {
     return this.commentService.commentCreateInCommunity(dto, userId);
   }
 
-  @Put('community:id')
+  @Put('community/:id')
   @Auth('user')
   commentUpdateInCommunity(
     @Body() dto: UpdateCommentDto,

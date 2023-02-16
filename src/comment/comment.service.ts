@@ -360,7 +360,7 @@ export class CommentService {
         this.communityRepository,
         userId,
         this.userRepository,
-        true,
+        false,
       );
 
       const post = community.posts.find((post) => post.id === dto.postId);
@@ -385,7 +385,7 @@ export class CommentService {
         this.communityRepository,
         userId,
         this.userRepository,
-        true,
+        false,
       );
 
       const photo = community.photos.find((photo) => photo.id === dto.photoId);
@@ -410,6 +410,8 @@ export class CommentService {
     commentId: string,
     userId: string,
   ) {
+    const comment = await this.findOneById(commentId);
+
     if (dto.postId && dto.photoId)
       throw new ForbiddenException('Enter only one id');
 
@@ -419,6 +421,9 @@ export class CommentService {
         this.communityRepository,
         userId,
         this.userRepository,
+        false,
+        true,
+        comment.user.id,
       );
 
       const post = community.posts.find((post) => post.id === dto.postId);
@@ -427,8 +432,6 @@ export class CommentService {
 
       if (post.turnOffComments)
         throw new ForbiddenException('This post has comments turned off.');
-
-      const comment = await this.findOneById(commentId);
 
       if (!comment) throw new NotFoundException('Comment not found');
 
@@ -450,13 +453,14 @@ export class CommentService {
         this.communityRepository,
         userId,
         this.userRepository,
+        false,
+        true,
+        comment.user.id,
       );
 
       const photo = community.photos.find((photo) => photo.id === dto.photoId);
 
       if (!photo) throw new NotFoundException('Photo not found');
-
-      const comment = await this.findOneById(commentId);
 
       if (!comment) throw new NotFoundException('Comment not found');
 
@@ -498,6 +502,7 @@ export class CommentService {
           this.communityRepository,
           userId,
           this.userRepository,
+          true,
           false,
           comment.user.id,
         );
@@ -516,6 +521,7 @@ export class CommentService {
           this.communityRepository,
           userId,
           this.userRepository,
+          true,
           false,
           comment.user.id,
         );
