@@ -1,9 +1,9 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-export class CreateMusicDto {
+export class CreateVideoDto {
   @IsNotEmpty()
   @IsString()
-  musicUrl: string;
+  videoUrl: string;
 
   @IsOptional()
   @IsString()

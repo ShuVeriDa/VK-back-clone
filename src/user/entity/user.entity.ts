@@ -15,6 +15,7 @@ import { FriendEntity } from '../../friend/entity/friend.entity';
 import { CommunityEntity } from '../../community/entity/community.entity';
 import { MusicEntity } from '../../music/entity/music.entity';
 import { PhotoEntity } from '../../photo/entity/photo.entity';
+import { VideoEntity } from '../../video/entity/video.entity';
 
 @Entity('user')
 export class UserEntity {
@@ -87,6 +88,10 @@ export class UserEntity {
   @ManyToMany(() => MusicEntity, (music) => music.musicAdders)
   @JoinTable()
   music: MusicEntity[];
+
+  @ManyToMany(() => VideoEntity, (video) => video.videoAdders)
+  @JoinTable()
+  video: VideoEntity[];
 
   // @OneToMany(() => MusicEntity, (music) => music.user, {
   //   eager: false,

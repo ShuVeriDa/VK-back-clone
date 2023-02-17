@@ -20,6 +20,8 @@ import { MusicModule } from './music/music.module';
 import { MusicEntity } from './music/entity/music.entity';
 import { PhotoModule } from './photo/photo.module';
 import { PhotoEntity } from './photo/entity/photo.entity';
+import { VideoModule } from './video/video.module';
+import { VideoEntity } from './video/entity/video.entity';
 
 @Module({
   imports: [
@@ -39,6 +41,7 @@ import { PhotoEntity } from './photo/entity/photo.entity';
         MessageEntity,
         MusicEntity,
         PhotoEntity,
+        VideoEntity,
       ],
       synchronize: true,
     }),
@@ -52,6 +55,7 @@ import { PhotoEntity } from './photo/entity/photo.entity';
     MessageModule,
     MusicModule,
     PhotoModule,
+    VideoModule,
   ],
   controllers: [AppController],
   providers: [AppService],
