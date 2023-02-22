@@ -1,14 +1,22 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { VideoEntity } from './entity/video.entity';
 import { Repository } from 'typeorm';
 import { CreateVideoDto } from './dto/create.dto';
 import { UpdateVideoDto } from './dto/update.dto';
+import { UserEntity } from '../user/entity/user.entity';
 
 @Injectable()
 export class VideoService {
   @InjectRepository(VideoEntity)
   private readonly videoRepository: Repository<VideoEntity>;
+
+  @InjectRepository(UserEntity)
+  private readonly userRepository: Repository<UserEntity>;
 
   async getAll() {
     const video = await this.videoRepository.find({
@@ -81,5 +89,28 @@ export class VideoService {
     return video;
   }
 
-  // async update(dto: UpdateVideoDto, videoUrl: string, userId: string) {}
+  async update(dto: UpdateVideoDto, videoUrl: string, userId: string) {
+    const video = await this.getOne(videoUrl);
+
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    const isAuthor = video.user.id === user.id;
+
+    if (!isAuthor)
+      throw new ForbiddenException("You don't have access to this video");
+
+    await this.videoRepository.update(
+      { id: video.id },
+      {
+        title: dto.title,
+        description: dto.description,
+      },
+    );
+
+    return await this.getOne(video.id);
+  }
 }

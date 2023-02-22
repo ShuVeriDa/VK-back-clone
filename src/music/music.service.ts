@@ -156,7 +156,7 @@ export class MusicService {
     const isAuthor = music.user.id === userId;
 
     if (!isAuthor)
-      throw new ForbiddenException("You don't have access to this message");
+      throw new ForbiddenException("You don't have access to this music");
 
     await this.musicRepository.update(
       { id: music.id },

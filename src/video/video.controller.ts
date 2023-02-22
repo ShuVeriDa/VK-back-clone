@@ -37,15 +37,15 @@ export class VideoController {
     return this.videoService.create(dto, userId);
   }
 
-  // @UsePipes(new ValidationPipe())
-  // @Put(':id')
-  // @HttpCode(200)
-  // @Auth('user')
-  // update(
-  //   @Body() dto: UpdateVideoDto,
-  //   @Param('id') videoId: string,
-  //   @User('id') userId: string,
-  // ) {
-  //   return this.videoService.update(dto, videoId, userId);
-  // }
+  @UsePipes(new ValidationPipe())
+  @Put(':id')
+  @HttpCode(200)
+  @Auth('user')
+  update(
+    @Body() dto: UpdateVideoDto,
+    @Param('id') videoId: string,
+    @User('id') userId: string,
+  ) {
+    return this.videoService.update(dto, videoId, userId);
+  }
 }
