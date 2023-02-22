@@ -24,6 +24,12 @@ export class VideoController {
     return this.videoService.getAll();
   }
 
+  @Get()
+  @Auth('user')
+  getMyVideo(@User('id') userId: string) {
+    return this.videoService.getMyVideo(userId);
+  }
+
   @Get(':id')
   getOne(@Param('id') videoId: string) {
     return this.videoService.getOne(videoId);

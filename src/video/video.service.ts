@@ -37,6 +37,31 @@ export class VideoService {
     return video;
   }
 
+  async getMyVideo(userId: string) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['video'],
+    });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    const video = await this.videoRepository.find({
+      where: { user: { id: user.id } },
+      order: { createdAt: 'DESC' },
+    });
+
+    return video.map((video) => {
+      delete video.user.password;
+
+      video.videoAdders.map((adder) => {
+        delete adder.password;
+        return adder;
+      });
+
+      return video;
+    });
+  }
+
   async getOne(videoId: string) {
     const video = await this.videoRepository.findOne({
       where: { id: videoId },
