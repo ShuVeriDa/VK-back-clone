@@ -10,6 +10,7 @@ import { CreateVideoDto } from './dto/create.dto';
 import { UpdateVideoDto } from './dto/update.dto';
 import { UserEntity } from '../user/entity/user.entity';
 import { SearchVideoDto } from '../photo/dto/search.dto';
+import { addAndRemoveAdderVideo } from '../components/forServices/addAndRemoveAdderVideo';
 
 @Injectable()
 export class VideoService {
@@ -47,7 +48,7 @@ export class VideoService {
     if (!user) throw new NotFoundException('User not found');
 
     const video = await this.videoRepository.find({
-      where: { user: { id: user.id } },
+      where: { videoAdders: { id: user.id } },
       order: { createdAt: 'DESC' },
     });
 
@@ -201,5 +202,16 @@ export class VideoService {
 
       await manager.remove(video);
     });
+  }
+
+  async addVideo(videoId: string, userId: string) {
+    return await addAndRemoveAdderVideo(
+      videoId,
+      this.videoRepository,
+      userId,
+      this.userRepository,
+      this.getOne(videoId),
+      'add',
+    );
   }
 }

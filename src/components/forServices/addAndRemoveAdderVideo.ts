@@ -2,16 +2,17 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { MusicEntity } from '../../music/entity/music.entity';
 import { UserEntity } from '../../user/entity/user.entity';
+import { VideoEntity } from '../../video/entity/video.entity';
 
-export const addAndRemoveAdderMusic = async (
-  musicId: string,
-  musicRepos: Repository<MusicEntity>,
+export const addAndRemoveAdderVideo = async (
+  videoId: string,
+  videoRepos: Repository<VideoEntity>,
   userId: string,
   userRepos: Repository<UserEntity>,
   getOne: any,
   flag?: 'add' | 'remove',
 ) => {
-  const music = await getOne;
+  const video = await getOne;
 
   const user = await userRepos.findOne({ where: { id: userId } });
 
@@ -19,14 +20,14 @@ export const addAndRemoveAdderMusic = async (
 
   delete user.password;
 
-  const isAdd = music.musicAdders.find((adder) => adder.id === user.id);
+  const isAdd = video.videoAdders.find((adder) => adder.id === user.id);
 
   if (flag === 'add') {
-    if (isAdd) throw new ForbiddenException('The user already has this music.');
+    if (isAdd) throw new ForbiddenException('The user already has this video.');
 
-    await musicRepos.save({
-      ...music,
-      musicAdders: [...music.musicAdders, user],
+    await videoRepos.save({
+      ...video,
+      videoAdders: [...video.videoAdders, user],
     });
   }
 
@@ -34,10 +35,10 @@ export const addAndRemoveAdderMusic = async (
     if (!isAdd)
       throw new ForbiddenException('The user no longer has this music.');
 
-    music.musicAdders = music.musicAdders.filter(
+    video.videoAdders = video.videoAdders.filter(
       (adder) => adder.id !== user.id,
     );
-    await musicRepos.save(music);
+    await videoRepos.save(video);
   }
 
   return await getOne;
