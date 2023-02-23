@@ -10,6 +10,7 @@ import {
 import { UserEntity } from '../../user/entity/user.entity';
 import { PostEntity } from '../../post/entity/post.entity';
 import { PhotoEntity } from '../../photo/entity/photo.entity';
+import { VideoEntity } from '../../video/entity/video.entity';
 
 @Entity('comments')
 export class CommentEntity {
@@ -39,6 +40,12 @@ export class CommentEntity {
   })
   @JoinColumn({ name: 'photoId' })
   photo: PhotoEntity;
+
+  @ManyToOne(() => VideoEntity, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'videoId' })
+  video: VideoEntity;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

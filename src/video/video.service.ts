@@ -138,4 +138,30 @@ export class VideoService {
 
     return await this.getOne(video.id);
   }
+
+  async delete(videoId: string, userId: string) {
+    await this.videoRepository.manager.transaction(async (manager) => {
+      const video = await manager.findOne(VideoEntity, {
+        where: { id: videoId },
+        relations: ['communities'],
+      });
+
+      if (!video) throw new NotFoundException('Video not found');
+
+      const isCommunity = video.communities.length > 0;
+
+      const isAuthor = video.user.id === userId;
+
+      if (!isAuthor || isCommunity) {
+        throw new ForbiddenException("You don't have access to this video");
+      }
+
+      const comments = video.comments;
+      for (const comment of comments) {
+        await manager.remove(comment);
+      }
+
+      await manager.remove(video);
+    });
+  }
 }

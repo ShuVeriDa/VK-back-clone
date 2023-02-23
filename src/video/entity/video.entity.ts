@@ -5,11 +5,13 @@ import {
   JoinColumn,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { UserEntity } from '../../user/entity/user.entity';
 import { CommunityEntity } from '../../community/entity/community.entity';
+import { CommentEntity } from '../../comment/entity/comment.entity';
 
 @Entity('video')
 export class VideoEntity {
@@ -34,6 +36,10 @@ export class VideoEntity {
   })
   @JoinColumn({ name: 'videoAddersId' })
   videoAdders: UserEntity[];
+
+  @OneToMany(() => CommentEntity, (comment) => comment.video, { eager: true })
+  @JoinColumn()
+  comments: CommentEntity[];
 
   @ManyToMany(() => CommunityEntity, (community) => community.video)
   @JoinColumn({ name: 'communityId' })

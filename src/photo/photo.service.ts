@@ -13,6 +13,7 @@ import { CommunityEntity } from '../community/entity/community.entity';
 import { validationCRUDInCommunity } from '../components/forServices/validationCRUDInCommunity';
 import { FetchPhotoDto } from './dto/fetch.dto';
 import { validationCommunity } from '../components/forServices/validationCommunity';
+import { VideoEntity } from '../video/entity/video.entity';
 
 @Injectable()
 export class PhotoService {
@@ -103,22 +104,46 @@ export class PhotoService {
   }
 
   async delete(photoId: string, userId: string) {
-    const photo = await this.getOne(photoId);
+    // const photo = await this.getOne(photoId);
+    //
+    // const user = await this.userRepository.findOne({
+    //   where: { id: userId },
+    // });
+    //
+    // if (!user) throw new NotFoundException('User not found');
+    //
+    // const isAuthor = photo.user.id === userId;
+    //
+    // const isCommunity = photo.community; // null
+    //
+    // if (!isAuthor || isCommunity)
+    //   throw new ForbiddenException("You don't have access to this photo");
+    //
+    // await this.photoRepository.delete(photo.id);
 
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
+    await this.photoRepository.manager.transaction(async (manager) => {
+      const photo = await manager.findOne(PhotoEntity, {
+        where: { id: photoId },
+        relations: ['community'],
+      });
+
+      if (!photo) throw new NotFoundException('Photo not found');
+
+      const isCommunity = photo.community;
+
+      const isAuthor = photo.user.id === userId;
+
+      if (!isAuthor || isCommunity) {
+        throw new ForbiddenException("You don't have access to this video");
+      }
+
+      const comments = photo.comments;
+      for (const comment of comments) {
+        await manager.remove(comment);
+      }
+
+      await manager.remove(photo);
     });
-
-    if (!user) throw new NotFoundException('User not found');
-
-    const isAuthor = photo.user.id === userId;
-
-    const isCommunity = photo.community; // null
-
-    if (!isAuthor || isCommunity)
-      throw new ForbiddenException("You don't have access to this photo");
-
-    await this.photoRepository.delete(photo.id);
   }
 
   // FOR COMMUNITY

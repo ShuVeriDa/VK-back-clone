@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Param,
@@ -53,5 +54,11 @@ export class VideoController {
     @User('id') userId: string,
   ) {
     return this.videoService.update(dto, videoId, userId);
+  }
+
+  @Delete(':id')
+  @Auth('user')
+  delete(@Param('id') videoId: string, @User('id') userId: string) {
+    return this.videoService.delete(videoId, userId);
   }
 }
