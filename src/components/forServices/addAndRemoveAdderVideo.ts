@@ -33,7 +33,7 @@ export const addAndRemoveAdderVideo = async (
 
   if (flag === 'remove') {
     if (!isAdd)
-      throw new ForbiddenException('The user no longer has this music.');
+      throw new ForbiddenException('The user no longer has this video.');
 
     video.videoAdders = video.videoAdders.filter(
       (adder) => adder.id !== user.id,

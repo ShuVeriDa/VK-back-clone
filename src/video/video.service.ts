@@ -11,6 +11,7 @@ import { UpdateVideoDto } from './dto/update.dto';
 import { UserEntity } from '../user/entity/user.entity';
 import { SearchVideoDto } from '../photo/dto/search.dto';
 import { addAndRemoveAdderVideo } from '../components/forServices/addAndRemoveAdderVideo';
+import { addAndRemoveAdderMusic } from '../components/forServices/addAndRemoveAdderMusic';
 
 @Injectable()
 export class VideoService {
@@ -212,6 +213,17 @@ export class VideoService {
       this.userRepository,
       this.getOne(videoId),
       'add',
+    );
+  }
+
+  async removeFromAdders(videoId: string, userId: string) {
+    return await addAndRemoveAdderVideo(
+      videoId,
+      this.videoRepository,
+      userId,
+      this.userRepository,
+      this.getOne(videoId),
+      'remove',
     );
   }
 }

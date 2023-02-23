@@ -76,4 +76,12 @@ export class VideoController {
   addVideo(@Param('id') videoId: string, @User('id') userId: string) {
     return this.videoService.addVideo(videoId, userId);
   }
+
+  @UsePipes(new ValidationPipe())
+  @Delete('remove/:id')
+  @HttpCode(200)
+  @Auth('user')
+  removeFromAdders(@Param('id') videoId: string, @User('id') userId: string) {
+    return this.videoService.removeFromAdders(videoId, userId);
+  }
 }

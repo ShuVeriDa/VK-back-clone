@@ -59,7 +59,7 @@ export class MusicService {
     if (!user) throw new NotFoundException('User not found');
 
     const music = await this.musicRepository.find({
-      where: { user: { id: user.id } },
+      where: { musicAdders: { id: user.id } },
       order: { createdAt: 'DESC' },
     });
 
