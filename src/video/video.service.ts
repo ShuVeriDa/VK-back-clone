@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { CreateVideoDto } from './dto/create.dto';
 import { UpdateVideoDto } from './dto/update.dto';
 import { UserEntity } from '../user/entity/user.entity';
+import { SearchVideoDto } from '../photo/dto/search.dto';
 
 @Injectable()
 export class VideoService {
@@ -60,6 +61,43 @@ export class VideoService {
 
       return video;
     });
+  }
+
+  async search(dto: SearchVideoDto) {
+    const qb = this.videoRepository.createQueryBuilder('video');
+
+    qb.limit(dto.limit || 0);
+    qb.take(dto.take || 100);
+
+    if (dto.title) {
+      qb.andWhere('video.title ILIKE :title');
+    }
+
+    if (dto.description) {
+      qb.andWhere('video.description ILIKE :description');
+    }
+
+    qb.setParameters({
+      title: `%${dto.title}%`,
+      description: `%${dto.description}%`,
+    });
+
+    const [video, total] = await qb
+      .leftJoinAndSelect('video.user', 'user')
+      .leftJoinAndSelect('video.videoAdders', 'videoAdders')
+      .getManyAndCount();
+
+    video.map((video) => {
+      delete video.user.password;
+
+      video.videoAdders.map((adder) => {
+        delete adder.password;
+        return adder;
+      });
+      return video;
+    });
+
+    return { video, total };
   }
 
   async getOne(videoId: string) {

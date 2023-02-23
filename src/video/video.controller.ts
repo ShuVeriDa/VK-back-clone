@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -15,6 +16,7 @@ import { Auth } from '../auth/decorators/auth.decorator';
 import { CreateVideoDto } from './dto/create.dto';
 import { User } from '../user/decorators/user.decorator';
 import { UpdateVideoDto } from './dto/update.dto';
+import { SearchVideoDto } from '../photo/dto/search.dto';
 
 @Controller('video')
 export class VideoController {
@@ -29,6 +31,11 @@ export class VideoController {
   @Auth('user')
   getMyVideo(@User('id') userId: string) {
     return this.videoService.getMyVideo(userId);
+  }
+
+  @Get('search')
+  search(@Query() dto: SearchVideoDto) {
+    return this.videoService.search(dto);
   }
 
   @Get(':id')
