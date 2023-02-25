@@ -12,11 +12,17 @@ import { UserEntity } from '../user/entity/user.entity';
 import { SearchVideoDto } from '../photo/dto/search.dto';
 import { addAndRemoveAdderVideo } from '../components/forServices/addAndRemoveAdderVideo';
 import { addAndRemoveAdderMusic } from '../components/forServices/addAndRemoveAdderMusic';
+import { FetchVideoDto } from './dto/fetch.dto';
+import { validationCommunity } from '../components/forServices/validationCommunity';
+import { CommunityEntity } from '../community/entity/community.entity';
 
 @Injectable()
 export class VideoService {
   @InjectRepository(VideoEntity)
   private readonly videoRepository: Repository<VideoEntity>;
+
+  @InjectRepository(CommunityEntity)
+  private readonly communityRepository: Repository<CommunityEntity>;
 
   @InjectRepository(UserEntity)
   private readonly userRepository: Repository<UserEntity>;
@@ -225,5 +231,39 @@ export class VideoService {
       this.getOne(videoId),
       'remove',
     );
+  }
+
+  ///////////////
+  //FOR COMMUNITY
+  //////////////
+
+  async getAllInCommunity(dto: FetchVideoDto) {
+    const { community } = await validationCommunity(
+      dto.communityId,
+      this.communityRepository,
+    );
+
+    const video = await this.videoRepository.find({
+      where: { communities: { id: community.id } },
+      relations: ['communities'],
+    });
+
+    return video.map((v) => {
+      delete v.user.password;
+
+      v.communities.map((community) => {
+        community.admins.map((admin) => {
+          delete admin.password;
+          return admin;
+        });
+
+        delete community.author.password;
+        delete community.members;
+
+        return community;
+      });
+
+      return video;
+    });
   }
 }

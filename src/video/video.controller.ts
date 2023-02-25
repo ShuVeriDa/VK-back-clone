@@ -17,6 +17,7 @@ import { CreateVideoDto } from './dto/create.dto';
 import { User } from '../user/decorators/user.decorator';
 import { UpdateVideoDto } from './dto/update.dto';
 import { SearchVideoDto } from '../photo/dto/search.dto';
+import { FetchVideoDto } from './dto/fetch.dto';
 
 @Controller('video')
 export class VideoController {
@@ -83,5 +84,14 @@ export class VideoController {
   @Auth('user')
   removeFromAdders(@Param('id') videoId: string, @User('id') userId: string) {
     return this.videoService.removeFromAdders(videoId, userId);
+  }
+
+  ///////////////
+  //FOR COMMUNITY
+  //////////////
+
+  @Get('community/video')
+  getAllInCommunity(@Body() dto: FetchVideoDto) {
+    return this.videoService.getAllInCommunity(dto);
   }
 }

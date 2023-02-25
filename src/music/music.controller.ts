@@ -87,7 +87,9 @@ export class MusicController {
     return this.musicService.removeFromAdders(musicId, userId);
   }
 
-  // for community
+  ///////////////
+  //FOR COMMUNITY
+  //////////////
 
   @Get('community/music')
   getAllInCommunity(@Body() dto: FetchMusicDto) {

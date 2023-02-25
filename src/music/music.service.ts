@@ -220,7 +220,9 @@ export class MusicService {
     );
   }
 
+  ///////////////
   //FOR COMMUNITY
+  //////////////
 
   async getAllInCommunity(dto: FetchMusicDto) {
     const { community } = await validationCommunity(
