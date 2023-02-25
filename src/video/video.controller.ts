@@ -103,4 +103,16 @@ export class VideoController {
   createInCommunity(@Body() dto: CreateVideoDto, @User('id') userId: string) {
     return this.videoService.createInCommunity(dto, userId);
   }
+
+  @UsePipes(new ValidationPipe())
+  @Put('community/video/:id')
+  @HttpCode(200)
+  @Auth('user')
+  updateInCommunity(
+    @Body() dto: UpdateVideoDto,
+    @Param('id') videoId: string,
+    @User('id') userId: string,
+  ) {
+    return this.videoService.updateInCommunity(dto, videoId, userId);
+  }
 }

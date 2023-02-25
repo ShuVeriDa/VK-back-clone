@@ -15,7 +15,7 @@ export const validationCRUDInCommunity = async (
 ) => {
   const community = await communityRepos.findOne({
     where: { id: communityId },
-    relations: ['music', 'admins', 'members', 'posts', 'photos'],
+    relations: ['music', 'admins', 'members', 'posts', 'photos', 'video'],
   });
 
   if (!community)

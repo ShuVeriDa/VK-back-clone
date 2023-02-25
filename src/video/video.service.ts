@@ -276,10 +276,6 @@ export class VideoService {
       this.userRepository,
     );
 
-    const isAdmin = community.admins.find((admin) => admin.id === user.id);
-
-    if (!isAdmin) throw new ForbiddenException('You have no rights!');
-
     const video = await this.videoRepository.save({
       title: dto.title,
       description: dto.description,
@@ -287,6 +283,36 @@ export class VideoService {
       user: { id: user.id },
       communities: [{ id: community.id }],
     });
+
+    return await this.getOne(video.id);
+  }
+
+  async updateInCommunity(
+    dto: UpdateVideoDto,
+    videoId: string,
+    userId: string,
+  ) {
+    const { community } = await validationCRUDInCommunity(
+      dto.communityId,
+      this.communityRepository,
+      userId,
+      this.userRepository,
+    );
+    console.log(community.video);
+    const video = community.video.find((v) => v.id === videoId);
+
+    if (!video)
+      throw new NotFoundException('Video not found in this community');
+
+    await this.videoRepository.update(
+      {
+        id: video.id,
+      },
+      {
+        title: dto.title,
+        description: dto.description,
+      },
+    );
 
     return await this.getOne(video.id);
   }
