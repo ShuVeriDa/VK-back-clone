@@ -15,6 +15,7 @@ import { addAndRemoveAdderMusic } from '../components/forServices/addAndRemoveAd
 import { FetchVideoDto } from './dto/fetch.dto';
 import { validationCommunity } from '../components/forServices/validationCommunity';
 import { CommunityEntity } from '../community/entity/community.entity';
+import { validationCRUDInCommunity } from '../components/forServices/validationCRUDInCommunity';
 
 @Injectable()
 export class VideoService {
@@ -265,5 +266,28 @@ export class VideoService {
 
       return video;
     });
+  }
+
+  async createInCommunity(dto: CreateVideoDto, userId: string) {
+    const { community, user } = await validationCRUDInCommunity(
+      dto.communityId,
+      this.communityRepository,
+      userId,
+      this.userRepository,
+    );
+
+    const isAdmin = community.admins.find((admin) => admin.id === user.id);
+
+    if (!isAdmin) throw new ForbiddenException('You have no rights!');
+
+    const video = await this.videoRepository.save({
+      title: dto.title,
+      description: dto.description,
+      videoUrl: dto.videoUrl,
+      user: { id: user.id },
+      communities: [{ id: community.id }],
+    });
+
+    return await this.getOne(video.id);
   }
 }

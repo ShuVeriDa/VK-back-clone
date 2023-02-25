@@ -18,6 +18,7 @@ import { User } from '../user/decorators/user.decorator';
 import { UpdateVideoDto } from './dto/update.dto';
 import { SearchVideoDto } from '../photo/dto/search.dto';
 import { FetchVideoDto } from './dto/fetch.dto';
+import { CreateMusicDto } from '../music/dto/create.dto';
 
 @Controller('video')
 export class VideoController {
@@ -93,5 +94,13 @@ export class VideoController {
   @Get('community/video')
   getAllInCommunity(@Body() dto: FetchVideoDto) {
     return this.videoService.getAllInCommunity(dto);
+  }
+
+  @UsePipes(new ValidationPipe())
+  @Post('community/video')
+  @HttpCode(200)
+  @Auth('user')
+  createInCommunity(@Body() dto: CreateVideoDto, @User('id') userId: string) {
+    return this.videoService.createInCommunity(dto, userId);
   }
 }
