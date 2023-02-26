@@ -354,7 +354,7 @@ export class MusicService {
         true,
       );
 
-      const isMusic = community.music.find((music) => music.id === musicId);
+      const isMusic = community.music.find((music) => music.id === music.id);
 
       if (!isMusic)
         throw new NotFoundException('Music not found in this community');

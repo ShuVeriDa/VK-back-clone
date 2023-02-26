@@ -11,7 +11,6 @@ import { UpdateVideoDto } from './dto/update.dto';
 import { UserEntity } from '../user/entity/user.entity';
 import { SearchVideoDto } from '../photo/dto/search.dto';
 import { addAndRemoveAdderVideo } from '../components/forServices/addAndRemoveAdderVideo';
-import { addAndRemoveAdderMusic } from '../components/forServices/addAndRemoveAdderMusic';
 import { FetchVideoDto } from './dto/fetch.dto';
 import { validationCommunity } from '../components/forServices/validationCommunity';
 import { CommunityEntity } from '../community/entity/community.entity';
@@ -331,5 +330,40 @@ export class VideoService {
     );
 
     return await this.getOne(video.id);
+  }
+
+  async deleteFromCommunity(
+    dto: FetchVideoDto,
+    videoId: string,
+    userId: string,
+  ) {
+    await this.videoRepository.manager.transaction(async (manager) => {
+      const video = await manager.findOne(VideoEntity, {
+        where: { id: videoId },
+        relations: ['communities'],
+      });
+
+      if (!video) throw new NotFoundException('Video not found');
+
+      const { community, user } = await validationCRUDInCommunity(
+        dto.communityId,
+        this.communityRepository,
+        userId,
+        this.userRepository,
+        true,
+      );
+
+      const isVideo = community.video.find((v) => v.id === video.id);
+
+      if (!isVideo)
+        throw new NotFoundException('Video not found in this community');
+
+      const comments = video.comments;
+      for (const comment of comments) {
+        await manager.remove(comment);
+      }
+
+      await manager.remove(video);
+    });
   }
 }

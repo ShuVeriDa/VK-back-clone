@@ -19,6 +19,7 @@ import { UpdateVideoDto } from './dto/update.dto';
 import { SearchVideoDto } from '../photo/dto/search.dto';
 import { FetchVideoDto } from './dto/fetch.dto';
 import { CreateMusicDto } from '../music/dto/create.dto';
+import { FetchMusicDto } from '../music/dto/fetch.dto';
 
 @Controller('video')
 export class VideoController {
@@ -119,5 +120,15 @@ export class VideoController {
     @User('id') userId: string,
   ) {
     return this.videoService.updateInCommunity(dto, videoId, userId);
+  }
+
+  @Delete('community/video/:id')
+  @Auth('user')
+  deleteFromCommunity(
+    @Body() dto: FetchVideoDto,
+    @Param('id') videoId: string,
+    @User('id') userId: string,
+  ) {
+    return this.videoService.deleteFromCommunity(dto, videoId, userId);
   }
 }
