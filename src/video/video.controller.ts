@@ -96,6 +96,11 @@ export class VideoController {
     return this.videoService.getAllInCommunity(dto);
   }
 
+  @Get('community/video/:id')
+  getOneInCommunity(@Body() dto: FetchVideoDto, @Param('id') videoId: string) {
+    return this.videoService.getOneInCommunity(dto, videoId);
+  }
+
   @UsePipes(new ValidationPipe())
   @Post('community/video')
   @HttpCode(200)

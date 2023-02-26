@@ -264,8 +264,24 @@ export class VideoService {
         return community;
       });
 
-      return video;
+      return v;
     });
+  }
+
+  async getOneInCommunity(dto: FetchVideoDto, videoId: string) {
+    const video = await this.getOne(videoId);
+
+    const { community } = await validationCommunity(
+      dto.communityId,
+      this.communityRepository,
+    );
+
+    const isExistVideo = community.video.find((v) => v.id === video.id);
+
+    if (!isExistVideo)
+      throw new NotFoundException('Video not found in this community');
+
+    return video;
   }
 
   async createInCommunity(dto: CreateVideoDto, userId: string) {
