@@ -173,7 +173,7 @@ export class CommentService {
     commentId: string,
     userId: string,
   ) {
-    if (dto.postId && dto.photoId)
+    if (dto.postId && dto.photoId && dto.videoId)
       throw new ForbiddenException('Enter only one id');
 
     const user = await this.userRepository.findOneBy({ id: userId });
@@ -201,7 +201,7 @@ export class CommentService {
         },
         {
           text: dto.text,
-          post: { id: dto.postId },
+          post: { id: post.id },
           user: { id: userId },
         },
       );
@@ -230,7 +230,36 @@ export class CommentService {
         },
         {
           text: dto.text,
-          photo: { id: dto.photoId },
+          photo: { id: photo.id },
+          user: { id: userId },
+        },
+      );
+
+      return this.findOneById(commentId);
+    }
+
+    if (dto.videoId) {
+      const video = await this.videoRepository.findOne({
+        where: { id: dto.videoId },
+        relations: ['comments'],
+      });
+
+      if (!video) throw new NotFoundException('Video not found');
+
+      const comment = video.comments.find(
+        (comment) => comment.id === commentId,
+      );
+
+      if (!comment)
+        throw new NotFoundException('Comment not found on this video');
+
+      await this.commentRepository.update(
+        {
+          id: comment.id,
+        },
+        {
+          text: dto.text,
+          video: { id: video.id },
           user: { id: userId },
         },
       );
