@@ -50,24 +50,24 @@ export class CommentController {
 
   @Post()
   @Auth('user')
-  createPostComment(@Body() dto: CreateCommentDto, @User('id') userId: string) {
-    return this.commentService.createPostComment(dto, userId);
+  createComment(@Body() dto: CreateCommentDto, @User('id') userId: string) {
+    return this.commentService.createComment(dto, userId);
   }
 
   @Put(':id')
   @Auth('user')
-  updatePostComment(
+  updateComment(
     @Param('id') commentId: string,
     @Body() dto: UpdateCommentDto,
     @User('id') userId: string,
   ) {
-    return this.commentService.updatePostComment(dto, commentId, userId);
+    return this.commentService.updateComment(dto, commentId, userId);
   }
 
   @Delete(':id')
   @Auth('user')
-  remove(@Param('id') id: string, @User('id') userId: string) {
-    return this.commentService.remove(id, userId);
+  removeComment(@Param('id') id: string, @User('id') userId: string) {
+    return this.commentService.removeComment(id, userId);
   }
 
   //............

@@ -20,6 +20,7 @@ import { returnCommentFields } from '../components/forServices/returnCommentFiel
 import { returnCommentsFields } from '../components/forServices/returnCommentsFields';
 import { getOnePhotoInCommunity } from '../components/forServices/getOnePhotoInCommunity';
 import { VideoEntity } from '../video/entity/video.entity';
+import { getOneVideoInCommunity } from '../components/forServices/getOneVideoInCommunity';
 
 @Injectable()
 export class CommentService {
@@ -103,7 +104,7 @@ export class CommentService {
     return returnCommentsFields(comments);
   }
 
-  async createPostComment(dto: CreateCommentDto, userId: string) {
+  async createComment(dto: CreateCommentDto, userId: string) {
     if (dto.postId && dto.photoId && dto.videoId)
       throw new ForbiddenException('Enter only one id');
 
@@ -168,7 +169,7 @@ export class CommentService {
     }
   }
 
-  async updatePostComment(
+  async updateComment(
     dto: UpdateCommentDto,
     commentId: string,
     userId: string,
@@ -268,7 +269,7 @@ export class CommentService {
     }
   }
 
-  async remove(id: string, userId: string) {
+  async removeComment(id: string, userId: string) {
     const user = await this.userRepository.findOneBy({ id: userId });
     const comment = await this.findOneById(id);
 
@@ -288,7 +289,7 @@ export class CommentService {
   //.............//
 
   async getAllCommentsInCommunity(dto: FetchCommentDto) {
-    if (dto.postId && dto.photoId)
+    if (dto.postId && dto.photoId && dto.videoId)
       throw new ForbiddenException('Enter only one id');
 
     const community = await this.communityRepository.findOne({
@@ -300,6 +301,9 @@ export class CommentService {
         'photos',
         'photos.comments',
         'photos.community',
+        'video',
+        'video.comments',
+        'video.communities',
       ],
     });
 
@@ -362,10 +366,44 @@ export class CommentService {
 
       return photo;
     }
+
+    if (dto.videoId) {
+      community.video.map((p) => {
+        delete p.user.password;
+        return p;
+      });
+
+      const video = await this.videoRepository.findOne({
+        where: { id: dto.videoId },
+        relations: ['comments', 'comments.user', 'communities'],
+      });
+
+      if (!video) throw new NotFoundException('Video not found');
+
+      video.communities.map((community) => {
+        delete community.admins;
+        delete community.members;
+        delete community.posts;
+        delete community.music;
+        delete community.admins;
+        delete community.author;
+
+        return community;
+      });
+
+      delete video.user.password;
+
+      video.comments.map((comment) => {
+        delete comment.user.password;
+        return comment;
+      });
+
+      return video;
+    }
   }
 
   async getOneCommentInCommunity(dto: FetchCommentDto, commentId: string) {
-    if (dto.postId && dto.photoId)
+    if (dto.postId && dto.photoId && dto.videoId)
       throw new ForbiddenException('Enter only one id');
 
     if (dto.postId) {
