@@ -27,6 +27,11 @@ export class VideoEntity {
   @Column()
   videoUrl: string;
 
+  @Column({
+    default: false,
+  })
+  turnOffComments: boolean;
+
   @ManyToOne(() => UserEntity, { eager: true, nullable: false })
   user: UserEntity;
 

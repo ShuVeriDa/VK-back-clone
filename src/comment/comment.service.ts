@@ -59,20 +59,18 @@ export class CommentService {
   }
 
   async findAllByPostId(dto: FetchCommentDto) {
-    if (dto.postId) {
-      const post = await this.postRepository.findOne({
-        where: { id: dto.postId },
-      });
+    const post = await this.postRepository.findOne({
+      where: { id: dto.postId },
+    });
 
-      if (!post) throw new NotFoundException('Post not found');
+    if (!post) throw new NotFoundException('Post not found');
 
-      const comments = await this.commentRepository.find({
-        where: { post: { id: post.id } },
-        relations: ['post', 'user'],
-      });
+    const comments = await this.commentRepository.find({
+      where: { post: { id: post.id } },
+      relations: ['post', 'user'],
+    });
 
-      return returnCommentsFields(comments);
-    }
+    return returnCommentsFields(comments);
   }
 
   async findAllByPhotoId(dto: FetchCommentDto) {
@@ -95,8 +93,6 @@ export class CommentService {
       where: { id: dto.videoId },
     });
 
-    console.log(video);
-
     if (!video) throw new NotFoundException('Video not found');
 
     const comments = await this.commentRepository.find({
@@ -108,7 +104,7 @@ export class CommentService {
   }
 
   async createPostComment(dto: CreateCommentDto, userId: string) {
-    if (dto.postId && dto.photoId)
+    if (dto.postId && dto.photoId && dto.videoId)
       throw new ForbiddenException('Enter only one id');
 
     if (dto.postId) {
@@ -145,6 +141,26 @@ export class CommentService {
       const comment = await this.commentRepository.save({
         text: dto.text,
         photo: { id: photo.id },
+        user: { id: userId },
+      });
+
+      return this.findOneById(comment.id);
+    }
+
+    if (dto.videoId) {
+      const video = await this.videoRepository.findOne({
+        where: { id: dto.videoId },
+        relations: ['comments'],
+      });
+
+      if (!video) throw new NotFoundException('Video not found');
+
+      if (video.turnOffComments)
+        throw new ForbiddenException('This video has comments turned off');
+
+      const comment = await this.commentRepository.save({
+        text: dto.text,
+        video: { id: video.id },
         user: { id: userId },
       });
 
