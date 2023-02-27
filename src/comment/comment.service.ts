@@ -19,6 +19,7 @@ import { PhotoEntity } from '../photo/entity/photo.entity';
 import { returnCommentFields } from '../components/forServices/returnCommentFields';
 import { returnCommentsFields } from '../components/forServices/returnCommentsFields';
 import { getOnePhotoInCommunity } from '../components/forServices/getOnePhotoInCommunity';
+import { VideoEntity } from '../video/entity/video.entity';
 
 @Injectable()
 export class CommentService {
@@ -27,19 +28,19 @@ export class CommentService {
     private readonly commentRepository: Repository<CommentEntity>,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-
     @InjectRepository(PostEntity)
     private readonly postRepository: Repository<PostEntity>,
     @InjectRepository(PhotoEntity)
     private readonly photoRepository: Repository<PhotoEntity>,
-
+    @InjectRepository(VideoEntity)
+    private readonly videoRepository: Repository<VideoEntity>,
     @InjectRepository(CommunityEntity)
     private readonly communityRepository: Repository<CommunityEntity>,
   ) {}
 
   async findAll() {
     const comments = await this.commentRepository.find({
-      relations: ['user', 'post', 'photo'],
+      relations: ['user', 'post', 'photo', 'video'],
       order: { createdAt: 'DESC' },
     });
 
@@ -49,7 +50,7 @@ export class CommentService {
   async findOneById(commentId: string) {
     const comment = await this.commentRepository.findOne({
       where: { id: commentId },
-      relations: ['post', 'user', 'photo'],
+      relations: ['post', 'user', 'photo', 'video'],
     });
 
     if (!comment) throw new NotFoundException('Comment not found');
@@ -84,6 +85,23 @@ export class CommentService {
     const comments = await this.commentRepository.find({
       where: { photo: { id: photo.id } },
       relations: ['photo', 'user'],
+    });
+
+    return returnCommentsFields(comments);
+  }
+
+  async findAllByVideoId(dto: FetchCommentDto) {
+    const video = await this.videoRepository.findOne({
+      where: { id: dto.videoId },
+    });
+
+    console.log(video);
+
+    if (!video) throw new NotFoundException('Video not found');
+
+    const comments = await this.commentRepository.find({
+      where: { video: { id: video.id } },
+      relations: ['user', 'video'],
     });
 
     return returnCommentsFields(comments);

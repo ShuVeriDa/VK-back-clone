@@ -20,6 +20,13 @@ export const returnCommentsFields = (comments: CommentEntity[]) => {
             photoUrl: comment.photo.photoUrl,
           }
         : null,
+      video: comment.video
+        ? {
+            id: comment.video.id,
+            title: comment.video.title,
+            description: comment.video.description,
+          }
+        : null,
     };
   });
 };

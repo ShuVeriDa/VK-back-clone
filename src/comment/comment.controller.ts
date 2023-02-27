@@ -28,11 +28,6 @@ export class CommentController {
   //   return this.commentService.findAll(+query.postId);
   // }
 
-  @Get(':id')
-  findOneById(@Param('id') commentId: string) {
-    return this.commentService.findOneById(commentId);
-  }
-
   @Get('post')
   findAllByPostId(@Body() dto: FetchCommentDto) {
     return this.commentService.findAllByPostId(dto);
@@ -41,6 +36,16 @@ export class CommentController {
   @Get('photo')
   findAllByPhotoId(@Body() dto: FetchCommentDto) {
     return this.commentService.findAllByPhotoId(dto);
+  }
+
+  @Get('video')
+  findAllByVideoId(@Body() dto: FetchCommentDto) {
+    return this.commentService.findAllByVideoId(dto);
+  }
+
+  @Get(':id')
+  findOneById(@Param('id') commentId: string) {
+    return this.commentService.findOneById(commentId);
   }
 
   @Post()

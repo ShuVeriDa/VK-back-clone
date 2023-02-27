@@ -4,11 +4,10 @@ import { CommentService } from './comment.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommentEntity } from './entity/comment.entity';
 import { UserEntity } from '../user/entity/user.entity';
-import { UserModule } from '../user/user.module';
-import { PostModule } from '../post/post.module';
 import { CommunityEntity } from '../community/entity/community.entity';
 import { PostEntity } from '../post/entity/post.entity';
 import { PhotoEntity } from '../photo/entity/photo.entity';
+import { VideoEntity } from '../video/entity/video.entity';
 
 @Module({
   imports: [
@@ -18,9 +17,8 @@ import { PhotoEntity } from '../photo/entity/photo.entity';
       CommunityEntity,
       PostEntity,
       PhotoEntity,
+      VideoEntity,
     ]),
-    // UserModule,
-    // PostModule,
   ],
   controllers: [CommentController],
   providers: [CommentService],

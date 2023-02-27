@@ -11,5 +11,9 @@ export class FetchCommentDto {
 
   @IsOptional()
   @IsString()
+  videoId?: string;
+
+  @IsOptional()
+  @IsString()
   communityId?: string;
 }

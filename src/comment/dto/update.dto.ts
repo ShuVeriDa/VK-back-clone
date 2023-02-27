@@ -13,6 +13,10 @@ export class UpdateCommentDto {
   @IsOptional()
   photoId?: string;
 
+  @IsString()
+  @IsOptional()
+  videoId?: string;
+
   @IsOptional()
   @IsString()
   communityId?: string;
