@@ -105,7 +105,10 @@ export class CommentService {
   }
 
   async createComment(dto: CreateCommentDto, userId: string) {
-    if (dto.postId && dto.photoId && dto.videoId)
+    if (
+      (dto.postId && dto.photoId) ||
+      (dto.postId && dto.photoId && dto.videoId)
+    )
       throw new ForbiddenException('Enter only one id');
 
     if (dto.postId) {
@@ -174,7 +177,10 @@ export class CommentService {
     commentId: string,
     userId: string,
   ) {
-    if (dto.postId && dto.photoId && dto.videoId)
+    if (
+      (dto.postId && dto.photoId) ||
+      (dto.postId && dto.photoId && dto.videoId)
+    )
       throw new ForbiddenException('Enter only one id');
 
     const user = await this.userRepository.findOneBy({ id: userId });
@@ -289,7 +295,10 @@ export class CommentService {
   //.............//
 
   async getAllCommentsInCommunity(dto: FetchCommentDto) {
-    if (dto.postId && dto.photoId && dto.videoId)
+    if (
+      (dto.postId && dto.photoId) ||
+      (dto.postId && dto.photoId && dto.videoId)
+    )
       throw new ForbiddenException('Enter only one id');
 
     const community = await this.communityRepository.findOne({
@@ -403,7 +412,10 @@ export class CommentService {
   }
 
   async getOneCommentInCommunity(dto: FetchCommentDto, commentId: string) {
-    if (dto.postId && dto.photoId && dto.videoId)
+    if (
+      (dto.postId && dto.photoId) ||
+      (dto.postId && dto.photoId && dto.videoId)
+    )
       throw new ForbiddenException('Enter only one id');
 
     if (dto.postId) {
@@ -475,7 +487,10 @@ export class CommentService {
   }
 
   async commentCreateInCommunity(dto: CreateCommentDto, userId: string) {
-    if (dto.postId && dto.photoId)
+    if (
+      (dto.postId && dto.photoId) ||
+      (dto.postId && dto.photoId && dto.videoId)
+    )
       throw new ForbiddenException('Enter only one id');
 
     if (dto.postId) {
