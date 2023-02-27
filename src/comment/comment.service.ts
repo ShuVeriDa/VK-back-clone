@@ -449,6 +449,29 @@ export class CommentService {
       delete comment.user.password;
       return comment;
     }
+
+    if (dto.videoId) {
+      const { video } = await getOneVideoInCommunity(
+        dto.videoId,
+        this.videoRepository,
+        dto.communityId,
+        this.communityRepository,
+      );
+
+      const comment = await this.commentRepository.findOne({
+        where: { video: { comments: { id: commentId } } },
+        relations: ['user'],
+      });
+
+      if (!comment) throw new NotFoundException('Comment not found');
+
+      // const comment = photo.comments.find(
+      //   (comment) => comment.id === commentId,
+      // );
+
+      delete comment.user.password;
+      return comment;
+    }
   }
 
   async commentCreateInCommunity(dto: CreateCommentDto, userId: string) {
