@@ -493,15 +493,15 @@ export class CommentService {
     )
       throw new ForbiddenException('Enter only one id');
 
-    if (dto.postId) {
-      const { community, user } = await validationCRUDInCommunity(
-        dto.communityId,
-        this.communityRepository,
-        userId,
-        this.userRepository,
-        false,
-      );
+    const { community, user } = await validationCRUDInCommunity(
+      dto.communityId,
+      this.communityRepository,
+      userId,
+      this.userRepository,
+      false,
+    );
 
+    if (dto.postId) {
       const post = community.posts.find((post) => post.id === dto.postId);
 
       if (!post) throw new NotFoundException('Post not found');
@@ -519,14 +519,6 @@ export class CommentService {
     }
 
     if (dto.photoId) {
-      const { community, user } = await validationCRUDInCommunity(
-        dto.communityId,
-        this.communityRepository,
-        userId,
-        this.userRepository,
-        false,
-      );
-
       const photo = community.photos.find((photo) => photo.id === dto.photoId);
 
       if (!photo) throw new NotFoundException('Photo not found');
@@ -542,6 +534,23 @@ export class CommentService {
 
       return await this.findOneById(comment.id);
     }
+
+    if (dto.videoId) {
+      const video = community.video.find((v) => v.id === dto.videoId);
+
+      if (!video) throw new NotFoundException('Video not found');
+
+      if (video.turnOffComments)
+        throw new ForbiddenException('This video has comments turned off.');
+
+      const comment = await this.commentRepository.save({
+        text: dto.text,
+        video: { id: video.id },
+        user: { id: user.id },
+      });
+
+      return await this.findOneById(comment.id);
+    }
   }
 
   async commentUpdateInCommunity(
@@ -551,20 +560,23 @@ export class CommentService {
   ) {
     const comment = await this.findOneById(commentId);
 
-    if (dto.postId && dto.photoId)
+    if (
+      (dto.postId && dto.photoId) ||
+      (dto.postId && dto.photoId && dto.videoId)
+    )
       throw new ForbiddenException('Enter only one id');
 
-    if (dto.postId) {
-      const { community, user } = await validationCRUDInCommunity(
-        dto.communityId,
-        this.communityRepository,
-        userId,
-        this.userRepository,
-        false,
-        true,
-        comment.user.id,
-      );
+    const { community, user } = await validationCRUDInCommunity(
+      dto.communityId,
+      this.communityRepository,
+      userId,
+      this.userRepository,
+      false,
+      true,
+      comment.user.id,
+    );
 
+    if (dto.postId) {
       const post = community.posts.find((post) => post.id === dto.postId);
 
       if (!post) throw new NotFoundException('Post not found');
@@ -578,7 +590,7 @@ export class CommentService {
         { id: commentId },
         {
           text: dto.text,
-          post: { id: dto.postId },
+          post: { id: post.id },
           user: { id: user.id },
         },
       );
@@ -607,7 +619,36 @@ export class CommentService {
         { id: comment.id },
         {
           text: dto.text,
-          photo: { id: dto.photoId },
+          photo: { id: photo.id },
+          user: { id: user.id },
+        },
+      );
+
+      return await this.findOneById(comment.id);
+    }
+
+    if (dto.videoId) {
+      const { community, user } = await validationCRUDInCommunity(
+        dto.communityId,
+        this.communityRepository,
+        userId,
+        this.userRepository,
+        false,
+        true,
+        comment.user.id,
+      );
+
+      const video = community.video.find((v) => v.id === dto.videoId);
+
+      if (!video) throw new NotFoundException('Video not found');
+
+      if (!comment) throw new NotFoundException('Comment not found');
+
+      await this.commentRepository.update(
+        { id: comment.id },
+        {
+          text: dto.text,
+          video: { id: video.id },
           user: { id: user.id },
         },
       );
