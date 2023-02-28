@@ -671,14 +671,22 @@ export class CommentService {
           'photo',
           'photo.community',
           'user',
+          'video',
+          'video.communities',
         ],
       });
 
       if (!comment) throw new NotFoundException('Comment not found');
 
+      if (!dto.postId && dto.photoId && !dto.videoId)
+        throw new ForbiddenException(
+          'Enter the ID of the post or photo or video',
+        );
+
       if (dto.postId) {
         const { community, user } = await validationCRUDInCommunity(
-          comment.post.community.id,
+          // comment.post.community.id,
+          dto.communityId,
           this.communityRepository,
           userId,
           this.userRepository,
@@ -693,11 +701,14 @@ export class CommentService {
 
         if (!isComment)
           throw new NotFoundException('Comment not found in this post');
+
+        return await manager.remove(comment);
       }
 
       if (dto.photoId) {
         const { community, user } = await validationCRUDInCommunity(
-          comment.photo.community.id,
+          // comment.photo.community.id,
+          dto.communityId,
           this.communityRepository,
           userId,
           this.userRepository,
@@ -712,9 +723,32 @@ export class CommentService {
 
         if (!isComment)
           throw new NotFoundException('Comment not found in this photo');
+
+        return await manager.remove(comment);
       }
 
-      return await manager.remove(comment);
+      if (dto.videoId) {
+        const { community, user } = await validationCRUDInCommunity(
+          dto.communityId,
+          this.communityRepository,
+          userId,
+          this.userRepository,
+          true,
+          false,
+          comment.user.id,
+        );
+
+        console.log(comment.video);
+
+        const isComment = comment.video.comments.find(
+          (c) => c.id === comment.id,
+        );
+
+        if (!isComment)
+          throw new NotFoundException('Comment not found in this video');
+
+        return await manager.remove(comment);
+      }
     });
   }
 }
