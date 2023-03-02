@@ -35,11 +35,20 @@ export class PostService {
       relations: ['community'],
     });
 
-    return posts.map((obj) => {
-      delete obj.user.password;
-      delete obj.user.createdAt;
-      delete obj.user.updatedAt;
-      return obj;
+    return posts.map((post) => {
+      delete post.user.password;
+      delete post.user.createdAt;
+      delete post.user.updatedAt;
+
+      return {
+        ...post,
+        user: {
+          id: post.user.id,
+          firstName: post.user.firstName,
+          lastName: post.user.lastName,
+          avatar: post.user.avatar,
+        },
+      };
     });
   }
 
@@ -73,7 +82,17 @@ export class PostService {
       return 0;
     });
 
-    return combinedPosts;
+    return combinedPosts.map((post) => {
+      return {
+        ...post,
+        user: {
+          id: post.user.id,
+          firstName: post.user.firstName,
+          lastName: post.user.lastName,
+          avatar: post.user.avatar,
+        },
+      };
+    });
   }
 
   async search(dto: SearchPostDto) {
