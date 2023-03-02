@@ -21,9 +21,5 @@ export const getOnePost = async (
     .set({ views: () => 'views + 1' })
     .execute();
 
-  delete post.user.password;
-  delete post.user.createdAt;
-  delete post.user.updatedAt;
-
   return post;
 };

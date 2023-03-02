@@ -128,18 +128,33 @@ export class PostService {
       .leftJoinAndSelect('posts.user', 'user')
       .getManyAndCount();
 
-    const arr = posts.map((p) => {
-      delete p.user.password;
-      delete p.user.createdAt;
-      delete p.user.updatedAt;
-      return p;
+    const arr = posts.map((post) => {
+      return {
+        ...post,
+        user: {
+          id: post.user.id,
+          firstName: post.user.firstName,
+          lastName: post.user.lastName,
+          avatar: post.user.avatar,
+        },
+      };
     });
 
     return { posts: arr, total };
   }
 
   async findOne(id: string) {
-    return getOnePost(id, this.postRepository);
+    const post = await getOnePost(id, this.postRepository);
+
+    return {
+      ...post,
+      user: {
+        id: post.user.id,
+        firstName: post.user.firstName,
+        lastName: post.user.lastName,
+        avatar: post.user.avatar,
+      },
+    };
   }
 
   async create(dto: CreatePostDto, userId: string) {
