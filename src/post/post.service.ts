@@ -171,7 +171,15 @@ export class PostService {
     const { user } = fetchPost;
     delete user.password;
 
-    return fetchPost;
+    return {
+      ...fetchPost,
+      user: {
+        id: fetchPost.user.id,
+        firstName: fetchPost.user.firstName,
+        lastName: fetchPost.user.lastName,
+        avatar: fetchPost.user.avatar,
+      },
+    };
   }
 
   async update(id: string, dto: UpdatePostDto) {
@@ -196,7 +204,15 @@ export class PostService {
     const { user } = fetchPost;
     delete user.password;
 
-    return fetchPost;
+    return {
+      ...fetchPost,
+      user: {
+        id: fetchPost.user.id,
+        firstName: fetchPost.user.firstName,
+        lastName: fetchPost.user.lastName,
+        avatar: fetchPost.user.avatar,
+      },
+    };
   }
 
   async delete(postId: string, userId: string) {
