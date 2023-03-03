@@ -14,7 +14,7 @@ import { CommunityEntity } from '../community/entity/community.entity';
 import { PostEntity } from '../post/entity/post.entity';
 import { FetchCommentDto } from './dto/fetch.dto';
 import { UpdateCommentDto } from './dto/update.dto';
-import { getOnePostInCommunity } from '../components/forServices/getOnePostInCommunity';
+import { getOnePostInCommunityComponent } from '../components/forServices/getOnePostInCommunityComponent';
 import { PhotoEntity } from '../photo/entity/photo.entity';
 import { returnCommentFields } from '../components/forServices/returnCommentFields';
 import { returnCommentsFields } from '../components/forServices/returnCommentsFields';
@@ -419,7 +419,7 @@ export class CommentService {
       throw new ForbiddenException('Enter only one id');
 
     if (dto.postId) {
-      const { post } = await getOnePostInCommunity(
+      const { post } = await getOnePostInCommunityComponent(
         dto.postId,
         this.postRepository,
         dto.communityId,

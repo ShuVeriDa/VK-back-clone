@@ -2,8 +2,9 @@ import { NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { PostEntity } from '../../post/entity/post.entity';
 import { CommunityEntity } from '../../community/entity/community.entity';
+import { returnForCommunity } from './returnForCommunity';
 
-export const getOnePostInCommunity = async (
+export const getOnePostInCommunityComponent = async (
   postId: string,
   postRepos: Repository<PostEntity>,
   communityId: string,
@@ -29,11 +30,5 @@ export const getOnePostInCommunity = async (
   if (!isExistPost)
     throw new NotFoundException('Post not found in this community');
 
-  delete post.user.password;
-  // delete post.community.author.password;
-  // post.community.members.map((m) => {
-  //   delete m.password;
-  //   return m;
-  // });
-  return { post };
+  return { post: returnForCommunity(post) };
 };

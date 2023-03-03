@@ -16,7 +16,7 @@ import { removeFromFavoritesAndReposts } from '../components/forServices/removeF
 import { CommunityEntity } from '../community/entity/community.entity';
 import { FetchPostDto } from './dto/fetch.dto';
 import { validationCRUDInCommunity } from '../components/forServices/validationCRUDInCommunity';
-import { getOnePostInCommunity } from '../components/forServices/getOnePostInCommunity';
+import { getOnePostInCommunityComponent } from '../components/forServices/getOnePostInCommunityComponent';
 import { returnWithUser } from '../components/forServices/returnWithUser';
 import { returnForCommunity } from '../components/forServices/returnForCommunity';
 
@@ -258,7 +258,7 @@ export class PostService {
   }
 
   async getOnePostInCommunity(dto: FetchPostDto, postId: string) {
-    const { post } = await getOnePostInCommunity(
+    const { post } = await getOnePostInCommunityComponent(
       postId,
       this.postRepository,
       dto.communityId,
@@ -291,20 +291,7 @@ export class PostService {
       relations: ['community'],
     });
 
-    delete fetchPost.user.password;
-    delete fetchPost.community.author.password;
-
-    fetchPost.community.members.map((m) => {
-      delete m.password;
-      return m;
-    });
-
-    fetchPost.community.admins.map((a) => {
-      delete a.password;
-      return a;
-    });
-
-    return fetchPost;
+    return returnForCommunity(fetchPost);
   }
 
   async postUpdateInCommunity(
@@ -319,13 +306,12 @@ export class PostService {
       this.userRepository,
     );
 
-    const isExistPost = community.posts.find((post) => post.id === postId);
+    const post = community.posts.find((post) => post.id === postId);
 
-    if (!isExistPost)
-      throw new NotFoundException('Post not found in this community');
+    if (!post) throw new NotFoundException('Post not found in this community');
 
     await this.postRepository.update(
-      { id: postId },
+      { id: post.id },
       {
         text: dto.text,
         imageUrl: dto.imageUrl,
@@ -335,14 +321,12 @@ export class PostService {
       },
     );
 
-    const fetchPost = await this.postRepository.findOne({
-      where: { id: postId },
-      relations: ['community'],
-    });
-
-    delete fetchPost.user.password;
-
-    return fetchPost;
+    return await getOnePostInCommunityComponent(
+      post.id,
+      this.postRepository,
+      dto.communityId,
+      this.communityRepository,
+    );
   }
 
   async postDeleteInCommunity(postId: string, userId: string) {
