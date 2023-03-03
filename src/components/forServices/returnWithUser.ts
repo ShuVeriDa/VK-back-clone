@@ -1,6 +1,4 @@
-import { PostEntity } from '../../post/entity/post.entity';
-
-export const returnWithUser = (thing: PostEntity) => {
+export const returnWithUser = (thing: any) => {
   return {
     ...thing,
     user: {
