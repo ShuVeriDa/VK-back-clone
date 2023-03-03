@@ -1,18 +1,19 @@
 export const returnForCommunity = (thing: any) => {
   const returnUserData = (data: any) => {
-    return {
-      id: data.id,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      avatar: data.avatar,
-    };
+    if (data)
+      return {
+        id: data.id,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        avatar: data.avatar,
+      };
   };
 
-  const members = thing.community.members.map((member) => {
+  const members = thing.community?.members.map((member) => {
     return returnUserData(member);
   });
 
-  const admins = thing.community.admins.map((admin) => {
+  const admins = thing.community?.admins.map((admin) => {
     return returnUserData(admin);
   });
 
@@ -22,7 +23,7 @@ export const returnForCommunity = (thing: any) => {
       ...thing.community,
       members: members,
       admins: admins,
-      author: returnUserData(thing.community.author),
+      author: returnUserData(thing.community?.author),
     },
     user: returnUserData(thing.user),
   };

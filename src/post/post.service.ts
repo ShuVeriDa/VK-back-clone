@@ -38,21 +38,21 @@ export class PostService {
     });
 
     return posts.map((post) => {
-      delete post.user.password;
-      delete post.user.createdAt;
-      delete post.user.updatedAt;
+      // delete post.user.password;
+      // delete post.user.createdAt;
+      // delete post.user.updatedAt;
+      //
+      // return {
+      //   ...post,
+      //   user: {
+      //     id: post.user.id,
+      //     firstName: post.user.firstName,
+      //     lastName: post.user.lastName,
+      //     avatar: post.user.avatar,
+      //   },
+      // };
 
-      return {
-        ...post,
-        user: {
-          id: post.user.id,
-          firstName: post.user.firstName,
-          lastName: post.user.lastName,
-          avatar: post.user.avatar,
-        },
-      };
-
-      // return returnWithUser(post);
+      return returnForCommunity(post);
     });
   }
 
@@ -155,9 +155,9 @@ export class PostService {
   }
 
   async update(id: string, dto: UpdatePostDto) {
-    const food = await this.postRepository.findOneBy({ id });
+    const post = await this.postRepository.findOneBy({ id });
 
-    if (!food) throw new NotFoundException('Post not found');
+    if (!post) throw new NotFoundException('Post not found');
 
     await this.postRepository.update(
       {
