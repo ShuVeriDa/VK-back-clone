@@ -2,6 +2,8 @@ import { Repository } from 'typeorm';
 import { UserEntity } from '../../user/entity/user.entity';
 import { PostEntity } from '../../post/entity/post.entity';
 import { getOnePost } from './getOnePost';
+import { ForbiddenException } from '@nestjs/common';
+import { returnWithUser } from './returnWithUser';
 
 export const favoritesAndReposts = async (
   id: string,
@@ -21,6 +23,9 @@ export const favoritesAndReposts = async (
     const isNotFavorites =
       user.favorites.findIndex((obj) => obj.id === post.id) === -1;
 
+    if (!isNotFavorites)
+      throw new ForbiddenException('The post is already in favorites');
+
     if (isNotFavorites) {
       user.favorites.push(post);
       post.favorites++;
@@ -30,10 +35,13 @@ export const favoritesAndReposts = async (
   }
 
   if (title === 'reposts') {
-    const isNotFavorites =
+    const isNotReposts =
       user.reposts.findIndex((obj) => obj.id === post.id) === -1;
 
-    if (isNotFavorites) {
+    if (!isNotReposts)
+      throw new ForbiddenException('The post already reposted');
+
+    if (isNotReposts) {
       user.reposts.push(post);
       post.reposts++;
       await userRepos.save(user);
@@ -41,13 +49,5 @@ export const favoritesAndReposts = async (
     }
   }
 
-  return {
-    ...post,
-    user: {
-      id: post.user.id,
-      firstName: post.user.firstName,
-      lastName: post.user.lastName,
-      avatar: post.user.avatar,
-    },
-  };
+  return returnWithUser(post);
 };

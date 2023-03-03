@@ -2,6 +2,8 @@ import { Repository } from 'typeorm';
 import { UserEntity } from '../../user/entity/user.entity';
 import { PostEntity } from '../../post/entity/post.entity';
 import { getOnePost } from './getOnePost';
+import { ForbiddenException } from '@nestjs/common';
+import { returnWithUser } from './returnWithUser';
 
 export const removeFromFavoritesAndReposts = async (
   id: string,
@@ -20,6 +22,9 @@ export const removeFromFavoritesAndReposts = async (
   if (title === 'favorites') {
     const postIndex = user.favorites.findIndex((obj) => obj.id === post.id);
 
+    if (postIndex < 0)
+      throw new ForbiddenException('The post is no longer in favorites');
+
     if (postIndex >= 0) {
       user.favorites.splice(postIndex, 1);
       post.favorites--;
@@ -31,6 +36,9 @@ export const removeFromFavoritesAndReposts = async (
   if (title === 'reposts') {
     const postIndex = user.reposts.findIndex((obj) => obj.id === post.id);
 
+    if (postIndex < 0)
+      throw new ForbiddenException('The post is no longer reposted');
+
     if (postIndex >= 0) {
       user.reposts.splice(postIndex, 1);
       post.reposts--;
@@ -39,13 +47,5 @@ export const removeFromFavoritesAndReposts = async (
     }
   }
 
-  return {
-    ...post,
-    user: {
-      id: post.user.id,
-      firstName: post.user.firstName,
-      lastName: post.user.lastName,
-      avatar: post.user.avatar,
-    },
-  };
+  return returnWithUser(post);
 };
