@@ -288,9 +288,45 @@ export class PostService {
 
     if (!community) throw new NotFoundException('Community not found');
 
-    return community.posts.map((p) => {
-      delete p.user.password;
-      return p;
+    return community.posts.map((post) => {
+      const members = post.community.members.map((member) => {
+        return {
+          id: member.id,
+          firstName: member.firstName,
+          lastName: member.lastName,
+          avatar: member.avatar,
+        };
+      });
+
+      const admins = post.community.admins.map((admin) => {
+        return {
+          id: admin.id,
+          firstName: admin.firstName,
+          lastName: admin.lastName,
+          avatar: admin.avatar,
+        };
+      });
+
+      return {
+        ...post,
+        community: {
+          ...post.community,
+          members: members,
+          admins: admins,
+          author: {
+            id: post.community.author.id,
+            firstName: post.community.author.firstName,
+            lastName: post.community.author.lastName,
+            avatar: post.community.author.avatar,
+          },
+        },
+        user: {
+          id: post.user.id,
+          firstName: post.user.firstName,
+          lastName: post.user.lastName,
+          avatar: post.user.avatar,
+        },
+      };
     });
   }
 
@@ -304,6 +340,7 @@ export class PostService {
 
     return post;
   }
+
   async postCreateInCommunity(dto: CreatePostDto, userId: string) {
     const { community, user } = await validationCRUDInCommunity(
       dto.communityId,

@@ -39,5 +39,13 @@ export const removeFromFavoritesAndReposts = async (
     }
   }
 
-  return post;
+  return {
+    ...post,
+    user: {
+      id: post.user.id,
+      firstName: post.user.firstName,
+      lastName: post.user.lastName,
+      avatar: post.user.avatar,
+    },
+  };
 };
