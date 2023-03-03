@@ -17,6 +17,7 @@ import { CommunityEntity } from '../community/entity/community.entity';
 import { FetchPostDto } from './dto/fetch.dto';
 import { validationCRUDInCommunity } from '../components/forServices/validationCRUDInCommunity';
 import { getOnePostInCommunity } from '../components/forServices/getOnePostInCommunity';
+import { returnWithUser } from '../components/forServices/returnWithUser';
 
 @Injectable()
 export class PostService {
@@ -49,6 +50,8 @@ export class PostService {
           avatar: post.user.avatar,
         },
       };
+
+      // return returnWithUser(post);
     });
   }
 
@@ -83,15 +86,7 @@ export class PostService {
     });
 
     return combinedPosts.map((post) => {
-      return {
-        ...post,
-        user: {
-          id: post.user.id,
-          firstName: post.user.firstName,
-          lastName: post.user.lastName,
-          avatar: post.user.avatar,
-        },
-      };
+      return returnWithUser(post);
     });
   }
 
@@ -129,15 +124,7 @@ export class PostService {
       .getManyAndCount();
 
     const arr = posts.map((post) => {
-      return {
-        ...post,
-        user: {
-          id: post.user.id,
-          firstName: post.user.firstName,
-          lastName: post.user.lastName,
-          avatar: post.user.avatar,
-        },
-      };
+      return returnWithUser(post);
     });
 
     return { posts: arr, total };
@@ -146,15 +133,7 @@ export class PostService {
   async findOne(id: string) {
     const post = await getOnePost(id, this.postRepository);
 
-    return {
-      ...post,
-      user: {
-        id: post.user.id,
-        firstName: post.user.firstName,
-        lastName: post.user.lastName,
-        avatar: post.user.avatar,
-      },
-    };
+    return returnWithUser(post);
   }
 
   async create(dto: CreatePostDto, userId: string) {
@@ -171,15 +150,7 @@ export class PostService {
     const { user } = fetchPost;
     delete user.password;
 
-    return {
-      ...fetchPost,
-      user: {
-        id: fetchPost.user.id,
-        firstName: fetchPost.user.firstName,
-        lastName: fetchPost.user.lastName,
-        avatar: fetchPost.user.avatar,
-      },
-    };
+    return returnWithUser(fetchPost);
   }
 
   async update(id: string, dto: UpdatePostDto) {
@@ -204,15 +175,7 @@ export class PostService {
     const { user } = fetchPost;
     delete user.password;
 
-    return {
-      ...fetchPost,
-      user: {
-        id: fetchPost.user.id,
-        firstName: fetchPost.user.firstName,
-        lastName: fetchPost.user.lastName,
-        avatar: fetchPost.user.avatar,
-      },
-    };
+    return returnWithUser(fetchPost);
   }
 
   async delete(postId: string, userId: string) {
