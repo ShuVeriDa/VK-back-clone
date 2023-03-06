@@ -1,7 +1,7 @@
 import { returnUserData } from './returnUserData';
 import { MusicEntity } from '../../music/entity/music.entity';
 
-export const returnMusicForCommunity = (thing: MusicEntity) => {
+export const returnMusicForCommunity = (thing) => {
   // const members = thing.community?.members.map((member) => {
   //   return returnUserData(member);
   // });
@@ -10,7 +10,7 @@ export const returnMusicForCommunity = (thing: MusicEntity) => {
   //   return returnUserData(admin);
   // });
 
-  const adders = thing.musicAdders.map((adder) => {
+  const adders = thing.musicAdders?.map((adder) => {
     return returnUserData(adder);
   });
 
@@ -18,6 +18,7 @@ export const returnMusicForCommunity = (thing: MusicEntity) => {
     delete community.admins;
     delete community.members;
     delete community.author;
+
     // delete community.description;
 
     return community;

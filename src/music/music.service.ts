@@ -220,21 +220,19 @@ export class MusicService {
     });
   }
   async getOneInCommunity(dto: FetchMusicDto, musicId: string) {
-    const findMusic = await this.getOne(musicId);
+    const music = await this.getOne(musicId);
 
     const { community } = await validationCommunity(
       dto.communityId,
       this.communityRepository,
     );
 
-    const isExistMusic = community.music.find(
-      (music) => music.id === findMusic.id,
-    );
+    const isExistMusic = community.music.find((m) => m.id === m.id);
 
     if (!isExistMusic)
       throw new NotFoundException('Music not found in this community');
 
-    return findMusic;
+    return returnMusicForCommunity(music);
   }
 
   async createInCommunity(dto: CreateMusicDto, userId: string) {
@@ -255,7 +253,9 @@ export class MusicService {
       communities: [{ id: community.id }],
     });
 
-    return await this.getOne(music.id);
+    const isExistMusic = await this.getOne(music.id);
+
+    return returnMusicForCommunity(isExistMusic);
   }
 
   async updateInCommunity(
@@ -285,7 +285,9 @@ export class MusicService {
       },
     );
 
-    return this.getOne(musicId);
+    const updatedMusic = await this.getOne(musicId);
+
+    return returnMusicForCommunity(updatedMusic);
   }
 
   async deleteFromCommunity(
