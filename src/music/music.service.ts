@@ -130,13 +130,7 @@ export class MusicService {
       where: { id: newMusic.id },
     });
 
-    delete music.user.password;
-    music.musicAdders.map((m) => {
-      delete m.password;
-      return m;
-    });
-
-    return music;
+    return returnMusicWithUser(music);
   }
 
   async update(dto: UpdateMusicDto, musicId: string, userId: string) {
@@ -177,18 +171,10 @@ export class MusicService {
 
       await manager.remove(music);
     });
-    // const music = await this.getOne(musicId);
-    //
-    // const isAuthor = music.user.id === userId;
-    //
-    // if (!isAuthor)
-    //   throw new ForbiddenException("You don't have access to this message");
-    //
-    // return await this.musicRepository.delete(music.id);
   }
 
   async addMusic(musicId: string, userId: string) {
-    return await addAndRemoveAdderMusic(
+    await addAndRemoveAdderMusic(
       musicId,
       this.musicRepository,
       userId,
@@ -196,10 +182,12 @@ export class MusicService {
       this.getOne(musicId),
       'add',
     );
+
+    return await this.getOne(musicId);
   }
 
   async removeFromAdders(musicId: string, userId: string) {
-    return await addAndRemoveAdderMusic(
+    await addAndRemoveAdderMusic(
       musicId,
       this.musicRepository,
       userId,
@@ -207,6 +195,8 @@ export class MusicService {
       this.getOne(musicId),
       'remove',
     );
+
+    return await this.getOne(musicId);
   }
 
   ///////////////

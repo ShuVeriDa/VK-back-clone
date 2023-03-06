@@ -39,6 +39,4 @@ export const addAndRemoveAdderMusic = async (
     );
     await musicRepos.save(music);
   }
-
-  return await getOne;
 };
