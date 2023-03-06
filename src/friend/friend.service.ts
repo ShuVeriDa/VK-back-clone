@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FriendEntity } from './entity/friend.entity';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../user/entity/user.entity';
+import { returnUserData } from '../components/forServices/returnUserData';
 
 @Injectable()
 export class FriendService {
@@ -26,14 +27,15 @@ export class FriendService {
     });
 
     return friends.map((obj) => {
-      delete obj.friend.password;
-      delete obj.user.password;
-
-      return obj;
+      return {
+        ...obj,
+        friend: returnUserData(obj.friend),
+        user: returnUserData(obj.user),
+      };
     });
   }
 
-  async getById(id: string, userId: string) {
+  async getAllById(id: string, userId: string) {
     const find = await this.friendRepository.findOne({
       where: { id: id },
       relations: ['friend', 'user'],
@@ -49,26 +51,11 @@ export class FriendService {
       throw new NotFoundException('Friend not Found');
     }
 
-    delete find.friend.password;
-    delete find.user;
-    return find;
-  }
-
-  async removeFriend(friendId: string, userId: string) {
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-      relations: ['friends', 'friends.friend', 'friends.user'],
-    });
-
-    const friend = user.friends.find(
-      (obj) => String(obj.friend.id) === friendId,
-    );
-
-    if (!friend) {
-      throw new NotFoundException('Friend not found');
-    }
-
-    return this.friendRepository.delete(friend);
+    return {
+      ...find,
+      friend: returnUserData(find.friend),
+      user: returnUserData(find.user),
+    };
   }
 
   //Current User
@@ -79,8 +66,7 @@ export class FriendService {
     });
 
     return friends.map((obj) => {
-      const { friends } = obj;
-      friends.map((obj) => {
+      obj.friends.map((obj) => {
         delete obj.user.password;
         delete obj.friend.password;
         return obj;
@@ -164,5 +150,22 @@ export class FriendService {
     delete friend.friend.password;
     // delete find.user;
     return friend;
+  }
+
+  async removeFriend(friendId: string, userId: string) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['friends', 'friends.friend', 'friends.user'],
+    });
+
+    const friend = user.friends.find(
+      (obj) => String(obj.friend.id) === friendId,
+    );
+
+    if (!friend) {
+      throw new NotFoundException('Friend not found');
+    }
+
+    return this.friendRepository.delete(friend);
   }
 }

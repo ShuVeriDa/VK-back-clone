@@ -3,7 +3,7 @@ import { UserEntity } from '../../user/entity/user.entity';
 import { PostEntity } from '../../post/entity/post.entity';
 import { getOnePost } from './getOnePost';
 import { ForbiddenException } from '@nestjs/common';
-import { returnWithUser } from './returnWithUser';
+import { returnPostWithUser } from './returnPostWithUser';
 
 export const favoritesAndReposts = async (
   id: string,
@@ -49,5 +49,5 @@ export const favoritesAndReposts = async (
     }
   }
 
-  return returnWithUser(post);
+  return returnPostWithUser(post);
 };

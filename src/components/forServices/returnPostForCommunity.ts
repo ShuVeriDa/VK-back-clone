@@ -1,14 +1,6 @@
-export const returnForCommunity = (thing: any) => {
-  const returnUserData = (data: any) => {
-    if (data)
-      return {
-        id: data.id,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        avatar: data.avatar,
-      };
-  };
+import { returnUserData } from './returnUserData';
 
+export const returnPostForCommunity = (thing: any) => {
   const members = thing.community?.members.map((member) => {
     return returnUserData(member);
   });

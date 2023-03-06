@@ -15,6 +15,8 @@ import { CommunityEntity } from '../community/entity/community.entity';
 import { validationCRUDInCommunity } from '../components/forServices/validationCRUDInCommunity';
 import { FetchMusicDto } from './dto/fetch.dto';
 import { validationCommunity } from '../components/forServices/validationCommunity';
+import { returnUserData } from '../components/forServices/returnUserData';
+import { returnMusicWithUser } from '../components/forServices/returnMusicWithUser';
 
 @Injectable()
 export class MusicService {
@@ -64,14 +66,7 @@ export class MusicService {
     });
 
     return music.map((music) => {
-      delete music.user.password;
-
-      music.musicAdders.map((adder) => {
-        delete adder.password;
-        return adder;
-      });
-
-      return music;
+      return returnMusicWithUser(music);
     });
   }
 
@@ -99,14 +94,15 @@ export class MusicService {
       .leftJoinAndSelect('music.musicAdders', 'musicAdders')
       .getManyAndCount();
 
-    music.map((music) => {
-      delete music.user.password;
+    music.map((m) => {
+      delete m.user.password;
 
-      music.musicAdders.map((music) => {
-        delete music.password;
-        return music;
+      m.musicAdders.map((mus) => {
+        delete mus.password;
+        return mus;
       });
-      return music;
+
+      return m;
     });
 
     return { music, total };
@@ -120,14 +116,7 @@ export class MusicService {
 
     if (!music) throw new NotFoundException('Music not found');
 
-    delete music.user.password;
-
-    music.musicAdders.map((m) => {
-      delete m.password;
-      return m;
-    });
-
-    return music;
+    return returnMusicWithUser(music);
   }
 
   async create(dto: CreateMusicDto, userId: string) {

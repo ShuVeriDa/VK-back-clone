@@ -17,8 +17,8 @@ import { CommunityEntity } from '../community/entity/community.entity';
 import { FetchPostDto } from './dto/fetch.dto';
 import { validationCRUDInCommunity } from '../components/forServices/validationCRUDInCommunity';
 import { getOnePostInCommunityComponent } from '../components/forServices/getOnePostInCommunityComponent';
-import { returnWithUser } from '../components/forServices/returnWithUser';
-import { returnForCommunity } from '../components/forServices/returnForCommunity';
+import { returnPostWithUser } from '../components/forServices/returnPostWithUser';
+import { returnPostForCommunity } from '../components/forServices/returnPostForCommunity';
 
 @Injectable()
 export class PostService {
@@ -38,21 +38,7 @@ export class PostService {
     });
 
     return posts.map((post) => {
-      // delete post.user.password;
-      // delete post.user.createdAt;
-      // delete post.user.updatedAt;
-      //
-      // return {
-      //   ...post,
-      //   user: {
-      //     id: post.user.id,
-      //     firstName: post.user.firstName,
-      //     lastName: post.user.lastName,
-      //     avatar: post.user.avatar,
-      //   },
-      // };
-
-      return returnForCommunity(post);
+      return returnPostForCommunity(post);
     });
   }
 
@@ -87,7 +73,7 @@ export class PostService {
     });
 
     return combinedPosts.map((post) => {
-      return returnWithUser(post);
+      return returnPostWithUser(post);
     });
   }
 
@@ -125,7 +111,7 @@ export class PostService {
       .getManyAndCount();
 
     const arr = posts.map((post) => {
-      return returnWithUser(post);
+      return returnPostWithUser(post);
     });
 
     return { posts: arr, total };
@@ -134,7 +120,7 @@ export class PostService {
   async findOne(id: string) {
     const post = await getOnePost(id, this.postRepository);
 
-    return returnWithUser(post);
+    return returnPostWithUser(post);
   }
 
   async create(dto: CreatePostDto, userId: string) {
@@ -151,7 +137,7 @@ export class PostService {
     const { user } = fetchPost;
     delete user.password;
 
-    return returnWithUser(fetchPost);
+    return returnPostWithUser(fetchPost);
   }
 
   async update(id: string, dto: UpdatePostDto) {
@@ -176,7 +162,7 @@ export class PostService {
     const { user } = fetchPost;
     delete user.password;
 
-    return returnWithUser(fetchPost);
+    return returnPostWithUser(fetchPost);
   }
 
   async delete(postId: string, userId: string) {
@@ -253,7 +239,7 @@ export class PostService {
     if (!community) throw new NotFoundException('Community not found');
 
     return community.posts.map((post) => {
-      return returnForCommunity(post);
+      return returnPostForCommunity(post);
     });
   }
 
@@ -291,7 +277,7 @@ export class PostService {
       relations: ['community'],
     });
 
-    return returnForCommunity(fetchPost);
+    return returnPostForCommunity(fetchPost);
   }
 
   async postUpdateInCommunity(

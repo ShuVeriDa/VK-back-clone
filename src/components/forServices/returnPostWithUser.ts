@@ -1,4 +1,4 @@
-export const returnWithUser = (thing: any) => {
+export const returnPostWithUser = (thing: any) => {
   return {
     ...thing,
     user: {

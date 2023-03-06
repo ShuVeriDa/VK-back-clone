@@ -29,14 +29,8 @@ export class FriendController {
 
   @Get('all/:id')
   @Auth('user')
-  getById(@Param('id') id: string, @User('id') userId: string) {
-    return this.friendService.getById(id, userId);
-  }
-
-  @Delete(':id')
-  @Auth('user')
-  removeFriend(@Param('id') friendId: string, @User('id') userId: string) {
-    return this.friendService.removeFriend(friendId, userId);
+  getAllById(@Param('id') id: string, @User('id') userId: string) {
+    return this.friendService.getAllById(id, userId);
   }
 
   //CurrentUser
@@ -58,5 +52,11 @@ export class FriendController {
   @Auth('user')
   addFriend(@Param('id') id: string, @User('id') userId: string) {
     return this.friendService.addFriend(id, userId);
+  }
+
+  @Delete(':id')
+  @Auth('user')
+  removeFriend(@Param('id') friendId: string, @User('id') userId: string) {
+    return this.friendService.removeFriend(friendId, userId);
   }
 }
