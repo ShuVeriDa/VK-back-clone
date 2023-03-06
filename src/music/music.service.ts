@@ -17,6 +17,7 @@ import { FetchMusicDto } from './dto/fetch.dto';
 import { validationCommunity } from '../components/forServices/validationCommunity';
 import { returnUserData } from '../components/forServices/returnUserData';
 import { returnMusicWithUser } from '../components/forServices/returnMusicWithUser';
+import { returnMusicForCommunity } from '../components/forServices/returnMusicForCommunity';
 
 @Injectable()
 export class MusicService {
@@ -165,7 +166,7 @@ export class MusicService {
 
       const isAuthor = music.user.id === userId;
 
-      if (music.user.id !== userId || isCommunity) {
+      if (!isAuthor || isCommunity) {
         throw new ForbiddenException("You don't have access to this music");
       }
 
@@ -215,33 +216,8 @@ export class MusicService {
     });
 
     return music.map((music) => {
-      delete music.user.password;
-
-      music.communities.map((community) => {
-        community.admins.map((a) => {
-          delete a.password;
-          return a;
-        });
-
-        delete community.author.password;
-        delete community.members;
-
-        return community;
-      });
-
-      return music;
+      return returnMusicForCommunity(music);
     });
-
-    // return community.music.map((music) => {
-    //   delete music.user.password;
-    //
-    //   music.musicAdders.map((adder) => {
-    //     delete adder.password;
-    //     return adder;
-    //   });
-    //
-    //   return music;
-    // });
   }
   async getOneInCommunity(dto: FetchMusicDto, musicId: string) {
     const findMusic = await this.getOne(musicId);
