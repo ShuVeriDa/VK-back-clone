@@ -15,9 +15,9 @@ import { CommunityEntity } from '../community/entity/community.entity';
 import { validationCRUDInCommunity } from '../components/forServices/validationCRUDInCommunity';
 import { FetchMusicDto } from './dto/fetch.dto';
 import { validationCommunity } from '../components/forServices/validationCommunity';
-import { returnUserData } from '../components/forServices/returnUserData';
 import { returnMusicWithUser } from '../components/forServices/returnMusicWithUser';
 import { returnMusicForCommunity } from '../components/forServices/returnMusicForCommunity';
+import { returnUserData } from '../components/forServices/returnUserData';
 
 @Injectable()
 export class MusicService {
@@ -35,22 +35,9 @@ export class MusicService {
       order: { createdAt: 'DESC' },
     });
 
-    music.map((music) => {
-      delete music.user.password;
-
-      music.communities.map((c) => {
-        delete c.admins;
-        delete c.members;
-        delete c.author;
-        return c;
-      });
-
-      delete music.musicAdders;
-
-      return music;
+    return music.map((m) => {
+      return returnMusicForCommunity(m);
     });
-
-    return music;
   }
 
   async getMyMusic(userId: string) {
@@ -93,20 +80,21 @@ export class MusicService {
     const [music, total] = await qb
       .leftJoinAndSelect('music.user', 'user')
       .leftJoinAndSelect('music.musicAdders', 'musicAdders')
+      .leftJoinAndSelect('music.communities', 'communities')
       .getManyAndCount();
 
-    music.map((m) => {
-      delete m.user.password;
+    const correctedMusic = music.map((m) => {
+      // delete m.user.password;
+      //
+      // m.musicAdders.map((mus) => {
+      //   delete mus.password;
+      //   return mus;
+      // });
 
-      m.musicAdders.map((mus) => {
-        delete mus.password;
-        return mus;
-      });
-
-      return m;
+      return returnMusicForCommunity(m);
     });
 
-    return { music, total };
+    return { music: correctedMusic, total };
   }
 
   async getOne(musicId: string) {

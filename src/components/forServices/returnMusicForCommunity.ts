@@ -14,7 +14,7 @@ export const returnMusicForCommunity = (thing) => {
     return returnUserData(adder);
   });
 
-  const communities = thing.communities.map((community) => {
+  const communities = thing.communities?.map((community) => {
     delete community.admins;
     delete community.members;
     delete community.author;
