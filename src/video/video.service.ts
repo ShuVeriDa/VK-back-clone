@@ -15,6 +15,7 @@ import { FetchVideoDto } from './dto/fetch.dto';
 import { validationCommunity } from '../components/forServices/validationCommunity';
 import { CommunityEntity } from '../community/entity/community.entity';
 import { validationCRUDInCommunity } from '../components/forServices/validationCRUDInCommunity';
+import { returnVideoForCommunity } from '../components/forServices/returnVideoForCommunity';
 
 @Injectable()
 export class VideoService {
@@ -33,17 +34,9 @@ export class VideoService {
       order: { createdAt: 'DESC' },
     });
 
-    video.map((video) => {
-      delete video.user.password;
-      video.videoAdders.map((adder) => {
-        delete adder.password;
-        return adder;
-      });
-
-      return video;
+    return video.map((v) => {
+      return returnVideoForCommunity(v);
     });
-
-    return video;
   }
 
   async getMyVideo(userId: string) {
@@ -59,15 +52,8 @@ export class VideoService {
       order: { createdAt: 'DESC' },
     });
 
-    return video.map((video) => {
-      delete video.user.password;
-
-      video.videoAdders.map((adder) => {
-        delete adder.password;
-        return adder;
-      });
-
-      return video;
+    return video.map((v) => {
+      return returnVideoForCommunity(v);
     });
   }
 
@@ -93,19 +79,14 @@ export class VideoService {
     const [video, total] = await qb
       .leftJoinAndSelect('video.user', 'user')
       .leftJoinAndSelect('video.videoAdders', 'videoAdders')
+      .leftJoinAndSelect('video.communities', 'communities')
       .getManyAndCount();
 
-    video.map((video) => {
-      delete video.user.password;
-
-      video.videoAdders.map((adder) => {
-        delete adder.password;
-        return adder;
-      });
-      return video;
+    const newVideo = video.map((v) => {
+      return returnVideoForCommunity(v);
     });
 
-    return { video, total };
+    return { video: newVideo, total };
   }
 
   async getOne(videoId: string) {
@@ -116,25 +97,7 @@ export class VideoService {
 
     if (!video) throw new NotFoundException('Video not found');
 
-    delete video.user.password;
-
-    video?.communities?.map((community) => {
-      delete community.members;
-      delete community.author;
-      community.admins.map((admin) => {
-        delete admin.password;
-        return admin;
-      });
-
-      return community;
-    });
-
-    video.videoAdders.map((adder) => {
-      delete adder.password;
-      return adder;
-    });
-
-    return video;
+    return returnVideoForCommunity(video);
   }
 
   async create(dto: CreateVideoDto, userId: string) {
@@ -150,14 +113,7 @@ export class VideoService {
       where: { id: newVideo.id },
     });
 
-    delete video.user.password;
-
-    video.videoAdders.map((video) => {
-      delete video.password;
-      return video;
-    });
-
-    return video;
+    return returnVideoForCommunity(video);
   }
 
   async update(dto: UpdateVideoDto, videoUrl: string, userId: string) {
@@ -249,21 +205,7 @@ export class VideoService {
     });
 
     return video.map((v) => {
-      delete v.user.password;
-
-      v.communities.map((community) => {
-        community.admins.map((admin) => {
-          delete admin.password;
-          return admin;
-        });
-
-        delete community.author.password;
-        delete community.members;
-
-        return community;
-      });
-
-      return v;
+      return returnVideoForCommunity(v);
     });
   }
 
