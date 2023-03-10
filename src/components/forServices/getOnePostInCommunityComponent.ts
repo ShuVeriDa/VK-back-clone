@@ -2,7 +2,7 @@ import { NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { PostEntity } from '../../post/entity/post.entity';
 import { CommunityEntity } from '../../community/entity/community.entity';
-import { returnPostForCommunity } from './returnPostForCommunity';
+import { returnPostPhotoForCommunity } from './returnPostPhotoForCommunity';
 
 export const getOnePostInCommunityComponent = async (
   postId: string,
@@ -30,5 +30,5 @@ export const getOnePostInCommunityComponent = async (
   if (!isExistPost)
     throw new NotFoundException('Post not found in this community');
 
-  return { post: returnPostForCommunity(post) };
+  return { post: returnPostPhotoForCommunity(post) };
 };

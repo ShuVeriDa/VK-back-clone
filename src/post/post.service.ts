@@ -18,7 +18,7 @@ import { FetchPostDto } from './dto/fetch.dto';
 import { validationCRUDInCommunity } from '../components/forServices/validationCRUDInCommunity';
 import { getOnePostInCommunityComponent } from '../components/forServices/getOnePostInCommunityComponent';
 import { returnPostWithUser } from '../components/forServices/returnPostWithUser';
-import { returnPostForCommunity } from '../components/forServices/returnPostForCommunity';
+import { returnPostPhotoForCommunity } from '../components/forServices/returnPostPhotoForCommunity';
 
 @Injectable()
 export class PostService {
@@ -38,7 +38,7 @@ export class PostService {
     });
 
     return posts.map((post) => {
-      return returnPostForCommunity(post);
+      return returnPostPhotoForCommunity(post);
     });
   }
 
@@ -239,7 +239,7 @@ export class PostService {
     if (!community) throw new NotFoundException('Community not found');
 
     return community.posts.map((post) => {
-      return returnPostForCommunity(post);
+      return returnPostPhotoForCommunity(post);
     });
   }
 
@@ -277,7 +277,7 @@ export class PostService {
       relations: ['community'],
     });
 
-    return returnPostForCommunity(fetchPost);
+    return returnPostPhotoForCommunity(fetchPost);
   }
 
   async postUpdateInCommunity(

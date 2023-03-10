@@ -14,6 +14,8 @@ import { validationCRUDInCommunity } from '../components/forServices/validationC
 import { FetchPhotoDto } from './dto/fetch.dto';
 import { validationCommunity } from '../components/forServices/validationCommunity';
 import { VideoEntity } from '../video/entity/video.entity';
+import { returnUserData } from '../components/forServices/returnUserData';
+import { returnPostPhotoForCommunity } from '../components/forServices/returnPostPhotoForCommunity';
 
 @Injectable()
 export class PhotoService {
@@ -36,14 +38,13 @@ export class PhotoService {
 
     const photos = await this.photoRepository.find({
       where: { user: { id: user.id } },
+      relations: ['community'],
       order: { createdAt: 'DESC' },
     });
 
-    photos.map((p) => {
-      delete p.user.password;
-      return p;
+    return photos.map((p) => {
+      return returnPostPhotoForCommunity(p);
     });
-    return photos;
   }
 
   async getOne(photoId: string) {
@@ -54,16 +55,7 @@ export class PhotoService {
 
     if (!photo) throw new NotFoundException('Photo not found');
 
-    delete photo.user.password;
-    delete photo?.community?.members;
-    delete photo?.community?.author;
-
-    photo?.community?.admins.map((admin) => {
-      delete admin.password;
-      return admin;
-    });
-
-    return photo;
+    return returnPostPhotoForCommunity(photo);
   }
 
   async create(dto: CreatePhotoDto, userId: string) {
@@ -104,23 +96,6 @@ export class PhotoService {
   }
 
   async delete(photoId: string, userId: string) {
-    // const photo = await this.getOne(photoId);
-    //
-    // const user = await this.userRepository.findOne({
-    //   where: { id: userId },
-    // });
-    //
-    // if (!user) throw new NotFoundException('User not found');
-    //
-    // const isAuthor = photo.user.id === userId;
-    //
-    // const isCommunity = photo.community; // null
-    //
-    // if (!isAuthor || isCommunity)
-    //   throw new ForbiddenException("You don't have access to this photo");
-    //
-    // await this.photoRepository.delete(photo.id);
-
     await this.photoRepository.manager.transaction(async (manager) => {
       const photo = await manager.findOne(PhotoEntity, {
         where: { id: photoId },
@@ -159,30 +134,8 @@ export class PhotoService {
     });
 
     return photos.map((photo) => {
-      photo.community.admins.map((admin) => {
-        delete admin.password;
-        return admin;
-      });
-      delete photo.community.author;
-      delete photo.community.members;
-      delete photo.user.password;
-
-      return photo;
+      return returnPostPhotoForCommunity(photo);
     });
-
-    // return community.photos.map((photo) => {
-    //   delete photo.user.password;
-    //   // delete photo.community.author;
-    //   // delete photo.community.members;
-    //
-    //   // photo.community.admins.map((admin) => {
-    //   //   delete admin.password;
-    //   //   return admin;
-    //   // });
-    //
-    //   return photo;
-    // }
-    // );
   }
 
   async getOneInCommunity(dto: FetchPhotoDto, photoId: string) {

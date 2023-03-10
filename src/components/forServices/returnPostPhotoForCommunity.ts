@@ -1,7 +1,7 @@
 import { returnUserData } from './returnUserData';
 import { PostEntity } from '../../post/entity/post.entity';
 
-export const returnPostForCommunity = (thing: PostEntity) => {
+export const returnPostPhotoForCommunity = (thing: any) => {
   // const members = thing.community?.members.map((member) => {
   //   return returnUserData(member);
   // });
@@ -17,12 +17,10 @@ export const returnPostForCommunity = (thing: PostEntity) => {
 
   return {
     ...thing,
-    community: {
-      ...thing.community,
-      // members: members,
-      // admins: admins,
-      // author: returnUserData(thing.community?.author),
-    },
+    community: thing.community ? { ...thing.community } : null,
+    // members: members,
+    // admins: admins,
+    // author: returnUserData(thing.community?.author),
     user: returnUserData(thing.user),
   };
 };
