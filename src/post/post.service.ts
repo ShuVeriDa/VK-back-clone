@@ -18,6 +18,7 @@ import { FetchPostDto } from './dto/fetch.dto';
 import { validationCRUDInCommunity } from '../components/forServices/validationCRUDInCommunity';
 import { getOnePostInCommunityComponent } from '../components/forServices/getOnePostInCommunityComponent';
 import { returnPostPhotoForCommunity } from '../components/forServices/returnPostPhotoForCommunity';
+import { createPost } from '../components/forServices/createPost';
 
 @Injectable()
 export class PostService {
@@ -114,18 +115,7 @@ export class PostService {
   }
 
   async create(dto: CreatePostDto, userId: string) {
-    const post = await this.postRepository.save({
-      text: dto.text,
-      imageUrl: dto.imageUrl,
-      musicUrl: dto.musicUrl,
-      videoUrl: dto.videoUrl,
-      turnOffComments: dto.turnOffComments,
-      user: { id: userId },
-    });
-
-    const fetchPost = await this.postRepository.findOneBy({ id: post.id });
-
-    return returnPostPhotoForCommunity(fetchPost);
+    return createPost(this.postRepository, dto, userId);
   }
 
   async update(id: string, dto: UpdatePostDto) {
@@ -248,22 +238,7 @@ export class PostService {
       this.userRepository,
     );
 
-    const post = await this.postRepository.save({
-      text: dto.text,
-      imageUrl: dto.imageUrl,
-      musicUrl: dto.musicUrl,
-      videoUrl: dto.videoUrl,
-      turnOffComments: dto.turnOffComments,
-      user: { id: user.id },
-      community: { id: community.id },
-    });
-
-    const fetchPost = await this.postRepository.findOne({
-      where: { id: post.id },
-      relations: ['community'],
-    });
-
-    return returnPostPhotoForCommunity(fetchPost);
+    return createPost(this.postRepository, dto, userId, community.id);
   }
 
   async postUpdateInCommunity(
