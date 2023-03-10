@@ -15,7 +15,6 @@ import { CommunityEntity } from '../community/entity/community.entity';
 import { validationCRUDInCommunity } from '../components/forServices/validationCRUDInCommunity';
 import { FetchMusicDto } from './dto/fetch.dto';
 import { validationCommunity } from '../components/forServices/validationCommunity';
-import { returnMusicWithUser } from '../components/forServices/returnMusicWithUser';
 import { returnMusicForCommunity } from '../components/forServices/returnMusicForCommunity';
 
 @Injectable()
@@ -53,7 +52,7 @@ export class MusicService {
     });
 
     return music.map((music) => {
-      return returnMusicWithUser(music);
+      return returnMusicForCommunity(music);
     });
   }
 
@@ -83,13 +82,6 @@ export class MusicService {
       .getManyAndCount();
 
     const correctedMusic = music.map((m) => {
-      // delete m.user.password;
-      //
-      // m.musicAdders.map((mus) => {
-      //   delete mus.password;
-      //   return mus;
-      // });
-
       return returnMusicForCommunity(m);
     });
 
@@ -104,7 +96,7 @@ export class MusicService {
 
     if (!music) throw new NotFoundException('Music not found');
 
-    return returnMusicWithUser(music);
+    return returnMusicForCommunity(music);
   }
 
   async create(dto: CreateMusicDto, userId: string) {
@@ -118,7 +110,7 @@ export class MusicService {
       where: { id: newMusic.id },
     });
 
-    return returnMusicWithUser(music);
+    return returnMusicForCommunity(music);
   }
 
   async update(dto: UpdateMusicDto, musicId: string, userId: string) {

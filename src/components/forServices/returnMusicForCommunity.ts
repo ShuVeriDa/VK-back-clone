@@ -26,7 +26,7 @@ export const returnMusicForCommunity = (thing) => {
 
   return {
     ...thing,
-    communities: thing.communities.length ? communities : null,
+    communities: thing.communities?.length ? communities : null,
     user: returnUserData(thing.user),
     musicAdders: adders,
   };
