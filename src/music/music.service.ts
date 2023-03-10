@@ -17,7 +17,6 @@ import { FetchMusicDto } from './dto/fetch.dto';
 import { validationCommunity } from '../components/forServices/validationCommunity';
 import { returnMusicWithUser } from '../components/forServices/returnMusicWithUser';
 import { returnMusicForCommunity } from '../components/forServices/returnMusicForCommunity';
-import { returnUserData } from '../components/forServices/returnUserData';
 
 @Injectable()
 export class MusicService {

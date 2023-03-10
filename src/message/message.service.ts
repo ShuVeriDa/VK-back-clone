@@ -11,6 +11,8 @@ import { UserEntity } from '../user/entity/user.entity';
 import { UpdateMessageDto } from './dto/update.dto';
 import { markAsRead } from '../components/forServices/markAsRead';
 import { validationMessage } from '../components/forServices/validationMessage';
+import { returnUserData } from '../components/forServices/returnUserData';
+import { returnMessage } from '../components/forServices/returnMessage';
 
 @Injectable()
 export class MessageService {
@@ -26,9 +28,7 @@ export class MessageService {
     });
 
     return messages.map((m) => {
-      delete m.sender.password;
-      delete m.recipient.password;
-      return m;
+      return returnMessage(m);
     });
   }
 
@@ -48,16 +48,12 @@ export class MessageService {
     });
 
     myMessages.map((m) => {
-      delete m.sender.password;
-      delete m.recipient.password;
       return m;
     });
 
     hisMessages.map((m) => {
-      delete m.sender.password;
       m.read = true;
       m.readAt = new Date();
-      delete m.recipient.password;
       return m;
     });
 
@@ -68,8 +64,6 @@ export class MessageService {
     });
 
     markHisMessages.map((m) => {
-      delete m.sender.password;
-      delete m.recipient.password;
       return m;
     });
 
@@ -81,7 +75,9 @@ export class MessageService {
         return 0;
       });
 
-    return allOurSorteredMessages;
+    return allOurSorteredMessages.map((m) => {
+      return returnMessage(m);
+    });
   }
 
   async getOneById(messageId: string, userId: string) {
@@ -96,10 +92,7 @@ export class MessageService {
       }
     }
 
-    delete message.sender.password;
-    delete message.recipient.password;
-
-    return message;
+    return returnMessage(message);
   }
 
   async create(dto: CreateMessageDto, userId: string) {
@@ -114,10 +107,7 @@ export class MessageService {
       relations: ['sender', 'recipient'],
     });
 
-    delete message.recipient.password;
-    delete message.sender.password;
-
-    return message;
+    return returnMessage(message);
   }
 
   async update(dto: UpdateMessageDto, messageId: string, userId: string) {
@@ -146,7 +136,7 @@ export class MessageService {
     delete updatedMessage.recipient.password;
     delete updatedMessage.sender.password;
 
-    return updatedMessage;
+    return returnMessage(updatedMessage);
   }
 
   async delete(messageId: string, userId: string) {
@@ -163,6 +153,7 @@ export class MessageService {
     delete message.recipient.password;
 
     await this.messageRepository.remove(message);
-    return message;
+
+    return { message: 'Success' };
   }
 }
