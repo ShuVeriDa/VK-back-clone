@@ -12,6 +12,7 @@ import { subscribeAndUnSubscribe } from '../components/forServices/subscribeAndU
 import { validationCommunity } from '../components/forServices/validationCommunity';
 import { AddAdminCommunityDto } from './dto/addAdmin.dto';
 import { addAndRemoveAdmin } from '../components/forServices/addAndRemoveAdmin';
+import { returnCommunity } from '../components/forServices/returnCommunity';
 
 @Injectable()
 export class CommunityService {
@@ -24,24 +25,12 @@ export class CommunityService {
 
   async getAll() {
     const communities = await this.communityRepository.find({
-      relations: ['members', 'posts'],
+      order: { createdAt: 'DESC' },
+      relations: ['members', 'posts', 'video', 'music', 'photos'],
     });
 
     return communities.map((c) => {
-      delete c.author.password;
-      c.members.map((m) => {
-        delete m.password;
-        return m;
-      });
-      c.posts.map((p) => {
-        delete p.user.password;
-        return p;
-      });
-      c.admins.map((a) => {
-        delete a.password;
-        return a;
-      });
-      return c;
+      return returnCommunity(c);
     });
   }
 
@@ -51,22 +40,7 @@ export class CommunityService {
       this.communityRepository,
     );
 
-    community.members.map((m) => {
-      delete m.password;
-      return m;
-    });
-    community.posts.map((p) => {
-      delete p.user.password;
-      return p;
-    });
-    community.admins.map((a) => {
-      delete a.password;
-      return a;
-    });
-
-    delete community.author.password;
-
-    return community;
+    return returnCommunity(community);
   }
 
   async create(dto: CreateCommunityDto, userId: string) {
@@ -80,31 +54,23 @@ export class CommunityService {
       author: { id: userId },
     });
 
-    const existedCommunity = await this.communityRepository.findOne({
-      where: { id: community.id },
-      relations: ['members', 'admins'],
-    });
-
-    existedCommunity.members.map((m) => {
-      delete m.password;
-      return m;
-    });
-
-    existedCommunity.admins.map((m) => {
-      delete m.password;
-      return m;
-    });
-
-    delete existedCommunity.author.password;
-
-    return existedCommunity;
+    return await this.getOne(community.id);
   }
 
   async delete(communityId: string, userId: string) {
     await this.communityRepository.manager.transaction(async (manager) => {
       const community = await manager.findOne(CommunityEntity, {
         where: { id: communityId },
-        relations: ['posts', 'posts.comments'],
+        relations: [
+          'posts',
+          'posts.comments',
+          'photos',
+          'photos.comments',
+          'video',
+          'video.comments',
+          'music',
+          'music.comments',
+        ],
       });
 
       if (!community) {
@@ -118,13 +84,32 @@ export class CommunityService {
       }
 
       const posts = community.posts;
+      const music = community.music;
+      const photos = community.photos;
+      const video = community.video;
+
       for (const post of posts) {
-        const comments = await manager.find(CommunityEntity, {
-          where: { posts: post },
-        });
-        await manager.remove(comments);
-        await manager.remove(post);
+        for (const comment of post.comments) {
+          await manager.remove(comment);
+        }
       }
+
+      for (const photo of photos) {
+        for (const comment of photo.comments) {
+          await manager.remove(comment);
+        }
+      }
+
+      for (const v of video) {
+        for (const comment of v.comments) {
+          await manager.remove(comment);
+        }
+      }
+
+      await manager.remove(music);
+      await manager.remove(posts);
+      await manager.remove(photos);
+      await manager.remove(video);
       await manager.remove(community);
     });
 

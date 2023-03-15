@@ -5,6 +5,8 @@ import {
   Get,
   HttpCode,
   Param,
+  Patch,
+  Post,
   Put,
   UsePipes,
   ValidationPipe,

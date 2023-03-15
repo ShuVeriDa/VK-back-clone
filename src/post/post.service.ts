@@ -125,7 +125,7 @@ export class PostService {
 
     await this.postRepository.update(
       {
-        id: id,
+        id: post.id,
       },
       {
         text: dto.text,
