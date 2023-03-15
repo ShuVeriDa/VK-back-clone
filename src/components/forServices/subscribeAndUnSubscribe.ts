@@ -3,6 +3,7 @@ import { CommunityEntity } from '../../community/entity/community.entity';
 import { UserEntity } from '../../user/entity/user.entity';
 import { ForbiddenException } from '@nestjs/common';
 import { validationCommunity } from './validationCommunity';
+import { returnCommunity } from './returnCommunity';
 
 export const subscribeAndUnSubscribe = async (
   communityId: string,
@@ -52,12 +53,5 @@ export const subscribeAndUnSubscribe = async (
     relations: ['members'],
   });
 
-  existCommunity.members.map((m) => {
-    delete m.password;
-    return m;
-  });
-
-  delete existCommunity.author.password;
-
-  return existCommunity;
+  return returnCommunity(existCommunity);
 };

@@ -4,6 +4,7 @@ import { CommunityEntity } from '../../community/entity/community.entity';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { validationCommunity } from './validationCommunity';
 import { UserEntity } from '../../user/entity/user.entity';
+import { returnCommunity } from './returnCommunity';
 
 export const addAndRemoveAdmin = async (
   dto: AddAdminCommunityDto,
@@ -75,5 +76,5 @@ export const addAndRemoveAdmin = async (
     return m;
   });
 
-  return existAdmin;
+  return returnCommunity(existAdmin);
 };
