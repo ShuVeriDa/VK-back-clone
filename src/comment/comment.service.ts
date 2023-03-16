@@ -45,7 +45,9 @@ export class CommentService {
       order: { createdAt: 'DESC' },
     });
 
-    return returnCommentsFields(comments);
+    return comments.map((comment) => {
+      return returnCommentFields(comment);
+    });
   }
 
   async findOneById(commentId: string) {
@@ -71,7 +73,9 @@ export class CommentService {
       relations: ['post', 'user'],
     });
 
-    return returnCommentsFields(comments);
+    return comments.map((comment) => {
+      return returnCommentFields(comment);
+    });
   }
 
   async findAllByPhotoId(dto: FetchCommentDto) {
@@ -86,7 +90,9 @@ export class CommentService {
       relations: ['photo', 'user'],
     });
 
-    return returnCommentsFields(comments);
+    return comments.map((comment) => {
+      return returnCommentFields(comment);
+    });
   }
 
   async findAllByVideoId(dto: FetchCommentDto) {
@@ -101,7 +107,9 @@ export class CommentService {
       relations: ['user', 'video'],
     });
 
-    return returnCommentsFields(comments);
+    return comments.map((comment) => {
+      return returnCommentFields(comment);
+    });
   }
 
   async createComment(dto: CreateCommentDto, userId: string) {
@@ -128,7 +136,7 @@ export class CommentService {
         user: { id: userId },
       });
 
-      return this.findOneById(comment.id);
+      return await this.findOneById(comment.id);
     }
 
     if (dto.photoId) {
@@ -148,7 +156,7 @@ export class CommentService {
         user: { id: userId },
       });
 
-      return this.findOneById(comment.id);
+      return await this.findOneById(comment.id);
     }
 
     if (dto.videoId) {
@@ -168,7 +176,7 @@ export class CommentService {
         user: { id: userId },
       });
 
-      return this.findOneById(comment.id);
+      return await this.findOneById(comment.id);
     }
   }
 
@@ -213,7 +221,7 @@ export class CommentService {
         },
       );
 
-      return this.findOneById(commentId);
+      return await this.findOneById(commentId);
     }
 
     if (dto.photoId) {
@@ -242,7 +250,7 @@ export class CommentService {
         },
       );
 
-      return this.findOneById(commentId);
+      return await this.findOneById(commentId);
     }
 
     if (dto.videoId) {
@@ -271,7 +279,7 @@ export class CommentService {
         },
       );
 
-      return this.findOneById(commentId);
+      return await this.findOneById(commentId);
     }
   }
 
