@@ -81,6 +81,12 @@ export class UserEntity {
   })
   friends: FriendEntity[];
 
+  @ManyToMany(() => UserEntity, (user) => user.newFriends, {
+    nullable: true,
+  })
+  @JoinTable()
+  newFriends: UserEntity[];
+
   @ManyToMany(() => CommunityEntity, (community) => community.members)
   @JoinTable()
   communities: CommunityEntity[];

@@ -87,4 +87,22 @@ export class UserService {
 
     return this.userRepository.delete({ id: userIdToChange });
   }
+
+  async addFriend(friendId: string, userId: string) {
+    const friend = await this.userRepository.findOne({
+      where: { id: friendId },
+      relations: ['newFriends'],
+    });
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['newFriends'],
+    });
+
+    const newFriend = await this.userRepository.save({
+      ...user,
+      newFriends: [...user.newFriends, friend],
+    });
+
+    return newFriend;
+  }
 }

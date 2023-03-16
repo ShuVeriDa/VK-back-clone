@@ -49,4 +49,12 @@ export class UserController {
   removeUser(@Param('id') userIdToChange: string, @User('id') userId: string) {
     return this.userService.removeUser(userIdToChange, userId);
   }
+
+  @UsePipes(new ValidationPipe())
+  @Post('friend/:id')
+  @HttpCode(200)
+  @Auth('user')
+  addFriend(@Param('id') friendId: string, @User('id') userId: string) {
+    return this.userService.addFriend(friendId, userId);
+  }
 }
