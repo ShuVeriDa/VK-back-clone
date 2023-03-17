@@ -51,10 +51,16 @@ export class UserController {
   }
 
   @UsePipes(new ValidationPipe())
-  @Post('friend/:id')
+  @Patch('friend/:id')
   @HttpCode(200)
   @Auth('user')
   addFriend(@Param('id') friendId: string, @User('id') userId: string) {
     return this.userService.addFriend(friendId, userId);
+  }
+
+  @Delete('friend/:id')
+  @Auth('user')
+  removeFriend(@Param('id') friendId: string, @User('id') userId: string) {
+    return this.userService.removeFriend(friendId, userId);
   }
 }
