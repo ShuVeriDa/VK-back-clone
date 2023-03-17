@@ -1,5 +1,4 @@
 import { CommentEntity } from '../../comment/entity/comment.entity';
-import { returnVideoForCommunity } from './returnVideoForCommunity';
 
 export const returnCommentFields = (comment: CommentEntity) => {
   return {

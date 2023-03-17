@@ -17,10 +17,11 @@ import { UpdateCommentDto } from './dto/update.dto';
 import { getOnePostInCommunityComponent } from '../components/forServices/getOnePostInCommunityComponent';
 import { PhotoEntity } from '../photo/entity/photo.entity';
 import { returnCommentFields } from '../components/forServices/returnCommentFields';
-import { returnCommentsFields } from '../components/forServices/returnCommentsFields';
 import { getOnePhotoInCommunity } from '../components/forServices/getOnePhotoInCommunity';
 import { VideoEntity } from '../video/entity/video.entity';
 import { getOneVideoInCommunity } from '../components/forServices/getOneVideoInCommunity';
+import { returnPostPhotoForCommunity } from '../components/forServices/returnPostPhotoForCommunity';
+import { returnUserData } from '../components/forServices/returnUserData';
 
 @Injectable()
 export class CommentService {
@@ -327,32 +328,43 @@ export class CommentService {
     if (!community) throw new NotFoundException('Community not found');
 
     if (dto.postId) {
-      community.posts.map((p) => {
-        delete p.user.password;
-        return p;
-      });
+      // community.posts.map((p) => {
+      //   delete p.user.password;
+      //   return p;
+      // });
 
       const post = await this.postRepository.findOne({
         where: { id: dto.postId },
-        relations: ['comments', 'comments.user', 'community'],
+        relations: [
+          'comments',
+          'comments.user',
+          'community',
+          'comments.photo',
+          'comments.video',
+          'comments.post',
+        ],
       });
 
       if (!post) throw new NotFoundException('Post not found');
 
-      delete post.community.admins;
-      delete post.community.members;
-      delete post.community.posts;
-      delete post.community.music;
-      delete post.community.admins;
-      delete post.community.author;
-      delete post.user.password;
+      // delete post.community.admins;
+      // delete post.community.members;
+      // delete post.community.posts;
+      // delete post.community.music;
+      // delete post.community.admins;
+      // delete post.community.author;
+      // delete post.user.password;
+      //
+      // post.comments.map((comment) => {
+      //   delete comment.user.password;
+      //   return comment;
+      // });
 
-      post.comments.map((comment) => {
-        delete comment.user.password;
-        return comment;
+      // return post;
+
+      return post.comments.map((comment) => {
+        return returnCommentFields(comment);
       });
-
-      return post;
     }
 
     if (dto.photoId) {
@@ -363,25 +375,36 @@ export class CommentService {
 
       const photo = await this.photoRepository.findOne({
         where: { id: dto.photoId },
-        relations: ['comments', 'comments.user', 'community'],
+        relations: [
+          'comments',
+          'comments.user',
+          'community',
+          'comments.photo',
+          'comments.video',
+          'comments.post',
+        ],
       });
 
       if (!photo) throw new NotFoundException('Photo not found');
 
-      delete photo.community.admins;
-      delete photo.community.members;
-      delete photo.community.posts;
-      delete photo.community.music;
-      delete photo.community.admins;
-      delete photo.community.author;
-      delete photo.user.password;
+      // delete photo.community.admins;
+      // delete photo.community.members;
+      // delete photo.community.posts;
+      // delete photo.community.music;
+      // delete photo.community.admins;
+      // delete photo.community.author;
+      // delete photo.user.password;
+      //
+      // photo.comments.map((comment) => {
+      //   delete comment.user.password;
+      //   return comment;
+      // });
+      //
+      // return photo;
 
-      photo.comments.map((comment) => {
-        delete comment.user.password;
-        return comment;
+      return photo.comments.map((comment) => {
+        return returnCommentFields(comment);
       });
-
-      return photo;
     }
 
     if (dto.videoId) {
@@ -397,25 +420,29 @@ export class CommentService {
 
       if (!video) throw new NotFoundException('Video not found');
 
-      video.communities.map((community) => {
-        delete community.admins;
-        delete community.members;
-        delete community.posts;
-        delete community.music;
-        delete community.admins;
-        delete community.author;
+      // video.communities.map((community) => {
+      //   delete community.admins;
+      //   delete community.members;
+      //   delete community.posts;
+      //   delete community.music;
+      //   delete community.admins;
+      //   delete community.author;
+      //
+      //   return community;
+      // });
+      //
+      // delete video.user.password;
+      //
+      // video.comments.map((comment) => {
+      //   delete comment.user.password;
+      //   return comment;
+      // });
 
-        return community;
+      // return video;
+
+      return video.comments.map((comment) => {
+        return returnCommentFields(comment);
       });
-
-      delete video.user.password;
-
-      video.comments.map((comment) => {
-        delete comment.user.password;
-        return comment;
-      });
-
-      return video;
     }
   }
 
@@ -438,13 +465,12 @@ export class CommentService {
 
       const comment = await this.commentRepository.findOne({
         where: { post: { comments: { id: commentId } } },
-        relations: ['user'],
+        relations: ['user', 'post', 'video', 'photo'],
       });
 
       if (!comment) throw new NotFoundException('Comment not found');
 
-      delete comment.user.password;
-      return comment;
+      return returnCommentFields(comment);
     }
 
     if (dto.photoId) {
@@ -457,7 +483,7 @@ export class CommentService {
 
       const comment = await this.commentRepository.findOne({
         where: { photo: { comments: { id: commentId } } },
-        relations: ['user'],
+        relations: ['user', 'post', 'video', 'photo'],
       });
 
       if (!comment) throw new NotFoundException('Comment not found');
@@ -466,8 +492,7 @@ export class CommentService {
       //   (comment) => comment.id === commentId,
       // );
 
-      delete comment.user.password;
-      return comment;
+      return returnCommentFields(comment);
     }
 
     if (dto.videoId) {
@@ -480,7 +505,7 @@ export class CommentService {
 
       const comment = await this.commentRepository.findOne({
         where: { video: { comments: { id: commentId } } },
-        relations: ['user'],
+        relations: ['user', 'post', 'video', 'photo'],
       });
 
       if (!comment) throw new NotFoundException('Comment not found');
@@ -489,8 +514,7 @@ export class CommentService {
       //   (comment) => comment.id === commentId,
       // );
 
-      delete comment.user.password;
-      return comment;
+      return returnCommentFields(comment);
     }
   }
 
