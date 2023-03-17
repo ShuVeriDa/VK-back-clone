@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entity/user.entity';
 import { Repository } from 'typeorm';
 import { UpdateUserDto } from './dto/update.dto';
+import { returnUserData } from '../components/forServices/returnUserData';
 
 @Injectable()
 export class UserService {
@@ -19,42 +20,36 @@ export class UserService {
 
   async getAll() {
     const users = await this.userRepository.find({
-      relations: ['friends.friend'],
+      relations: ['friends.friend', 'newFriends'],
     });
 
     return users.map((user) => {
-      user.friends.map((friend) => {
-        delete friend.friend.password;
-        return friend;
+      const friends = user.newFriends.map((friend) => {
+        return returnUserData(friend);
       });
-      delete user.password;
-      delete user.favorites;
-      return user;
+
+      return {
+        ...user,
+        newFriends: friends,
+      };
     });
-    // const qb = this.userRepository.createQueryBuilder('u');
-    //
-    // const arr = await qb
-    //   // .leftJoinAndSelect('u.posts', 'posts')
-    //   // .leftJoinAndSelect('u.comments', 'comments')
-    //   // .leftJoinAndSelect('u.reposts', 'reposts')
-    //   .leftJoinAndSelect('u.friends', 'friends')
-    //   .getMany();
-    //
-    // return arr.map((obj) => {
-    //   delete obj.password;
-    //   return {
-    //     ...obj,
-    //   };
-    // });
   }
 
   async getById(id: string) {
-    const user = await this.userRepository.findOneBy({ id });
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['newFriends'],
+    });
     if (!user) throw new NotFoundException('User not found');
 
-    delete user.password;
-    delete user.favorites;
-    return user;
+    const friends = user.newFriends.map((friend) => {
+      return returnUserData(friend);
+    });
+
+    return {
+      ...user,
+      newFriends: friends,
+    };
   }
 
   async updateUser(userIdToChange: string, userId: string, dto: UpdateUserDto) {
@@ -78,7 +73,7 @@ export class UserService {
       },
     );
 
-    return this.getById(userIdToChange);
+    return await this.getById(userIdToChange);
   }
 
   async removeUser(userIdToChange: string, userId: string) {
@@ -89,20 +84,49 @@ export class UserService {
   }
 
   async addFriend(friendId: string, userId: string) {
-    const friend = await this.userRepository.findOne({
+    const friendExist = await this.userRepository.findOne({
       where: { id: friendId },
       relations: ['newFriends'],
     });
-    const user = await this.userRepository.findOne({
+
+    const userExist = await this.userRepository.findOne({
       where: { id: userId },
       relations: ['newFriends'],
     });
 
+    if (!userExist || !friendExist) {
+      throw new HttpException(
+        'Invalid user or friend id!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (friendId === String(userId)) {
+      throw new HttpException(
+        "Friend not found because you can't add yourself as a friend",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const isFriendExist = userExist.newFriends.find(
+      (obj) => String(obj?.id) === friendId,
+    );
+
+    if (isFriendExist) {
+      throw new HttpException(
+        'Friendship already exists!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     const newFriend = await this.userRepository.save({
-      ...user,
-      newFriends: [...user.newFriends, friend],
+      ...userExist,
+      newFriends: [...userExist.newFriends, friendExist],
     });
 
-    return newFriend;
+    return {
+      ...newFriend,
+      newFriends: returnUserData(friendExist),
+    };
   }
 }

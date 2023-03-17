@@ -110,6 +110,7 @@ export class FriendService {
       relations: ['friends', 'friends.friend'],
     });
     const friendExist = await this.userRepository.findOneBy({ id: friendId });
+
     if (!userExist || !friendExist) {
       throw new HttpException(
         'Invalid user or friend id!',
