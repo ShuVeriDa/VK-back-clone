@@ -10,8 +10,6 @@ import { PostEntity } from './post/entity/post.entity';
 import { FileModule } from './file/file.module';
 import { CommentModule } from './comment/comment.module';
 import { CommentEntity } from './comment/entity/comment.entity';
-import { FriendModule } from './friend/friend.module';
-import { FriendEntity } from './friend/entity/friend.entity';
 import { CommunityModule } from './community/community.module';
 import { CommunityEntity } from './community/entity/community.entity';
 import { MessageModule } from './message/message.module';
@@ -36,7 +34,7 @@ import { VideoEntity } from './video/entity/video.entity';
         UserEntity,
         PostEntity,
         CommentEntity,
-        FriendEntity,
+        // FriendEntity,
         CommunityEntity,
         MessageEntity,
         MusicEntity,
@@ -50,7 +48,7 @@ import { VideoEntity } from './video/entity/video.entity';
     PostModule,
     FileModule,
     CommentModule,
-    FriendModule,
+    // FriendModule,
     CommunityModule,
     MessageModule,
     MusicModule,

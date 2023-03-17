@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 import { PostEntity } from '../../post/entity/post.entity';
 import { CommentEntity } from '../../comment/entity/comment.entity';
-import { FriendEntity } from '../../friend/entity/friend.entity';
+import { FriendEntity } from '../../../archive/friend/entity/friend.entity';
 import { CommunityEntity } from '../../community/entity/community.entity';
 import { MusicEntity } from '../../music/entity/music.entity';
 import { PhotoEntity } from '../../photo/entity/photo.entity';
@@ -75,17 +75,17 @@ export class UserEntity {
   })
   comments: CommentEntity[];
 
-  @OneToMany(() => FriendEntity, (friend) => friend.user, {
-    eager: false,
-    nullable: true,
-  })
-  friends: FriendEntity[];
+  // @OneToMany(() => FriendEntity, (friend) => friend.user, {
+  //   eager: false,
+  //   nullable: true,
+  // })
+  // friends: FriendEntity[];
 
-  @ManyToMany(() => UserEntity, (user) => user.newFriends, {
+  @ManyToMany(() => UserEntity, (user) => user.friends, {
     nullable: true,
   })
   @JoinTable()
-  newFriends: UserEntity[];
+  friends: UserEntity[];
 
   @ManyToMany(() => CommunityEntity, (community) => community.members)
   @JoinTable()

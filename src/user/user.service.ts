@@ -20,17 +20,18 @@ export class UserService {
 
   async getAll() {
     const users = await this.userRepository.find({
-      relations: ['friends.friend', 'newFriends'],
+      relations: ['friends'],
     });
 
     return users.map((user) => {
-      const friends = user.newFriends.map((friend) => {
+      delete user.password;
+      const friends = user.friends.map((friend) => {
         return returnUserData(friend);
       });
 
       return {
         ...user,
-        newFriends: friends,
+        friends: friends,
       };
     });
   }
@@ -38,17 +39,20 @@ export class UserService {
   async getById(id: string) {
     const user = await this.userRepository.findOne({
       where: { id },
-      relations: ['newFriends'],
+      relations: ['friends'],
     });
+
     if (!user) throw new NotFoundException('User not found');
 
-    const friends = user.newFriends.map((friend) => {
+    const friends = user.friends.map((friend) => {
       return returnUserData(friend);
     });
 
+    delete user.password;
+
     return {
       ...user,
-      newFriends: friends,
+      friends: friends,
     };
   }
 
@@ -86,12 +90,12 @@ export class UserService {
   async addFriend(friendId: string, userId: string) {
     const friendExist = await this.userRepository.findOne({
       where: { id: friendId },
-      relations: ['newFriends'],
+      relations: ['friends'],
     });
 
     const userExist = await this.userRepository.findOne({
       where: { id: userId },
-      relations: ['newFriends'],
+      relations: ['friends'],
     });
 
     if (!userExist || !friendExist) {
@@ -108,7 +112,7 @@ export class UserService {
       );
     }
 
-    const isFriendExist = userExist.newFriends.find(
+    const isFriendExist = userExist.friends.find(
       (obj) => String(obj?.id) === friendId,
     );
 
@@ -121,29 +125,41 @@ export class UserService {
 
     const newFriend = await this.userRepository.save({
       ...userExist,
-      newFriends: [...userExist.newFriends, friendExist],
+      friends: [...userExist.friends, friendExist],
+    });
+
+    const friends = newFriend.friends.map((friend) => {
+      return returnUserData(friend);
     });
 
     return {
       ...newFriend,
-      newFriends: returnUserData(friendExist),
+      friends: friends,
     };
   }
 
   async removeFriend(friendId: string, userId: string) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
-      relations: ['newFriends'],
+      relations: ['friends'],
     });
 
-    const friend = user.newFriends.find((obj) => String(obj.id) === friendId);
+    const friend = user.friends.find((obj) => String(obj.id) === friendId);
 
     if (!friend) {
       throw new NotFoundException('Friend not found');
     }
 
-    user.newFriends = user.newFriends.filter((fr) => fr.id !== friend.id);
+    user.friends = user.friends.filter((fr) => fr.id !== friend.id);
 
-    return await this.userRepository.save(user);
+    const updatedUser = await this.userRepository.save(user);
+    const friends = updatedUser.friends.map((friend) => {
+      return returnUserData(friend);
+    });
+
+    return {
+      ...updatedUser,
+      friends: friends,
+    };
   }
 }
