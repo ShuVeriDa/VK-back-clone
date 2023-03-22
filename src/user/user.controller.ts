@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -15,6 +16,8 @@ import { UserService } from './user.service';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { UpdateUserDto } from './dto/update.dto';
 import { User } from './decorators/user.decorator';
+import { SearchCommunityDto } from '../community/dto/search.dto';
+import { SearchUserDto } from './dto/search.dto';
 
 @Controller('users')
 export class UserController {
@@ -23,6 +26,11 @@ export class UserController {
   @Get()
   getAll() {
     return this.userService.getAll();
+  }
+
+  @Get('search')
+  search(@Query() dto: SearchUserDto) {
+    return this.userService.search(dto);
   }
 
   @Get(':id')

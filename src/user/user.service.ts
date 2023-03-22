@@ -10,6 +10,8 @@ import { UserEntity } from './entity/user.entity';
 import { Repository } from 'typeorm';
 import { UpdateUserDto } from './dto/update.dto';
 import { returnUserData } from '../components/forServices/returnUserData';
+import { SearchUserDto } from './dto/search.dto';
+import { returnMusicForCommunity } from '../components/forServices/returnMusicForCommunity';
 
 @Injectable()
 export class UserService {
@@ -34,6 +36,32 @@ export class UserService {
         friends: friends,
       };
     });
+  }
+
+  async search(dto: SearchUserDto) {
+    const qb = this.userRepository.createQueryBuilder('user');
+
+    qb.limit(dto.limit || 0);
+    qb.take(dto.take || 100);
+
+    if (dto.firstName) {
+      qb.andWhere('user.firstName ILIKE :firstname');
+    }
+
+    if (dto.lastName) {
+      qb.andWhere('user.lastName ILIKE :lastname');
+    }
+
+    qb.setParameters({
+      firstname: `%${dto.firstName}%`,
+      lastname: `%${dto.lastName}%`,
+    });
+
+    const [user, total] = await qb.getManyAndCount();
+
+    const users = user.map((u) => returnUserData(u));
+
+    return { users: users, total };
   }
 
   async getById(id: string) {
