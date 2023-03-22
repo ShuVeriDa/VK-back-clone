@@ -15,6 +15,7 @@ import { addAndRemoveAdmin } from '../components/forServices/addAndRemoveAdmin';
 import { returnCommunity } from '../components/forServices/returnCommunity';
 import { returnVideoForCommunity } from '../components/forServices/returnVideoForCommunity';
 import { SearchCommunityDto } from './dto/search.dto';
+import { SearchMemberCommunityDto } from './dto/searchMember.dto';
 
 @Injectable()
 export class CommunityService {
@@ -62,6 +63,33 @@ export class CommunityService {
     const [community, total] = await qb.getManyAndCount();
 
     return { communities: community, total };
+  }
+
+  async searchMember(dto: SearchMemberCommunityDto, communityId: string) {
+    const qb = this.userRepository
+      .createQueryBuilder('user')
+      .innerJoin('user.communities', 'communities')
+      .where('communities.id = :id', { id: communityId });
+
+    qb.limit(dto.limit || 0);
+    qb.take(dto.take || 100);
+
+    if (dto.firstname) {
+      qb.andWhere('user.firstName ILIKE :firstname');
+    }
+
+    if (dto.lastname) {
+      qb.andWhere('user.lastName ILIKE :lastname');
+    }
+
+    qb.setParameters({
+      firstname: `%${dto.firstname}%`,
+      lastname: `%${dto.lastname}%`,
+    });
+
+    const [members, total] = await qb.getManyAndCount();
+
+    return { members: members, total };
   }
 
   async create(dto: CreateCommunityDto, userId: string) {

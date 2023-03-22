@@ -44,17 +44,17 @@ export class UserService {
     qb.limit(dto.limit || 0);
     qb.take(dto.take || 100);
 
-    if (dto.firstName) {
+    if (dto.firstname) {
       qb.andWhere('user.firstName ILIKE :firstname');
     }
 
-    if (dto.lastName) {
+    if (dto.lastname) {
       qb.andWhere('user.lastName ILIKE :lastname');
     }
 
     qb.setParameters({
-      firstname: `%${dto.firstName}%`,
-      lastname: `%${dto.lastName}%`,
+      firstname: `%${dto.firstname}%`,
+      lastname: `%${dto.lastname}%`,
     });
 
     const [user, total] = await qb
@@ -173,6 +173,8 @@ export class UserService {
       return returnUserData(friend);
     });
 
+    delete newFriend.password;
+
     return {
       ...newFriend,
       friends: friends,
@@ -197,6 +199,8 @@ export class UserService {
     const friends = updatedUser.friends.map((friend) => {
       return returnUserData(friend);
     });
+
+    delete updatedUser.password;
 
     return {
       ...updatedUser,

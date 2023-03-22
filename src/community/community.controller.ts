@@ -13,6 +13,7 @@ import { Auth } from '../auth/decorators/auth.decorator';
 import { CreateCommunityDto } from './dto/create.dto';
 import { AddAdminCommunityDto } from './dto/addAdmin.dto';
 import { SearchCommunityDto } from './dto/search.dto';
+import { SearchMemberCommunityDto } from './dto/searchMember.dto';
 
 @Controller('community')
 export class CommunityController {
@@ -26,6 +27,14 @@ export class CommunityController {
   @Get('search')
   search(@Query() dto: SearchCommunityDto) {
     return this.communityService.search(dto);
+  }
+
+  @Get('search/:id/members')
+  searchMember(
+    @Query() dto: SearchMemberCommunityDto,
+    @Param('id') communityId: string,
+  ) {
+    return this.communityService.searchMember(dto, communityId);
   }
 
   @Get(':id')

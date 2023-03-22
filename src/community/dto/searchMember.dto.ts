@@ -1,6 +1,6 @@
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class SearchUserDto {
+export class SearchMemberCommunityDto {
   @IsOptional()
   @IsString()
   firstname?: string;
@@ -9,8 +9,6 @@ export class SearchUserDto {
   @IsString()
   lastname?: string;
 
-  @IsOptional()
-  @IsString()
   @IsOptional()
   @IsNumber()
   limit?: number;
