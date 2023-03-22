@@ -20,7 +20,7 @@ export const addAndRemoveAdderVideo = async (
 
   delete user.password;
 
-  const isAdd = video.videoAdders.find((adder) => adder.id === user.id);
+  const isAdd = video.videoAdders.some((adder) => adder.id === user.id);
 
   if (flag === 'add') {
     if (isAdd) throw new ForbiddenException('The user already has this video.');
@@ -40,6 +40,4 @@ export const addAndRemoveAdderVideo = async (
     );
     await videoRepos.save(video);
   }
-
-  return await getOne;
 };

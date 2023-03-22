@@ -49,6 +49,7 @@ export class VideoService {
 
     const video = await this.videoRepository.find({
       where: { videoAdders: { id: user.id } },
+      relations: ['communities'],
       order: { createdAt: 'DESC' },
     });
 
@@ -92,7 +93,7 @@ export class VideoService {
   async getOne(videoId: string) {
     const video = await this.videoRepository.findOne({
       where: { id: videoId },
-      relations: ['communities'],
+      relations: ['communities', 'communities.video'],
     });
 
     if (!video) throw new NotFoundException('Video not found');
@@ -168,7 +169,7 @@ export class VideoService {
   }
 
   async addVideo(videoId: string, userId: string) {
-    return await addAndRemoveAdderVideo(
+    await addAndRemoveAdderVideo(
       videoId,
       this.videoRepository,
       userId,
@@ -176,10 +177,12 @@ export class VideoService {
       this.getOne(videoId),
       'add',
     );
+
+    return this.getOne(videoId);
   }
 
   async removeFromAdders(videoId: string, userId: string) {
-    return await addAndRemoveAdderVideo(
+    await addAndRemoveAdderVideo(
       videoId,
       this.videoRepository,
       userId,
@@ -187,6 +190,8 @@ export class VideoService {
       this.getOne(videoId),
       'remove',
     );
+
+    return this.getOne(videoId);
   }
 
   ///////////////
@@ -255,7 +260,7 @@ export class VideoService {
       userId,
       this.userRepository,
     );
-    console.log(community.video);
+
     const video = community.video.find((v) => v.id === videoId);
 
     if (!video)
@@ -307,5 +312,30 @@ export class VideoService {
 
       await manager.remove(video);
     });
+  }
+
+  async addVideoInCommunity(
+    dto: FetchVideoDto,
+    videoId: string,
+    userId: string,
+  ) {
+    const { community } = await validationCRUDInCommunity(
+      dto.communityId,
+      this.communityRepository,
+      userId,
+      this.userRepository,
+    );
+
+    const video = await this.getOne(videoId);
+
+    const isAdd = community.video.find((v) => v.id === video.id);
+
+    if (isAdd)
+      throw new ForbiddenException('The video exist already in community');
+
+    community.video.push(video);
+    await this.communityRepository.save(community);
+
+    return await this.getOneInCommunity(dto, video.id);
   }
 }

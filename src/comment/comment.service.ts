@@ -770,8 +770,6 @@ export class CommentService {
           comment.user.id,
         );
 
-        console.log(comment.video);
-
         const isComment = comment.video.comments.find(
           (c) => c.id === comment.id,
         );
