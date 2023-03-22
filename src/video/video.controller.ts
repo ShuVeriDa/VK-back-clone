@@ -141,4 +141,16 @@ export class VideoController {
   ) {
     return this.videoService.addVideoInCommunity(dto, videoId, userId);
   }
+
+  @UsePipes(new ValidationPipe())
+  @Delete('community/remove/video/:id')
+  @HttpCode(200)
+  @Auth('user')
+  removeVideoInCommunity(
+    @Body() dto: FetchVideoDto,
+    @Param('id') videoId: string,
+    @User('id') userId: string,
+  ) {
+    return this.videoService.removeVideoInCommunity(dto, videoId, userId);
+  }
 }

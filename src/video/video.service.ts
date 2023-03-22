@@ -93,7 +93,7 @@ export class VideoService {
   async getOne(videoId: string) {
     const video = await this.videoRepository.findOne({
       where: { id: videoId },
-      relations: ['communities', 'communities.video'],
+      relations: ['communities'],
     });
 
     if (!video) throw new NotFoundException('Video not found');
@@ -331,11 +331,36 @@ export class VideoService {
     const isAdd = community.video.find((v) => v.id === video.id);
 
     if (isAdd)
-      throw new ForbiddenException('The video exist already in community');
+      throw new ForbiddenException('The community already has this video.');
 
     community.video.push(video);
     await this.communityRepository.save(community);
 
     return await this.getOneInCommunity(dto, video.id);
+  }
+
+  async removeVideoInCommunity(
+    dto: FetchVideoDto,
+    videoId: string,
+    userId: string,
+  ) {
+    const { community } = await validationCRUDInCommunity(
+      dto.communityId,
+      this.communityRepository,
+      userId,
+      this.userRepository,
+    );
+
+    const video = await this.getOne(videoId);
+
+    const isAdd = community.video.find((v) => v.id === video.id);
+
+    if (!isAdd)
+      throw new ForbiddenException('The community no longer has this video.');
+
+    community.video = community.video.filter((v) => v.id !== video.id);
+    await this.communityRepository.save(community);
+
+    return await this.getOne(video.id);
   }
 }
