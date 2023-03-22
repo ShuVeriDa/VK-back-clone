@@ -16,6 +16,7 @@ import { validationCommunity } from '../components/forServices/validationCommuni
 import { CommunityEntity } from '../community/entity/community.entity';
 import { validationCRUDInCommunity } from '../components/forServices/validationCRUDInCommunity';
 import { returnVideoForCommunity } from '../components/forServices/returnVideoForCommunity';
+import { addAndRemoveVideoInCommunity } from '../components/forServices/addAndRemoveVideoInCommunity';
 
 @Injectable()
 export class VideoService {
@@ -319,24 +320,18 @@ export class VideoService {
     videoId: string,
     userId: string,
   ) {
-    const { community } = await validationCRUDInCommunity(
-      dto.communityId,
-      this.communityRepository,
+    await addAndRemoveVideoInCommunity(
+      dto,
+      videoId,
+      this.videoRepository,
       userId,
       this.userRepository,
+      this.communityRepository,
+      this.getOne(videoId),
+      'add',
     );
 
-    const video = await this.getOne(videoId);
-
-    const isAdd = community.video.find((v) => v.id === video.id);
-
-    if (isAdd)
-      throw new ForbiddenException('The community already has this video.');
-
-    community.video.push(video);
-    await this.communityRepository.save(community);
-
-    return await this.getOneInCommunity(dto, video.id);
+    return this.getOneInCommunity(dto, videoId);
   }
 
   async removeVideoInCommunity(
@@ -344,23 +339,17 @@ export class VideoService {
     videoId: string,
     userId: string,
   ) {
-    const { community } = await validationCRUDInCommunity(
-      dto.communityId,
-      this.communityRepository,
+    await addAndRemoveVideoInCommunity(
+      dto,
+      videoId,
+      this.videoRepository,
       userId,
       this.userRepository,
+      this.communityRepository,
+      this.getOne(videoId),
+      'remove',
     );
 
-    const video = await this.getOne(videoId);
-
-    const isAdd = community.video.find((v) => v.id === video.id);
-
-    if (!isAdd)
-      throw new ForbiddenException('The community no longer has this video.');
-
-    community.video = community.video.filter((v) => v.id !== video.id);
-    await this.communityRepository.save(community);
-
-    return await this.getOne(video.id);
+    return this.getOne(videoId);
   }
 }
