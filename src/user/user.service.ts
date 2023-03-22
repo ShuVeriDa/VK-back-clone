@@ -38,7 +38,7 @@ export class UserService {
     });
   }
 
-  async search(dto: SearchUserDto) {
+  async search(dto: SearchUserDto, userId: string) {
     const qb = this.userRepository.createQueryBuilder('user');
 
     qb.limit(dto.limit || 0);
@@ -57,11 +57,24 @@ export class UserService {
       lastname: `%${dto.lastName}%`,
     });
 
-    const [user, total] = await qb.getManyAndCount();
+    const [user, total] = await qb
+      .leftJoinAndSelect('user.friends', 'friends')
+      .getManyAndCount();
 
-    const users = user.map((u) => returnUserData(u));
+    const users = user.map((u) => {
+      return returnUserData(u);
+    });
 
-    return { users: users, total };
+    const currentUser = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['friends'],
+    });
+
+    const friends = currentUser.friends
+      .filter((fr1) => user.some((fr2) => fr1.id === fr2.id))
+      .map((friend) => returnUserData(friend));
+
+    return { users, friends, total };
   }
 
   async getById(id: string) {

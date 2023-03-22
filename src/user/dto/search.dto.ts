@@ -3,11 +3,11 @@ import { IsNumber, IsOptional, IsString } from 'class-validator';
 export class SearchUserDto {
   @IsOptional()
   @IsString()
-  firstName: string;
+  firstName?: string;
 
   @IsOptional()
   @IsString()
-  lastName: string;
+  lastName?: string;
 
   @IsOptional()
   @IsString()

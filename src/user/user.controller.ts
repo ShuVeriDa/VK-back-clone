@@ -29,8 +29,9 @@ export class UserController {
   }
 
   @Get('search')
-  search(@Query() dto: SearchUserDto) {
-    return this.userService.search(dto);
+  @Auth('user')
+  search(@Query() dto: SearchUserDto, @User('id') userId: string) {
+    return this.userService.search(dto, userId);
   }
 
   @Get(':id')
