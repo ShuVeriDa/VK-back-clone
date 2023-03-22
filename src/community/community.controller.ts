@@ -1,9 +1,18 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { CommunityService } from './community.service';
 import { User } from '../user/decorators/user.decorator';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { CreateCommunityDto } from './dto/create.dto';
 import { AddAdminCommunityDto } from './dto/addAdmin.dto';
+import { SearchCommunityDto } from './dto/search.dto';
 
 @Controller('community')
 export class CommunityController {
@@ -12,6 +21,11 @@ export class CommunityController {
   @Get()
   getAll() {
     return this.communityService.getAll();
+  }
+
+  @Get('search')
+  search(@Query() dto: SearchCommunityDto) {
+    return this.communityService.search(dto);
   }
 
   @Get(':id')

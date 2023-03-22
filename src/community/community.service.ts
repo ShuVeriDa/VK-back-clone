@@ -13,6 +13,8 @@ import { validationCommunity } from '../components/forServices/validationCommuni
 import { AddAdminCommunityDto } from './dto/addAdmin.dto';
 import { addAndRemoveAdmin } from '../components/forServices/addAndRemoveAdmin';
 import { returnCommunity } from '../components/forServices/returnCommunity';
+import { returnVideoForCommunity } from '../components/forServices/returnVideoForCommunity';
+import { SearchCommunityDto } from './dto/search.dto';
 
 @Injectable()
 export class CommunityService {
@@ -41,6 +43,25 @@ export class CommunityService {
     );
 
     return returnCommunity(community);
+  }
+
+  async search(dto: SearchCommunityDto) {
+    const qb = this.communityRepository.createQueryBuilder('community');
+
+    qb.limit(dto.limit || 0);
+    qb.take(dto.take || 100);
+
+    if (dto.name) {
+      qb.andWhere('community.name ILIKE :name');
+    }
+
+    qb.setParameters({
+      name: `%${dto.name}%`,
+    });
+
+    const [community, total] = await qb.getManyAndCount();
+
+    return { communities: community, total };
   }
 
   async create(dto: CreateCommunityDto, userId: string) {
