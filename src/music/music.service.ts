@@ -16,6 +16,7 @@ import { validationCRUDInCommunity } from '../components/forServices/validationC
 import { FetchMusicDto } from './dto/fetch.dto';
 import { validationCommunity } from '../components/forServices/validationCommunity';
 import { returnMusicForCommunity } from '../components/forServices/returnMusicForCommunity';
+import { addAndRemoveMusicInCommunity } from '../components/forServices/addAndRemoveMusicInCommunity';
 
 @Injectable()
 export class MusicService {
@@ -48,6 +49,7 @@ export class MusicService {
 
     const music = await this.musicRepository.find({
       where: { musicAdders: { id: user.id } },
+      relations: ['communities'],
       order: { createdAt: 'DESC' },
     });
 
@@ -304,5 +306,43 @@ export class MusicService {
 
       await manager.remove(music);
     });
+  }
+
+  async addMusicInCommunity(
+    dto: FetchMusicDto,
+    musicId: string,
+    userId: string,
+  ) {
+    await addAndRemoveMusicInCommunity(
+      musicId,
+      this.musicRepository,
+      userId,
+      this.userRepository,
+      dto.communityId,
+      this.communityRepository,
+      this.getOne(musicId),
+      'add',
+    );
+
+    return this.getOneInCommunity(dto, musicId);
+  }
+
+  async removeMusicInCommunity(
+    dto: FetchMusicDto,
+    musicId: string,
+    userId: string,
+  ) {
+    await addAndRemoveMusicInCommunity(
+      musicId,
+      this.musicRepository,
+      userId,
+      this.userRepository,
+      dto.communityId,
+      this.communityRepository,
+      this.getOne(musicId),
+      'remove',
+    );
+
+    return this.getOne(musicId);
   }
 }

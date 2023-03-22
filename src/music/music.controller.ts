@@ -18,7 +18,6 @@ import { CreateMusicDto } from './dto/create.dto';
 import { UpdateMusicDto } from './dto/update.dto';
 import { SearchMusicDto } from './dto/search.dto';
 import { FetchMusicDto } from './dto/fetch.dto';
-import { CreatePhotoDto } from '../photo/dto/create.dto';
 
 @Controller('music')
 export class MusicController {
@@ -128,5 +127,29 @@ export class MusicController {
     @User('id') userId: string,
   ) {
     return this.musicService.deleteFromCommunity(dto, musicId, userId);
+  }
+
+  @UsePipes(new ValidationPipe())
+  @Post('community/add/music/:id')
+  @HttpCode(200)
+  @Auth('user')
+  addMusicInCommunity(
+    @Body() dto: FetchMusicDto,
+    @Param('id') musicId: string,
+    @User('id') userId: string,
+  ) {
+    return this.musicService.addMusicInCommunity(dto, musicId, userId);
+  }
+
+  @UsePipes(new ValidationPipe())
+  @Delete('community/remove/music/:id')
+  @HttpCode(200)
+  @Auth('user')
+  removeMusicInCommunity(
+    @Body() dto: FetchMusicDto,
+    @Param('id') musicId: string,
+    @User('id') userId: string,
+  ) {
+    return this.musicService.removeMusicInCommunity(dto, musicId, userId);
   }
 }

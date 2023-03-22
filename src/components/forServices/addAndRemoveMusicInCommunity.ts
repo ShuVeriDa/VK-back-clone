@@ -1,13 +1,13 @@
 import { validationCRUDInCommunity } from './validationCRUDInCommunity';
 import { ForbiddenException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { VideoEntity } from '../../video/entity/video.entity';
 import { UserEntity } from '../../user/entity/user.entity';
 import { CommunityEntity } from '../../community/entity/community.entity';
+import { MusicEntity } from '../../music/entity/music.entity';
 
-export const addAndRemoveVideoInCommunity = async (
-  videoId: string,
-  videoRepos: Repository<VideoEntity>,
+export const addAndRemoveMusicInCommunity = async (
+  musicId: string,
+  musicRepos: Repository<MusicEntity>,
   userId: string,
   userRepos: Repository<UserEntity>,
   communityId: string,
@@ -22,23 +22,23 @@ export const addAndRemoveVideoInCommunity = async (
     userRepos,
   );
 
-  const video = await getOne;
+  const music = await getOne;
 
-  const isAdd = community.video.find((v) => v.id === video.id);
+  const isAdd = community.music.find((v) => v.id === music.id);
 
   if (flag === 'add') {
     if (isAdd)
-      throw new ForbiddenException('The community already has this video.');
+      throw new ForbiddenException('The community already has this music.');
 
-    community.video.push(video);
+    community.music.push(music);
     await communityRepos.save(community);
   }
 
   if (flag === 'remove') {
     if (!isAdd)
-      throw new ForbiddenException('The community no longer has this video.');
+      throw new ForbiddenException('The community no longer has this music.');
 
-    community.video = community.video.filter((v) => v.id !== video.id);
+    community.music = community.music.filter((v) => v.id !== music.id);
     await communityRepos.save(community);
   }
 };

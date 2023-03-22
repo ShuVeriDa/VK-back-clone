@@ -321,11 +321,11 @@ export class VideoService {
     userId: string,
   ) {
     await addAndRemoveVideoInCommunity(
-      dto,
       videoId,
       this.videoRepository,
       userId,
       this.userRepository,
+      dto.communityId,
       this.communityRepository,
       this.getOne(videoId),
       'add',
@@ -340,11 +340,11 @@ export class VideoService {
     userId: string,
   ) {
     await addAndRemoveVideoInCommunity(
-      dto,
       videoId,
       this.videoRepository,
       userId,
       this.userRepository,
+      dto.communityId,
       this.communityRepository,
       this.getOne(videoId),
       'remove',
