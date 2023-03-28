@@ -20,8 +20,6 @@ import { returnCommentFields } from '../components/forServices/returnCommentFiel
 import { getOnePhotoInCommunity } from '../components/forServices/getOnePhotoInCommunity';
 import { VideoEntity } from '../video/entity/video.entity';
 import { getOneVideoInCommunity } from '../components/forServices/getOneVideoInCommunity';
-import { returnPostPhotoForCommunity } from '../components/forServices/returnPostPhotoForCommunity';
-import { returnUserData } from '../components/forServices/returnUserData';
 
 @Injectable()
 export class CommentService {

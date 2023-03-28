@@ -12,6 +12,9 @@ import { UpdateUserDto } from './dto/update.dto';
 import { returnUserData } from '../components/forServices/returnUserData';
 import { SearchUserDto } from './dto/search.dto';
 import { returnMusicForCommunity } from '../components/forServices/returnMusicForCommunity';
+import { returnCommentFields } from '../components/forServices/returnCommentFields';
+import { returnCommunity } from '../components/forServices/returnCommunity';
+import { returnCommunityForUser } from '../components/forServices/returnCommunityForUser';
 
 @Injectable()
 export class UserService {
@@ -80,7 +83,7 @@ export class UserService {
   async getById(id: string) {
     const user = await this.userRepository.findOne({
       where: { id },
-      relations: ['friends'],
+      relations: ['friends', 'communities'],
     });
 
     if (!user) throw new NotFoundException('User not found');
@@ -89,11 +92,16 @@ export class UserService {
       return returnUserData(friend);
     });
 
+    const communities = user.communities.map((community) => {
+      return returnCommunityForUser(community);
+    });
+
     delete user.password;
 
     return {
       ...user,
       friends: friends,
+      communities: communities,
     };
   }
 

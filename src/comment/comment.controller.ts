@@ -6,7 +6,6 @@ import {
   Param,
   Post,
   Put,
-  Query,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { Auth } from '../auth/decorators/auth.decorator';
@@ -14,7 +13,6 @@ import { CreateCommentDto } from './dto/create.dto';
 import { User } from '../user/decorators/user.decorator';
 import { FetchCommentDto } from './dto/fetch.dto';
 import { UpdateCommentDto } from './dto/update.dto';
-import { FetchPhotoDto } from '../photo/dto/fetch.dto';
 
 @Controller('comments')
 export class CommentController {
