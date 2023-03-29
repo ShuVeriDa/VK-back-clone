@@ -60,6 +60,14 @@ export class UserController {
   }
 
   @UsePipes(new ValidationPipe())
+  @Patch('status')
+  @HttpCode(200)
+  @Auth('user')
+  changeStatus(@User('id') userId: string, @Body('status') status: string) {
+    return this.userService.changeStatus(userId, status);
+  }
+
+  @UsePipes(new ValidationPipe())
   @Patch('friend/:id')
   @HttpCode(200)
   @Auth('user')
