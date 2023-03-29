@@ -46,6 +46,11 @@ export class UserEntity {
   })
   status?: string;
 
+  @Column({
+    default: 'Соьлжа-Г1ала',
+  })
+  location?: string;
+
   @Column({ default: false })
   isAdmin?: boolean;
 

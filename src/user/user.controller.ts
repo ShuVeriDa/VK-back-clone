@@ -41,7 +41,7 @@ export class UserController {
 
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
-  @Put(':id')
+  @Patch(':id')
   @Auth('user')
   updateUser(
     @Param('id') userIdToChange: string,
@@ -59,13 +59,13 @@ export class UserController {
     return this.userService.removeUser(userIdToChange, userId);
   }
 
-  @UsePipes(new ValidationPipe())
-  @Patch('status')
-  @HttpCode(200)
-  @Auth('user')
-  changeStatus(@User('id') userId: string, @Body('status') status: string) {
-    return this.userService.changeStatus(userId, status);
-  }
+  // @UsePipes(new ValidationPipe())
+  // @Patch('status')
+  // @HttpCode(200)
+  // @Auth('user')
+  // changeStatus(@User('id') userId: string, @Body('status') status: string) {
+  //   return this.userService.changeStatus(userId, status);
+  // }
 
   @UsePipes(new ValidationPipe())
   @Patch('friend/:id')

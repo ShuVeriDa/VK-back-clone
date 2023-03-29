@@ -123,6 +123,7 @@ export class UserService {
         firstName: dto.firstName,
         lastName: dto.lastName,
         status: dto.status,
+        location: dto.location,
       },
     );
 
@@ -136,20 +137,20 @@ export class UserService {
     return this.userRepository.delete({ id: userIdToChange });
   }
 
-  async changeStatus(userId: string, statusStr: string) {
-    await this.userRepository.update(
-      {
-        id: userId,
-      },
-      {
-        status: statusStr,
-      },
-    );
-
-    const { status } = await this.getById(userId);
-
-    return status;
-  }
+  // async changeStatus(userId: string, statusStr: string) {
+  //   await this.userRepository.update(
+  //     {
+  //       id: userId,
+  //     },
+  //     {
+  //       status: statusStr,
+  //     },
+  //   );
+  //
+  //   const { status } = await this.getById(userId);
+  //
+  //   return status;
+  // }
 
   async addFriend(friendId: string, userId: string) {
     const friendExist = await this.userRepository.findOne({
