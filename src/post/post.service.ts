@@ -57,8 +57,8 @@ export class PostService {
 
     const filteredPosts = posts.filter((post) => post.community === null);
     const combinedPosts = filteredPosts.concat(user.reposts).sort((a, b) => {
-      if (a.createdAt > b.createdAt) return 1;
-      if (a.createdAt < b.createdAt) return -1;
+      if (a.updatedAt > b.updatedAt) return -1;
+      if (a.updatedAt < b.updatedAt) return 1;
       return 0;
     });
 
