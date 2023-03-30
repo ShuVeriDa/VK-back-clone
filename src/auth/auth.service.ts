@@ -108,6 +108,7 @@ export class AuthService {
       lastName: user.lastName,
       avatar: user.avatar,
       status: user.status,
+      location: user.location,
     };
   }
 }
