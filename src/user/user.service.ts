@@ -11,9 +11,6 @@ import { Repository } from 'typeorm';
 import { UpdateUserDto } from './dto/update.dto';
 import { returnUserData } from '../components/forServices/returnUserData';
 import { SearchUserDto } from './dto/search.dto';
-import { returnMusicForCommunity } from '../components/forServices/returnMusicForCommunity';
-import { returnCommentFields } from '../components/forServices/returnCommentFields';
-import { returnCommunity } from '../components/forServices/returnCommunity';
 import { returnCommunityForUser } from '../components/forServices/returnCommunityForUser';
 
 @Injectable()
@@ -109,7 +106,10 @@ export class UserService {
     if (userIdToChange !== String(userId))
       throw new ForbiddenException("You don't have access");
 
-    const user = await this.userRepository.findOneBy({ id: userIdToChange });
+    const user = await this.userRepository.findOne({
+      where: { id: userIdToChange },
+      // relations: ['friends', 'communities'],
+    });
 
     if (!user) throw new NotFoundException('User not found');
 
@@ -119,7 +119,8 @@ export class UserService {
       },
       {
         email: dto.email,
-        password: dto.password,
+        // password: dto.password && (await hash(dto.password, salt)),
+        avatar: dto.avatar,
         firstName: dto.firstName,
         lastName: dto.lastName,
         status: dto.status,
@@ -128,6 +129,23 @@ export class UserService {
     );
 
     return await this.getById(userIdToChange);
+
+    // const salt = await genSalt(10);
+
+    // const friends = user.friends.map((friend) => {
+    //   return returnUserData(friend);
+    // });
+    //
+    // const communities = user.communities.map((community) => {
+    //   return returnCommunityForUser(community);
+    // });
+    //
+    // return {
+    //   ...user,
+    //   password: await hash(user.password, salt),
+    //   friends: friends,
+    //   communities: communities,
+    // };
   }
 
   async removeUser(userIdToChange: string, userId: string) {

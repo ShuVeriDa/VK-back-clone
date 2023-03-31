@@ -7,6 +7,10 @@ export class UpdateUserDto {
 
   @IsOptional()
   @IsString()
+  avatar?: string;
+
+  @IsOptional()
+  @IsString()
   @MinLength(6, {
     message: 'Password cannot be less than 6 characters',
   })
