@@ -3,6 +3,7 @@ import { Column, IsNull } from 'typeorm';
 
 export class CreatePostDto {
   @IsString()
+  @IsOptional()
   text: string;
 
   @IsString()

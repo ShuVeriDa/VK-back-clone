@@ -82,8 +82,12 @@ export class PostController {
   @UsePipes(new ValidationPipe())
   @Post(':id/repost')
   @Auth('user')
-  async repostPost(@User('id') userId: string, @Param('id') id: string) {
-    return this.postService.repostPost(id, userId);
+  async repostPost(
+    @Body() dto: CreatePostDto,
+    @User('id') userId: string,
+    @Param('id') id: string,
+  ) {
+    return this.postService.repostPost(id, userId, dto);
   }
 
   @UsePipes(new ValidationPipe())

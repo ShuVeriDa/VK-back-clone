@@ -55,16 +55,28 @@ export class PostService {
 
     if (!user) throw new NotFoundException('User not found');
 
-    const filteredPosts = posts.filter((post) => post.community === null);
-    const combinedPosts = filteredPosts.concat(user.reposts).sort((a, b) => {
-      if (a.updatedAt > b.updatedAt) return -1;
-      if (a.updatedAt < b.updatedAt) return 1;
-      return 0;
-    });
+    const filteredPosts = posts
+      .filter((post) => post.community === null)
+      .sort((a, b) => {
+        if (a.updatedAt > b.updatedAt) return -1;
+        if (a.updatedAt < b.updatedAt) return 1;
+        return 0;
+      });
 
-    return combinedPosts.map((post) => {
+    return filteredPosts.map((post) => {
       return returnPostPhotoForCommunity(post);
     });
+
+    // const filteredPosts = posts.filter((post) => post.community === null);
+    // const combinedPosts = filteredPosts.concat(user.reposts).sort((a, b) => {
+    //   if (a.updatedAt > b.updatedAt) return -1;
+    //   if (a.updatedAt < b.updatedAt) return 1;
+    //   return 0;
+    // });
+    //
+    // return combinedPosts.map((post) => {
+    //   return returnPostPhotoForCommunity(post);
+    // });
   }
 
   async search(dto: SearchPostDto) {
@@ -184,14 +196,22 @@ export class PostService {
     );
   }
 
-  async repostPost(id: string, userId: string) {
-    return favoritesAndReposts(
+  async repostPost(id: string, userId: string, dto: CreatePostDto) {
+    await favoritesAndReposts(
       id,
       userId,
       'reposts',
       this.postRepository,
       this.userRepository,
     );
+
+    const createPost = await this.create(dto, userId);
+    const repost = await this.findOne(id);
+
+    return {
+      ...createPost,
+      repost: repost,
+    };
   }
 
   async removeFromRepost(id: string, userId: string) {

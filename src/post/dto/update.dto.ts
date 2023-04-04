@@ -2,6 +2,7 @@ import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class UpdatePostDto {
   @IsString()
+  @IsOptional()
   text?: string;
 
   @IsString()
