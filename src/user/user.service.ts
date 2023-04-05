@@ -62,7 +62,13 @@ export class UserService {
       .getManyAndCount();
 
     const users = user.map((u) => {
-      return returnUserData(u);
+      return {
+        id: u.id,
+        firstName: u.firstName,
+        lastName: u.lastName,
+        avatar: u.avatar,
+        location: u.location,
+      };
     });
 
     const currentUser = await this.userRepository.findOne({
