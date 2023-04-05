@@ -93,8 +93,11 @@ export class PostController {
   @UsePipes(new ValidationPipe())
   @Delete(':id/repost')
   @Auth('user')
-  async removeFromRepost(@User('id') userId: string, @Param('id') id: string) {
-    return this.postService.removeFromRepost(id, userId);
+  async removeFromRepost(
+    @User('id') userId: string,
+    @Param('id') repostId: string,
+  ) {
+    return this.postService.removeFromRepost(repostId, userId);
   }
 
   //FOR COMMUNITY

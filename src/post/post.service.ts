@@ -214,9 +214,9 @@ export class PostService {
     };
   }
 
-  async removeFromRepost(id: string, userId: string) {
+  async removeFromRepost(repostId: string, userId: string) {
     return removeFromFavoritesAndReposts(
-      id,
+      repostId,
       userId,
       'reposts',
       this.postRepository,

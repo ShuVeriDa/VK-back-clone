@@ -10,8 +10,6 @@ export class SearchUserDto {
   lastname?: string;
 
   @IsOptional()
-  @IsString()
-  @IsOptional()
   @IsNumber()
   limit?: number;
 
