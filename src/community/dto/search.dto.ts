@@ -6,6 +6,10 @@ export class SearchCommunityDto {
   name?: string;
 
   @IsOptional()
+  @IsString()
+  category?: string | null;
+
+  @IsOptional()
   @IsNumber()
   limit?: number;
 

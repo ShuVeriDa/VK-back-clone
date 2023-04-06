@@ -67,6 +67,7 @@ export class CommunityService {
       return {
         id: co.id,
         name: co.name,
+        category: co.category,
         description: co.description,
         imageUrl: co.imageUrl,
         members: co.members.length,
@@ -107,6 +108,7 @@ export class CommunityService {
     const community = await this.communityRepository.save({
       name: dto.name,
       description: dto.description,
+      category: dto.category,
       imageUrl: dto.imageUrl,
       isAdmin: true,
       members: [{ id: userId }],

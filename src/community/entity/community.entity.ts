@@ -27,6 +27,9 @@ export class CommunityEntity {
   @Column()
   description: string;
 
+  @Column({ nullable: true, default: null })
+  category: string | null;
+
   @Column()
   imageUrl: string;
 

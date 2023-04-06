@@ -11,6 +11,10 @@ export class CreateCommunityDto {
 
   @IsOptional()
   @IsString()
+  category?: string | null;
+
+  @IsOptional()
+  @IsString()
   imageUrl?: string;
 
   @IsOptional()
