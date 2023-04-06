@@ -13,7 +13,6 @@ import { validationCommunity } from '../components/forServices/validationCommuni
 import { AddAdminCommunityDto } from './dto/addAdmin.dto';
 import { addAndRemoveAdmin } from '../components/forServices/addAndRemoveAdmin';
 import { returnCommunity } from '../components/forServices/returnCommunity';
-import { returnVideoForCommunity } from '../components/forServices/returnVideoForCommunity';
 import { SearchCommunityDto } from './dto/search.dto';
 import { SearchMemberCommunityDto } from './dto/searchMember.dto';
 
@@ -60,9 +59,21 @@ export class CommunityService {
       name: `%${dto.name}%`,
     });
 
-    const [community, total] = await qb.getManyAndCount();
+    const [community, total] = await qb
+      .leftJoinAndSelect('community.members', 'members')
+      .getManyAndCount();
 
-    return { communities: community, total };
+    const communities = community.map((co) => {
+      return {
+        id: co.id,
+        name: co.name,
+        description: co.description,
+        imageUrl: co.imageUrl,
+        members: co.members.length,
+      };
+    });
+
+    return { communities: communities, total };
   }
 
   async searchMember(dto: SearchMemberCommunityDto, communityId: string) {

@@ -223,10 +223,7 @@ export class UserService {
 
     delete newFriend.password;
 
-    return {
-      ...newFriend,
-      friends: friends,
-    };
+    return 'The user has been added as a friend.';
   }
 
   async removeFriend(friendId: string, userId: string) {
@@ -250,9 +247,6 @@ export class UserService {
 
     delete updatedUser.password;
 
-    return {
-      ...updatedUser,
-      friends: friends,
-    };
+    return 'The user has been deleted as a friend.';
   }
 }
