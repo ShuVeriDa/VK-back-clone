@@ -15,6 +15,7 @@ import { addAndRemoveAdmin } from '../components/forServices/addAndRemoveAdmin';
 import { returnCommunity } from '../components/forServices/returnCommunity';
 import { SearchCommunityDto } from './dto/search.dto';
 import { SearchMemberCommunityDto } from './dto/searchMember.dto';
+import { returnUserData } from '../components/forServices/returnUserData';
 
 @Injectable()
 export class CommunityService {
@@ -69,7 +70,7 @@ export class CommunityService {
         name: co.name,
         category: co.category,
         description: co.description,
-        imageUrl: co.imageUrl,
+        avatar: co.avatar,
         members: co.members.length,
       };
     });
@@ -109,7 +110,7 @@ export class CommunityService {
       name: dto.name,
       description: dto.description,
       category: dto.category,
-      imageUrl: dto.imageUrl,
+      avatar: dto.avatar,
       isAdmin: true,
       members: [{ id: userId }],
       admins: [{ id: userId }],
@@ -131,7 +132,6 @@ export class CommunityService {
           'video',
           'video.comments',
           'music',
-          'music.comments',
         ],
       });
 

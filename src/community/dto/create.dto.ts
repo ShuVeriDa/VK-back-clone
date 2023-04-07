@@ -15,7 +15,7 @@ export class CreateCommunityDto {
 
   @IsOptional()
   @IsString()
-  imageUrl?: string;
+  avatar?: string;
 
   @IsOptional()
   @IsBoolean()

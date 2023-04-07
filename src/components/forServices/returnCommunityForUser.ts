@@ -6,7 +6,7 @@ export const returnCommunityForUser = (community: CommunityEntity) => {
       id: community.id,
       name: community.name,
       description: community.description,
-      imageUrl: community.imageUrl,
+      avatar: community.avatar,
     };
   }
 };

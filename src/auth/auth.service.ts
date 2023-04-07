@@ -12,6 +12,9 @@ import { validationOldUser } from '../components/forServices/validationOldUser';
 import { compare, genSalt, hash } from 'bcryptjs';
 import { LoginDto } from '../user/dto/login.dto';
 import { RefreshTokenDto } from './dto/refreshToken.dto';
+import { returnUserData } from '../components/forServices/returnUserData';
+import { returnCommunity } from '../components/forServices/returnCommunity';
+import { returnCommunityForUser } from '../components/forServices/returnCommunityForUser';
 
 @Injectable()
 export class AuthService {
@@ -50,7 +53,10 @@ export class AuthService {
   }
 
   async validateUser(dto: LoginDto) {
-    const user = await this.authRepository.findOneBy({ email: dto.email });
+    const user = await this.authRepository.findOne({
+      where: { email: dto.email },
+      relations: ['friends', 'communities'],
+    });
     if (!user) throw new UnauthorizedException('User not found');
 
     const isValidPassword = await compare(dto.password, user.password); // сравнение пароля который пришел из dto с паролемя который находится в базе данных
@@ -100,6 +106,10 @@ export class AuthService {
   }
 
   returnUserFields(user: UserEntity) {
+    const friends = user.friends.map((friend) => returnUserData(friend));
+    const communities = user.communities.map((community) =>
+      returnCommunityForUser(community),
+    );
     return {
       id: user.id,
       email: user.email,
@@ -109,6 +119,8 @@ export class AuthService {
       avatar: user.avatar,
       status: user.status,
       location: user.location,
+      friends: friends,
+      communities: communities,
     };
   }
 }

@@ -30,8 +30,8 @@ export class CommunityEntity {
   @Column({ nullable: true, default: null })
   category: string | null;
 
-  @Column()
-  imageUrl: string;
+  @Column({ default: null, nullable: true })
+  avatar: string;
 
   // @Column({ default: false })
   // isAdmin: boolean;
