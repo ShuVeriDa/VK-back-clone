@@ -31,6 +31,10 @@ export class AuthDto {
   status?: string;
 
   @IsOptional()
+  @IsString()
+  location?: string;
+
+  @IsOptional()
   @IsBoolean()
   isAdmin?: boolean;
 }

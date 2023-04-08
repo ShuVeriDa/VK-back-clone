@@ -16,6 +16,7 @@ import { returnCommunity } from '../components/forServices/returnCommunity';
 import { SearchCommunityDto } from './dto/search.dto';
 import { SearchMemberCommunityDto } from './dto/searchMember.dto';
 import { returnUserData } from '../components/forServices/returnUserData';
+import { returnCommunityForUser } from '../components/forServices/returnCommunityForUser';
 
 @Injectable()
 export class CommunityService {
@@ -46,7 +47,7 @@ export class CommunityService {
     return returnCommunity(community);
   }
 
-  async search(dto: SearchCommunityDto) {
+  async search(dto: SearchCommunityDto, userId: string) {
     const qb = this.communityRepository.createQueryBuilder('community');
 
     qb.limit(dto.limit || 0);
@@ -64,7 +65,25 @@ export class CommunityService {
       .leftJoinAndSelect('community.members', 'members')
       .getManyAndCount();
 
-    const communities = community.map((co) => {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['communities'],
+    });
+
+    const myCommunities = user.communities
+      .filter((co1) => community.some((co2) => co1.id === co2.id))
+      .map((co) => {
+        return {
+          id: co.id,
+          name: co.name,
+          category: co.category,
+          description: co.description,
+          avatar: co.avatar,
+          members: co.members.length,
+        };
+      });
+
+    const otherCommunities = community.map((co) => {
       return {
         id: co.id,
         name: co.name,
@@ -75,7 +94,11 @@ export class CommunityService {
       };
     });
 
-    return { communities: communities, total };
+    return {
+      myCommunities: myCommunities,
+      otherCommunities: otherCommunities,
+      total,
+    };
   }
 
   async searchMember(dto: SearchMemberCommunityDto, communityId: string) {

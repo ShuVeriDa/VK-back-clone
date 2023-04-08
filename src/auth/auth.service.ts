@@ -54,9 +54,12 @@ export class AuthService {
 
   async validateUser(dto: LoginDto) {
     const user = await this.authRepository.findOne({
-      where: { email: dto.email },
+      where: {
+        email: dto.email,
+      },
       relations: ['friends', 'communities'],
     });
+
     if (!user) throw new UnauthorizedException('User not found');
 
     const isValidPassword = await compare(dto.password, user.password); // сравнение пароля который пришел из dto с паролемя который находится в базе данных
@@ -77,6 +80,7 @@ export class AuthService {
       isAdmin: dto.isAdmin,
       avatar: dto.avatar,
       status: dto.status,
+      location: dto.location,
     });
 
     const tokens = await this.issueTokenPair(String(user.id));
@@ -87,7 +91,8 @@ export class AuthService {
         ...tokens,
       };
     } catch (error) {
-      throw new ForbiddenException('Registration error');
+      console.log(error);
+      throw new ForbiddenException('Registration error', error);
     }
   }
 
@@ -106,8 +111,8 @@ export class AuthService {
   }
 
   returnUserFields(user: UserEntity) {
-    const friends = user.friends.map((friend) => returnUserData(friend));
-    const communities = user.communities.map((community) =>
+    const friends = user.friends?.map((friend) => returnUserData(friend));
+    const communities = user.communities?.map((community) =>
       returnCommunityForUser(community),
     );
     return {

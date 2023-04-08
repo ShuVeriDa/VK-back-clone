@@ -25,8 +25,9 @@ export class CommunityController {
   }
 
   @Get('search')
-  search(@Query() dto: SearchCommunityDto) {
-    return this.communityService.search(dto);
+  @Auth('user')
+  search(@Query() dto: SearchCommunityDto, @User('id') userId: string) {
+    return this.communityService.search(dto, userId);
   }
 
   @Get('search/:id/members')
@@ -59,7 +60,7 @@ export class CommunityController {
     return this.communityService.subscribe(communityId, userId);
   }
 
-  @Delete('unsubscribe/:id')
+  @Delete('subscribe/:id')
   @Auth('user')
   unsubscribe(@Param('id') communityId: string, @User('id') userId: string) {
     return this.communityService.unsubscribe(communityId, userId);

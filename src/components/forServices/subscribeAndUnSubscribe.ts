@@ -34,6 +34,8 @@ export const subscribeAndUnSubscribe = async (
       ...community,
       members: [...community.members, { id: user.id }],
     });
+
+    return 'Subscribed to community';
   }
 
   if (flag === 'unsubscribe') {
@@ -46,12 +48,14 @@ export const subscribeAndUnSubscribe = async (
       (member) => member.id !== user.id,
     );
     await communityRepos.save(community);
+
+    return 'Community has been unsubscribed';
   }
 
-  const existCommunity = await communityRepos.findOne({
-    where: { id: communityId },
-    relations: ['members'],
-  });
+  // const existCommunity = await communityRepos.findOne({
+  //   where: { id: communityId },
+  //   relations: ['members'],
+  // });
 
-  return returnCommunity(existCommunity);
+  // return returnCommunity(existCommunity);
 };
