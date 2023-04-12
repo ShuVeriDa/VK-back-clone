@@ -101,17 +101,17 @@ export class PostController {
   }
 
   //FOR COMMUNITY
-
-  @Get('/community/post')
-  getAllPostsInCommunity(@Body() dto: FetchPostDto) {
-    return this.postService.getAllPostsInCommunity(dto);
-  }
   @Get('/community/post/:id')
   getOnePostInCommunity(
     @Body() dto: FetchPostDto,
     @Param('id') postId: string,
   ) {
     return this.postService.getOnePostInCommunity(dto, postId);
+  }
+
+  @Post('/community/post/fetch')
+  getAllPostsInCommunity(@Body() dto: FetchPostDto) {
+    return this.postService.getAllPostsInCommunity(dto);
   }
 
   @Post('community/post/')
