@@ -15,13 +15,14 @@ import { UserEntity } from '../../user/entity/user.entity';
 import { MusicEntity } from '../../music/entity/music.entity';
 import { PhotoEntity } from '../../photo/entity/photo.entity';
 import { VideoEntity } from '../../video/entity/video.entity';
+import { IsString, MinLength } from 'class-validator';
 
 @Entity('communities')
 export class CommunityEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ default: 'Публичная страница' })
   name: string;
 
   @Column()

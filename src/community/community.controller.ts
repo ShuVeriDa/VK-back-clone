@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Query,
 } from '@nestjs/common';
@@ -14,6 +15,7 @@ import { CreateCommunityDto } from './dto/create.dto';
 import { AddAdminCommunityDto } from './dto/addAdmin.dto';
 import { SearchCommunityDto } from './dto/search.dto';
 import { SearchMemberCommunityDto } from './dto/searchMember.dto';
+import { UpdateCommunityDto } from './dto/update.dto';
 
 @Controller('community')
 export class CommunityController {
@@ -47,6 +49,16 @@ export class CommunityController {
   @Auth('user')
   create(@Body() dto: CreateCommunityDto, @User('id') userId: string) {
     return this.communityService.create(dto, userId);
+  }
+
+  @Patch(':id')
+  @Auth('user')
+  update(
+    @Param('id') communityId: string,
+    @Body() dto: UpdateCommunityDto,
+    @User('id') userId: string,
+  ) {
+    return this.communityService.update(dto, communityId, userId);
   }
 
   @Delete(':id')

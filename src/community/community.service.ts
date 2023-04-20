@@ -17,6 +17,7 @@ import { SearchCommunityDto } from './dto/search.dto';
 import { SearchMemberCommunityDto } from './dto/searchMember.dto';
 import { returnUserData } from '../components/forServices/returnUserData';
 import { returnCommunityForUser } from '../components/forServices/returnCommunityForUser';
+import { UpdateCommunityDto } from './dto/update.dto';
 
 @Injectable()
 export class CommunityService {
@@ -140,7 +141,25 @@ export class CommunityService {
       author: { id: userId },
     });
 
-    return await this.getOne(community.id);
+    // return await this.getOne(community.id);
+
+    return { id: community.id };
+  }
+
+  async update(dto: UpdateCommunityDto, communityId: string, userId: string) {
+    const community = await this.communityRepository.update(
+      { id: communityId },
+      {
+        name: dto.name,
+        description: dto.description,
+        category: dto.category,
+        avatar: dto.avatar,
+      },
+    );
+
+    // return await this.getOne(community.id);
+
+    return await this.getOne(communityId);
   }
 
   async delete(communityId: string, userId: string) {

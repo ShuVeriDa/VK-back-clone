@@ -1,8 +1,17 @@
-import { IsArray, IsBoolean, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 import { UserEntity } from '../../user/entity/user.entity';
 
 export class CreateCommunityDto {
   @IsString()
+  @MinLength(3, {
+    message: 'Password cannot be less than 3 characters',
+  })
   name: string;
 
   @IsOptional()
