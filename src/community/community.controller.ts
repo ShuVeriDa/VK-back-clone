@@ -3,10 +3,13 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   Patch,
   Post,
   Query,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { CommunityService } from './community.service';
 import { User } from '../user/decorators/user.decorator';
@@ -51,6 +54,8 @@ export class CommunityController {
     return this.communityService.create(dto, userId);
   }
 
+  @UsePipes(new ValidationPipe())
+  @HttpCode(200)
   @Patch(':id')
   @Auth('user')
   update(

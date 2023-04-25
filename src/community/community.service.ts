@@ -159,7 +159,7 @@ export class CommunityService {
 
     // return await this.getOne(community.id);
 
-    return await this.getOne(communityId);
+    return { id: communityId };
   }
 
   async delete(communityId: string, userId: string) {
