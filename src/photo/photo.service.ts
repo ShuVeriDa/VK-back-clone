@@ -18,6 +18,7 @@ import { returnUserData } from '../components/forServices/returnUserData';
 import { returnPostPhotoForCommunity } from '../components/forServices/returnPostPhotoForCommunity';
 import { AlbumEntity } from './entity/album.entity';
 import { CreateAlbumDto } from './albumDto/create.dto';
+import { UpdateAlbumDto } from './albumDto/update.dto';
 
 @Injectable()
 export class PhotoService {
@@ -80,6 +81,28 @@ export class PhotoService {
     });
 
     return this.getOneAlbum(album.id);
+  }
+
+  async updateAlbum(dto: UpdateAlbumDto, albumId: string, userId: string) {
+    const album = await this.getOneAlbum(albumId);
+
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    const isAuthor = album.user.id === userId;
+
+    if (!isAuthor)
+      throw new ForbiddenException("You don't have access to this album");
+
+    await this.albumRepository.update(
+      { id: album.id },
+      { title: dto.title, description: dto.description },
+    );
+
+    return await this.getOneAlbum(album.id);
   }
 
   //photos

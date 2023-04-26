@@ -17,6 +17,7 @@ import { CreatePhotoDto } from './photoDto/create.dto';
 import { UpdatePhotoDto } from './photoDto/update.dto';
 import { FetchPhotoDto } from './photoDto/fetch.dto';
 import { CreateAlbumDto } from './albumDto/create.dto';
+import { UpdateAlbumDto } from './albumDto/update.dto';
 
 @Controller('photos')
 export class PhotoController {
@@ -40,6 +41,18 @@ export class PhotoController {
   @Auth('user')
   createAlbum(@Body() dto: CreateAlbumDto, @User('id') userId: string) {
     return this.photoService.createAlbum(dto, userId);
+  }
+
+  @UsePipes(new ValidationPipe())
+  @Put('albums/:id')
+  @HttpCode(200)
+  @Auth('user')
+  updateAlbum(
+    @Body() dto: UpdateAlbumDto,
+    @Param('id') albumId: string,
+    @User('id') userId: string,
+  ) {
+    return this.photoService.updateAlbum(dto, albumId, userId);
   }
 
   // photos
