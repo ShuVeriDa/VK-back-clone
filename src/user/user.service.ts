@@ -125,7 +125,7 @@ export class UserService {
       },
       {
         email: dto.email,
-        // password: dto.password && (await hash(dto.password, salt)),
+        // password: photoDto.password && (await hash(photoDto.password, salt)),
         avatar: dto.avatar,
         firstName: dto.firstName,
         lastName: dto.lastName,

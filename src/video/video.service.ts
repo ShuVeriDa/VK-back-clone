@@ -9,7 +9,7 @@ import { Repository } from 'typeorm';
 import { CreateVideoDto } from './dto/create.dto';
 import { UpdateVideoDto } from './dto/update.dto';
 import { UserEntity } from '../user/entity/user.entity';
-import { SearchVideoDto } from '../photo/dto/search.dto';
+import { SearchVideoDto } from '../photo/photoDto/search.dto';
 import { addAndRemoveAdderVideo } from '../components/forServices/addAndRemoveAdderVideo';
 import { FetchVideoDto } from './dto/fetch.dto';
 import { validationCommunity } from '../components/forServices/validationCommunity';

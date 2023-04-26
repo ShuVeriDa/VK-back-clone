@@ -16,7 +16,7 @@ import { Auth } from '../auth/decorators/auth.decorator';
 import { CreateVideoDto } from './dto/create.dto';
 import { User } from '../user/decorators/user.decorator';
 import { UpdateVideoDto } from './dto/update.dto';
-import { SearchVideoDto } from '../photo/dto/search.dto';
+import { SearchVideoDto } from '../photo/photoDto/search.dto';
 import { FetchVideoDto } from './dto/fetch.dto';
 
 @Controller('video')

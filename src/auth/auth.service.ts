@@ -62,7 +62,7 @@ export class AuthService {
 
     if (!user) throw new UnauthorizedException('User not found');
 
-    const isValidPassword = await compare(dto.password, user.password); // сравнение пароля который пришел из dto с паролемя который находится в базе данных
+    const isValidPassword = await compare(dto.password, user.password); // сравнение пароля который пришел из photoDto с паролемя который находится в базе данных
     if (!isValidPassword) throw new UnauthorizedException('Invalid password');
 
     return user;

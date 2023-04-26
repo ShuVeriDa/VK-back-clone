@@ -13,19 +13,33 @@ import {
 import { PhotoService } from './photo.service';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { User } from '../user/decorators/user.decorator';
-import { CreatePhotoDto } from './dto/create.dto';
-import { UpdatePhotoDto } from './dto/update.dto';
-import { FetchPhotoDto } from './dto/fetch.dto';
+import { CreatePhotoDto } from './photoDto/create.dto';
+import { UpdatePhotoDto } from './photoDto/update.dto';
+import { FetchPhotoDto } from './photoDto/fetch.dto';
+import { CreateAlbumDto } from './albumDto/create.dto';
 
 @Controller('photos')
 export class PhotoController {
   constructor(private readonly photoService: PhotoService) {}
 
   //album
-  @Get('/albums')
+  @Get('albums')
   @Auth('user')
   getAllAlbum(@User('id') userId: string) {
     return this.photoService.getAllAlbum(userId);
+  }
+
+  @Get('albums/:id')
+  getOneAlbum(@Param('id') photoId: string) {
+    return this.photoService.getOneAlbum(photoId);
+  }
+
+  @UsePipes(new ValidationPipe())
+  @Post('albums')
+  @HttpCode(200)
+  @Auth('user')
+  createAlbum(@Body() dto: CreateAlbumDto, @User('id') userId: string) {
+    return this.photoService.createAlbum(dto, userId);
   }
 
   // photos

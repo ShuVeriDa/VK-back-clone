@@ -102,8 +102,8 @@ export class PostController {
 
   //FOR COMMUNITY
   // @Get('/community/post')
-  // getAllPostsInCommunity(@Body() dto: FetchPostDto) {
-  //   return this.postService.getAllPostsInCommunity(dto);
+  // getAllPostsInCommunity(@Body() photoDto: FetchPostDto) {
+  //   return this.postService.getAllPostsInCommunity(photoDto);
   // }
 
   @Get('/community/:communityId/post')

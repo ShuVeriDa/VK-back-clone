@@ -6,17 +6,18 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { PhotoEntity } from './entity/photo.entity';
 import { Repository } from 'typeorm';
-import { CreatePhotoDto } from './dto/create.dto';
+import { CreatePhotoDto } from './photoDto/create.dto';
 import { UserEntity } from '../user/entity/user.entity';
-import { UpdatePhotoDto } from './dto/update.dto';
+import { UpdatePhotoDto } from './photoDto/update.dto';
 import { CommunityEntity } from '../community/entity/community.entity';
 import { validationCRUDInCommunity } from '../components/forServices/validationCRUDInCommunity';
-import { FetchPhotoDto } from './dto/fetch.dto';
+import { FetchPhotoDto } from './photoDto/fetch.dto';
 import { validationCommunity } from '../components/forServices/validationCommunity';
 import { VideoEntity } from '../video/entity/video.entity';
 import { returnUserData } from '../components/forServices/returnUserData';
 import { returnPostPhotoForCommunity } from '../components/forServices/returnPostPhotoForCommunity';
 import { AlbumEntity } from './entity/album.entity';
+import { CreateAlbumDto } from './albumDto/create.dto';
 
 @Injectable()
 export class PhotoService {
@@ -49,6 +50,36 @@ export class PhotoService {
     return albums.map((p) => {
       return p;
     });
+  }
+
+  async getOneAlbum(albumId: string) {
+    const album = await this.albumRepository.findOne({
+      where: { id: albumId },
+      relations: ['photos'],
+    });
+
+    if (!album) throw new NotFoundException('Album not found');
+
+    return {
+      ...album,
+      user: returnUserData(album.user),
+    };
+  }
+
+  async createAlbum(dto: CreateAlbumDto, userId: string) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    const album = await this.albumRepository.save({
+      title: dto.title,
+      description: dto.description,
+      user: { id: userId },
+    });
+
+    return this.getOneAlbum(album.id);
   }
 
   //photos
