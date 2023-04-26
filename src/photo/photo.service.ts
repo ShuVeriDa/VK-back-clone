@@ -16,11 +16,15 @@ import { validationCommunity } from '../components/forServices/validationCommuni
 import { VideoEntity } from '../video/entity/video.entity';
 import { returnUserData } from '../components/forServices/returnUserData';
 import { returnPostPhotoForCommunity } from '../components/forServices/returnPostPhotoForCommunity';
+import { AlbumEntity } from './entity/album.entity';
 
 @Injectable()
 export class PhotoService {
   @InjectRepository(PhotoEntity)
   private readonly photoRepository: Repository<PhotoEntity>;
+
+  @InjectRepository(AlbumEntity)
+  private readonly albumRepository: Repository<AlbumEntity>;
 
   @InjectRepository(UserEntity)
   private readonly userRepository: Repository<UserEntity>;
@@ -28,6 +32,26 @@ export class PhotoService {
   @InjectRepository(CommunityEntity)
   private readonly communityRepository: Repository<CommunityEntity>;
 
+  //albums
+  async getAllAlbum(userId: string) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    const albums = await this.albumRepository.find({
+      where: { user: { id: user.id } },
+      // relations: ['community'],
+      order: { createdAt: 'DESC' },
+    });
+
+    return albums.map((p) => {
+      return p;
+    });
+  }
+
+  //photos
   async getAll(userId: string) {
     const user = await this.userRepository.findOne({
       where: { id: userId },

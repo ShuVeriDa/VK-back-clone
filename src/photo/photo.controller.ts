@@ -21,6 +21,14 @@ import { FetchPhotoDto } from './dto/fetch.dto';
 export class PhotoController {
   constructor(private readonly photoService: PhotoService) {}
 
+  //album
+  @Get('/albums')
+  @Auth('user')
+  getAllAlbum(@User('id') userId: string) {
+    return this.photoService.getAllAlbum(userId);
+  }
+
+  // photos
   @Get()
   @Auth('user')
   getAll(@User('id') userId: string) {

@@ -12,6 +12,7 @@ import {
 import { UserEntity } from '../../user/entity/user.entity';
 import { CommunityEntity } from '../../community/entity/community.entity';
 import { CommentEntity } from '../../comment/entity/comment.entity';
+import { AlbumEntity } from './album.entity';
 
 @Entity('photos')
 export class PhotoEntity {
@@ -28,6 +29,12 @@ export class PhotoEntity {
     default: false,
   })
   turnOffComments: boolean;
+
+  @OneToMany(() => AlbumEntity, (album) => album.photos, {
+    // nullable: true,
+  })
+  @JoinColumn()
+  albums: AlbumEntity[];
 
   @ManyToOne(() => UserEntity, { eager: true, nullable: false })
   user: UserEntity;

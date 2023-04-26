@@ -20,6 +20,7 @@ import { PhotoModule } from './photo/photo.module';
 import { PhotoEntity } from './photo/entity/photo.entity';
 import { VideoModule } from './video/video.module';
 import { VideoEntity } from './video/entity/video.entity';
+import { AlbumEntity } from './photo/entity/album.entity';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { VideoEntity } from './video/entity/video.entity';
         MusicEntity,
         PhotoEntity,
         VideoEntity,
+        AlbumEntity,
       ],
       synchronize: true,
     }),
