@@ -105,6 +105,33 @@ export class PhotoService {
     return await this.getOneAlbum(album.id);
   }
 
+  async deleteAlbum(albumId: string, userId: string) {
+    await this.albumRepository.manager.transaction(async (manager) => {
+      const album = await manager.findOne(AlbumEntity, {
+        where: { id: albumId },
+        relations: ['photos'],
+      });
+
+      if (!album) throw new NotFoundException('Album not found');
+
+      const isCommunity = album.photos;
+
+      const isAuthor = album.user.id === userId;
+
+      // if (!isAuthor || isCommunity) {
+      if (!isAuthor) {
+        throw new ForbiddenException("You don't have access to this album");
+      }
+      //
+      // const photos = album.photos;
+      // for (const photo of photos) {
+      //   await manager.remove(photo);
+      // }
+
+      await manager.remove(album);
+    });
+  }
+
   //photos
   async getAll(userId: string) {
     const user = await this.userRepository.findOne({
