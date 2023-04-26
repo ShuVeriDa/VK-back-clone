@@ -19,6 +19,7 @@ import { returnPostPhotoForCommunity } from '../components/forServices/returnPos
 import { AlbumEntity } from './entity/album.entity';
 import { CreateAlbumDto } from './albumDto/create.dto';
 import { UpdateAlbumDto } from './albumDto/update.dto';
+import { AddPhotoToAlbum } from './albumDto/addPhotoToAlbum.dto';
 
 @Injectable()
 export class PhotoService {
@@ -44,19 +45,22 @@ export class PhotoService {
 
     const albums = await this.albumRepository.find({
       where: { user: { id: user.id } },
-      // relations: ['community'],
+      // relations: ['photos'],
       order: { createdAt: 'DESC' },
     });
 
     return albums.map((p) => {
-      return p;
+      return {
+        ...p,
+        user: returnUserData(p.user),
+      };
     });
   }
 
   async getOneAlbum(albumId: string) {
     const album = await this.albumRepository.findOne({
       where: { id: albumId },
-      relations: ['photos'],
+      // relations: ['photos'],
     });
 
     if (!album) throw new NotFoundException('Album not found');
@@ -64,6 +68,7 @@ export class PhotoService {
     return {
       ...album,
       user: returnUserData(album.user),
+      photos: album.photos.map((photo) => returnPostPhotoForCommunity(photo)),
     };
   }
 
@@ -77,10 +82,14 @@ export class PhotoService {
     const album = await this.albumRepository.save({
       title: dto.title,
       description: dto.description,
-      user: { id: userId },
+      photos: [] as PhotoEntity[],
+      user: user,
     });
 
-    return this.getOneAlbum(album.id);
+    return {
+      ...album,
+      user: returnUserData(album.user),
+    };
   }
 
   async updateAlbum(dto: UpdateAlbumDto, albumId: string, userId: string) {
@@ -130,6 +139,30 @@ export class PhotoService {
 
       await manager.remove(album);
     });
+  }
+
+  async addPhotoToAlbum(albumId: string, dto: AddPhotoToAlbum, userId: string) {
+    const album = await this.getOneAlbum(albumId);
+
+    const photo = await this.getOne(dto.photoId);
+
+    // const album = await this.albumRepository.findOne({
+    //   where: { id: albumId },
+    //   relations: ['photos'],
+    // });
+
+    const isExist = album.photos.some((photo) => photo.id === dto.photoId);
+
+    if (isExist) {
+      throw new ForbiddenException('This photo already exists in this album');
+    }
+
+    await this.albumRepository.save({
+      ...album,
+      photos: [...album.photos, photo],
+    });
+
+    return await this.getOneAlbum(albumId);
   }
 
   //photos

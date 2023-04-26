@@ -31,7 +31,7 @@ export class PhotoEntity {
   turnOffComments: boolean;
 
   @OneToMany(() => AlbumEntity, (album) => album.photos, {
-    // nullable: true,
+    nullable: false,
   })
   @JoinColumn()
   albums: AlbumEntity[];
