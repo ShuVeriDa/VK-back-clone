@@ -165,6 +165,38 @@ export class PhotoService {
     return await this.getOneAlbum(albumId);
   }
 
+  async removePhotoToAlbum(
+    albumId: string,
+    dto: AddPhotoToAlbum,
+    userId: string,
+  ) {
+    const album = await this.getOneAlbum(albumId);
+
+    const photo = await this.getOne(dto.photoId);
+
+    // const album = await this.albumRepository.findOne({
+    //   where: { id: albumId },
+    //   relations: ['photos'],
+    // });
+
+    const isRights = album.user.id === userId;
+
+    if (!isRights)
+      throw new ForbiddenException('You do not have rights to this album');
+
+    const isExist = album.photos.some((p) => p.id === photo.id);
+
+    if (!isExist) {
+      throw new ForbiddenException('This photo is no longer in this album.');
+    }
+
+    album.photos = album.photos.filter((photo) => photo.id !== dto.photoId);
+
+    await this.albumRepository.save(album);
+
+    return await this.getOneAlbum(albumId);
+  }
+
   //photos
   async getAll(userId: string) {
     const user = await this.userRepository.findOne({

@@ -74,6 +74,16 @@ export class PhotoController {
     return this.photoService.addPhotoToAlbum(albumId, dto, userId);
   }
 
+  @Delete('albums/add/:id')
+  @Auth('user')
+  removePhotoToAlbum(
+    @Param('id') albumId: string,
+    @Body() dto: AddPhotoToAlbum,
+    @User('id') userId: string,
+  ) {
+    return this.photoService.removePhotoToAlbum(albumId, dto, userId);
+  }
+
   // photos
   @Get()
   @Auth('user')
