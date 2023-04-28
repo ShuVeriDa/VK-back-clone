@@ -65,16 +65,19 @@ export class PhotoService {
 
     const user = await this.userRepository.findOne({
       where: { id: userId },
+      relations: ['friends'],
     });
+
+    const isMe = album.user.id === user.id;
 
     if (!album) throw new NotFoundException('Album not found');
 
     if (album.turnOffWatching === 'friends') {
-      const isFriend = album.user.friends.some(
-        (friend) => friend.id === user.id,
+      const isFriend = user.friends.some(
+        (friend) => friend.id === album.user.id,
       );
 
-      if (!isFriend)
+      if (!isFriend && !isMe)
         throw new ForbiddenException(
           'This album can only be viewed by friends',
         );
