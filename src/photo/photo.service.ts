@@ -20,6 +20,7 @@ import { AlbumEntity } from './entity/album.entity';
 import { CreateAlbumDto } from './albumDto/create.dto';
 import { UpdateAlbumDto } from './albumDto/update.dto';
 import { AddPhotoToAlbum } from './albumDto/addPhotoToAlbum.dto';
+import { returnAlbum } from '../components/forServices/returnAlbum';
 
 @Injectable()
 export class PhotoService {
@@ -50,10 +51,7 @@ export class PhotoService {
     });
 
     return albums.map((p) => {
-      return {
-        ...p,
-        user: returnUserData(p.user),
-      };
+      return returnAlbum(p);
     });
   }
 
@@ -92,11 +90,7 @@ export class PhotoService {
         );
     }
 
-    return {
-      ...album,
-      user: returnUserData(album.user),
-      photos: album.photos.map((photo) => returnPostPhotoForCommunity(photo)),
-    };
+    return returnAlbum(album);
   }
 
   async createAlbum(dto: CreateAlbumDto, userId: string) {
