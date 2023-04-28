@@ -57,13 +57,37 @@ export class PhotoService {
     });
   }
 
-  async getOneAlbum(albumId: string) {
+  async getOneAlbum(albumId: string, userId: string) {
     const album = await this.albumRepository.findOne({
       where: { id: albumId },
       // relations: ['photos'],
     });
 
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
     if (!album) throw new NotFoundException('Album not found');
+
+    if (album.turnOffWatching === 'friends') {
+      const isFriend = album.user.friends.some(
+        (friend) => friend.id === user.id,
+      );
+
+      if (!isFriend)
+        throw new ForbiddenException(
+          'This album can only be viewed by friends',
+        );
+    }
+
+    if (album.turnOffWatching === 'me') {
+      const isMe = album.user.id === user.id;
+
+      if (!isMe)
+        throw new ForbiddenException(
+          'This album can only be viewed by the owner of this album',
+        );
+    }
 
     return {
       ...album,
@@ -82,6 +106,7 @@ export class PhotoService {
     const album = await this.albumRepository.save({
       title: dto.title,
       description: dto.description,
+      turnOffWatching: dto.turnOffWatching,
       photos: [] as PhotoEntity[],
       user: user,
     });
@@ -93,7 +118,7 @@ export class PhotoService {
   }
 
   async updateAlbum(dto: UpdateAlbumDto, albumId: string, userId: string) {
-    const album = await this.getOneAlbum(albumId);
+    const album = await this.getOneAlbum(albumId, userId);
 
     const user = await this.userRepository.findOne({
       where: { id: userId },
@@ -108,10 +133,14 @@ export class PhotoService {
 
     await this.albumRepository.update(
       { id: album.id },
-      { title: dto.title, description: dto.description },
+      {
+        title: dto.title,
+        description: dto.description,
+        turnOffWatching: dto.turnOffWatching,
+      },
     );
 
-    return await this.getOneAlbum(album.id);
+    return await this.getOneAlbum(album.id, userId);
   }
 
   async deleteAlbum(albumId: string, userId: string) {
@@ -142,7 +171,7 @@ export class PhotoService {
   }
 
   async addPhotoToAlbum(albumId: string, dto: AddPhotoToAlbum, userId: string) {
-    const album = await this.getOneAlbum(albumId);
+    const album = await this.getOneAlbum(albumId, userId);
 
     const photo = await this.getOne(dto.photoId);
 
@@ -162,7 +191,7 @@ export class PhotoService {
       photos: [...album.photos, photo],
     });
 
-    return await this.getOneAlbum(albumId);
+    return await this.getOneAlbum(albumId, userId);
   }
 
   async removePhotoToAlbum(
@@ -170,7 +199,7 @@ export class PhotoService {
     dto: AddPhotoToAlbum,
     userId: string,
   ) {
-    const album = await this.getOneAlbum(albumId);
+    const album = await this.getOneAlbum(albumId, userId);
 
     const photo = await this.getOne(dto.photoId);
 
@@ -194,7 +223,7 @@ export class PhotoService {
 
     await this.albumRepository.save(album);
 
-    return await this.getOneAlbum(albumId);
+    return await this.getOneAlbum(albumId, userId);
   }
 
   //photos

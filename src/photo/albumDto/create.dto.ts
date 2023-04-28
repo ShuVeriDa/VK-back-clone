@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class CreateAlbumDto {
   @IsString()
@@ -7,4 +7,8 @@ export class CreateAlbumDto {
   @IsOptional()
   @IsString()
   description: string | null;
+
+  @IsOptional()
+  @IsString()
+  turnOffWatching: 'me' | 'friends' | 'all';
 }

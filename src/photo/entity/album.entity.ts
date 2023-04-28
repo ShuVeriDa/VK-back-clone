@@ -21,7 +21,12 @@ export class AlbumEntity {
 
   @Column({ nullable: true })
   description: string | null;
-  //
+
+  @Column({
+    default: 'friends',
+  })
+  turnOffWatching: 'me' | 'friends' | 'all';
+
   @ManyToOne(() => UserEntity, { eager: true, nullable: false })
   user: UserEntity;
 

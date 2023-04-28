@@ -32,8 +32,9 @@ export class PhotoController {
   }
 
   @Get('albums/:id')
-  getOneAlbum(@Param('id') photoId: string) {
-    return this.photoService.getOneAlbum(photoId);
+  @Auth('user')
+  getOneAlbum(@Param('id') photoId: string, @User('id') userId: string) {
+    return this.photoService.getOneAlbum(photoId, userId);
   }
 
   @UsePipes(new ValidationPipe())
