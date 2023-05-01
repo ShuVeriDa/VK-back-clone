@@ -14,7 +14,7 @@ export class MessageEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ nullable: true })
   message: string;
 
   @ManyToOne(() => UserEntity, { eager: true })

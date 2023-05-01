@@ -21,6 +21,7 @@ import { PhotoEntity } from './photo/entity/photo.entity';
 import { VideoModule } from './video/video.module';
 import { VideoEntity } from './video/entity/video.entity';
 import { AlbumEntity } from './photo/entity/album.entity';
+import { RealTimeChatModule } from './real-time-chat/real-time-chat.module';
 
 @Module({
   imports: [
@@ -56,6 +57,9 @@ import { AlbumEntity } from './photo/entity/album.entity';
     MusicModule,
     PhotoModule,
     VideoModule,
+    // SocketModule,
+    RealTimeChatModule,
+    // GatewayModule,
   ],
   controllers: [AppController],
   providers: [AppService],

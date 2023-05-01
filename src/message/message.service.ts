@@ -11,7 +11,6 @@ import { UserEntity } from '../user/entity/user.entity';
 import { UpdateMessageDto } from './dto/update.dto';
 import { markAsRead } from '../components/forServices/markAsRead';
 import { validationMessage } from '../components/forServices/validationMessage';
-import { returnUserData } from '../components/forServices/returnUserData';
 import { returnMessage } from '../components/forServices/returnMessage';
 
 @Injectable()
