@@ -114,6 +114,14 @@ export class PhotoService {
     };
   }
 
+  async createPhoto(albumId: string, photoDto: CreatePhotoDto, userId: string) {
+    const photo = await this.create(photoDto, userId);
+
+    await this.addPhotoToAlbum(albumId, { photoId: photo.id }, userId);
+
+    return photo;
+  }
+
   async updateAlbum(dto: UpdateAlbumDto, albumId: string, userId: string) {
     const album = await this.getOneAlbum(albumId, userId);
 
@@ -144,7 +152,7 @@ export class PhotoService {
     await this.albumRepository.manager.transaction(async (manager) => {
       const album = await manager.findOne(AlbumEntity, {
         where: { id: albumId },
-        relations: ['photos'],
+        // relations: ['photos'],
       });
 
       if (!album) throw new NotFoundException('Album not found');
@@ -158,10 +166,10 @@ export class PhotoService {
         throw new ForbiddenException("You don't have access to this album");
       }
       //
-      // const photos = album.photos;
-      // for (const photo of photos) {
-      //   await manager.remove(photo);
-      // }
+      const photos = album.photos;
+      for (const photo of photos) {
+        await manager.remove(photo);
+      }
 
       await manager.remove(album);
     });
@@ -344,6 +352,7 @@ export class PhotoService {
 
     return photo;
   }
+
   async createInCommunity(dto: CreatePhotoDto, userId: string) {
     const { community, user } = await validationCRUDInCommunity(
       dto.communityId,

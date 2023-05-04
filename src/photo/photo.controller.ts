@@ -46,6 +46,18 @@ export class PhotoController {
   }
 
   @UsePipes(new ValidationPipe())
+  @Post('albums/add/photo/:id')
+  @HttpCode(200)
+  @Auth('user')
+  createPhoto(
+    @Body() photoDto: CreatePhotoDto,
+    @Param('id') albumId: string,
+    @User('id') userId: string,
+  ) {
+    return this.photoService.createPhoto(albumId, photoDto, userId);
+  }
+
+  @UsePipes(new ValidationPipe())
   @Put('albums/:id')
   @HttpCode(200)
   @Auth('user')
