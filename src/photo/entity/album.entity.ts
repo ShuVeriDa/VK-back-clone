@@ -3,8 +3,9 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -30,7 +31,14 @@ export class AlbumEntity {
   @ManyToOne(() => UserEntity, { eager: true, nullable: false })
   user: UserEntity;
 
-  @Column({ type: 'jsonb', nullable: true })
+  // @Column({ type: 'jsonb', nullable: true })
+  // photos: PhotoEntity[];
+
+  @ManyToMany(() => PhotoEntity, (photo) => photo.albums, {
+    eager: true,
+    nullable: true,
+  })
+  @JoinColumn({ name: 'photoId' })
   photos: PhotoEntity[];
 
   // @ManyToOne(() => CommunityEntity, (community) => community.photos)

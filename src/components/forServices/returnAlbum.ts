@@ -5,7 +5,7 @@ export const returnAlbum = (thing: AlbumEntity) => {
   return {
     ...thing,
     user: returnUserData(thing.user),
-    photos: thing.photos.map((photo) => {
+    photos: thing.photos?.map((photo) => {
       return {
         id: photo.id,
         description: photo.description,

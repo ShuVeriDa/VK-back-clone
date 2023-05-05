@@ -46,7 +46,7 @@ export class PhotoService {
 
     const albums = await this.albumRepository.find({
       where: { user: { id: user.id } },
-      // relations: ['photos'],
+      relations: ['photos'],
       order: { createdAt: 'DESC' },
     });
 
@@ -58,8 +58,11 @@ export class PhotoService {
   async getOneAlbum(albumId: string, userId: string) {
     const album = await this.albumRepository.findOne({
       where: { id: albumId },
-      // relations: ['photos'],
+      relations: ['photos'],
     });
+
+    if (!album) throw new NotFoundException('Album not found');
+    console.log(album);
 
     const user = await this.userRepository.findOne({
       where: { id: userId },
@@ -67,8 +70,6 @@ export class PhotoService {
     });
 
     const isMe = album.user.id === user.id;
-
-    if (!album) throw new NotFoundException('Album not found');
 
     if (album.turnOffWatching === 'friends') {
       const isFriend = user.friends.some(

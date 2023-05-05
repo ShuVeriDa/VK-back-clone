@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
   ManyToMany,
   ManyToOne,
   OneToMany,
@@ -30,11 +31,15 @@ export class PhotoEntity {
   })
   turnOffComments: boolean;
 
-  @OneToMany(() => AlbumEntity, (album) => album.photos, {
-    nullable: false,
-  })
-  @JoinColumn()
+  @ManyToMany(() => AlbumEntity, (album) => album.photos)
+  @JoinTable()
   albums: AlbumEntity[];
+
+  // @OneToMany(() => AlbumEntity, (album) => album.photos, {
+  //   nullable: false,
+  // })
+  // @JoinColumn()
+  // albums: AlbumEntity[];
 
   @ManyToOne(() => UserEntity, { eager: true, nullable: false })
   user: UserEntity;
