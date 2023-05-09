@@ -60,9 +60,9 @@ export class CommentService {
     return returnCommentFields(comment);
   }
 
-  async findAllByPostId(dto: FetchCommentDto) {
+  async findAllByPostId(postId: string) {
     const post = await this.postRepository.findOne({
-      where: { id: dto.postId },
+      where: { id: postId },
     });
 
     if (!post) throw new NotFoundException('Post not found');
@@ -77,9 +77,9 @@ export class CommentService {
     });
   }
 
-  async findAllByPhotoId(dto: FetchCommentDto) {
+  async findAllByPhotoId(photoId: string) {
     const photo = await this.photoRepository.findOne({
-      where: { id: dto.photoId },
+      where: { id: photoId },
     });
 
     if (!photo) throw new NotFoundException('Photo not found');
@@ -94,9 +94,9 @@ export class CommentService {
     });
   }
 
-  async findAllByVideoId(dto: FetchCommentDto) {
+  async findAllByVideoId(videoId: string) {
     const video = await this.videoRepository.findOne({
-      where: { id: dto.videoId },
+      where: { id: videoId },
     });
 
     if (!video) throw new NotFoundException('Video not found');

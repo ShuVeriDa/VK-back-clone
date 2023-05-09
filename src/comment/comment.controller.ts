@@ -26,24 +26,24 @@ export class CommentController {
   //   return this.commentService.findAll(+query.postId);
   // }
 
-  @Get('post')
-  findAllByPostId(@Body() dto: FetchCommentDto) {
-    return this.commentService.findAllByPostId(dto);
-  }
-
-  @Get('photo')
-  findAllByPhotoId(@Body() dto: FetchCommentDto) {
-    return this.commentService.findAllByPhotoId(dto);
-  }
-
-  @Get('video')
-  findAllByVideoId(@Body() dto: FetchCommentDto) {
-    return this.commentService.findAllByVideoId(dto);
-  }
-
   @Get(':id')
   findOneById(@Param('id') commentId: string) {
     return this.commentService.findOneById(commentId);
+  }
+
+  @Get('post/:id')
+  findAllByPostId(@Param('id') postId: string) {
+    return this.commentService.findAllByPostId(postId);
+  }
+
+  @Get('photo/:id')
+  findAllByPhotoId(@Param('id') photoId: string) {
+    return this.commentService.findAllByPhotoId(photoId);
+  }
+
+  @Get('video/:id')
+  findAllByVideoId(@Param('id') videoId: string) {
+    return this.commentService.findAllByVideoId(videoId);
   }
 
   @Post()
