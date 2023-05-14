@@ -31,6 +31,9 @@ export class PhotoEntity {
   })
   turnOffComments: boolean;
 
+  @Column({ default: 0 })
+  photoFavorites: number;
+
   @ManyToMany(() => AlbumEntity, (album) => album.photos)
   @JoinTable()
   albums: AlbumEntity[];

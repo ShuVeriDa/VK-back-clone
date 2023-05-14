@@ -74,6 +74,10 @@ export class UserEntity {
   @JoinTable()
   favorites: PostEntity[];
 
+  @ManyToMany(() => PhotoEntity)
+  @JoinTable()
+  photoFavorites: PhotoEntity[];
+
   @OneToMany(() => CommentEntity, (comment) => comment.user, {
     eager: false,
     nullable: true,

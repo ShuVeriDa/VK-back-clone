@@ -135,6 +135,15 @@ export class PhotoController {
     return this.photoService.delete(photoId, userId);
   }
 
+  @Post(':id/favorites')
+  @Auth('user')
+  async toggleFavorites(
+    @User('id') userId: string,
+    @Param('id') photoId: string,
+  ) {
+    return this.photoService.toggleFavorites(photoId, userId);
+  }
+
   // FOR COMMUNITY
 
   @Get('community/photo')

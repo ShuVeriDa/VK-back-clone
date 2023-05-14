@@ -21,6 +21,7 @@ import { CreateAlbumDto } from './albumDto/create.dto';
 import { UpdateAlbumDto } from './albumDto/update.dto';
 import { AddPhotoToAlbum } from './albumDto/addPhotoToAlbum.dto';
 import { returnAlbum } from '../components/forServices/returnAlbum';
+import { use } from 'passport';
 
 @Injectable()
 export class PhotoService {
@@ -324,6 +325,48 @@ export class PhotoService {
 
       await manager.remove(photo);
     });
+  }
+
+  async toggleFavorites(photoId: string, userId: string) {
+    const photo = await this.getOne(photoId);
+
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['photoFavorites'],
+    });
+
+    const favoritePhotoUsers = user.photoFavorites.map((photo) => {
+      return returnUserData(photo.user);
+    });
+
+    const isNotFavorites =
+      user.photoFavorites.findIndex((obj) => obj.id === photo.id) === -1;
+
+    if (!isNotFavorites) {
+      // throw new ForbiddenException('The photo is already in favorites');
+
+      const postIndex = user.photoFavorites.findIndex(
+        (obj) => obj.id === photo.id,
+      );
+
+      if (postIndex >= 0) {
+        user.photoFavorites.splice(postIndex, 1);
+        photo.photoFavorites--;
+        await this.userRepository.save(user);
+        await this.photoRepository.save(photo);
+      }
+    }
+
+    if (isNotFavorites) {
+      user.photoFavorites.push(photo);
+      photo.photoFavorites++;
+      await this.userRepository.save(user);
+      await this.photoRepository.save(photo);
+    }
+
+    return {
+      favorites: { ...returnPostPhotoForCommunity(photo), favoritePhotoUsers },
+    };
   }
 
   // FOR COMMUNITY
