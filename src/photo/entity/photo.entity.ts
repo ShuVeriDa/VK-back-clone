@@ -31,8 +31,12 @@ export class PhotoEntity {
   })
   turnOffComments: boolean;
 
-  @Column({ default: 0 })
-  photoFavorites: number;
+  @ManyToMany(() => UserEntity, (user) => user.photoFavoriteAdders, {
+    eager: true,
+    nullable: false,
+  })
+  @JoinColumn({ name: 'photoFavoriteAddersId' })
+  photoFavoriteAdders: UserEntity[];
 
   @ManyToMany(() => AlbumEntity, (album) => album.photos)
   @JoinTable()

@@ -237,14 +237,14 @@ export class PhotoService {
   async getAll(userId: string) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
-      relations: ['music'],
+      relations: ['music', 'photoFavoriteAdders'],
     });
 
     if (!user) throw new NotFoundException('User not found');
 
     const photos = await this.photoRepository.find({
       where: { user: { id: user.id } },
-      relations: ['community'],
+      relations: ['community', 'photoFavoriteAdders'],
       order: { createdAt: 'DESC' },
     });
 
@@ -256,7 +256,7 @@ export class PhotoService {
   async getOne(photoId: string) {
     const photo = await this.photoRepository.findOne({
       where: { id: photoId },
-      relations: ['community'],
+      relations: ['community', 'photoFavoriteAdders'],
     });
 
     if (!photo) throw new NotFoundException('Photo not found');
@@ -305,7 +305,7 @@ export class PhotoService {
     await this.photoRepository.manager.transaction(async (manager) => {
       const photo = await manager.findOne(PhotoEntity, {
         where: { id: photoId },
-        relations: ['community'],
+        relations: ['community', 'photoFavoriteAdders'],
       });
 
       if (!photo) throw new NotFoundException('Photo not found');
@@ -329,44 +329,56 @@ export class PhotoService {
 
   async toggleFavorites(photoId: string, userId: string) {
     const photo = await this.getOne(photoId);
-
     const user = await this.userRepository.findOne({
       where: { id: userId },
-      relations: ['photoFavorites'],
     });
 
-    const favoritePhotoUsers = user.photoFavorites.map((photo) => {
-      return returnUserData(photo.user);
-    });
+    const isNotFavorites = photo.photoFavoriteAdders?.some(
+      (u) => u.id === user.id,
+    );
 
-    const isNotFavorites =
-      user.photoFavorites.findIndex((obj) => obj.id === photo.id) === -1;
+    console.log(isNotFavorites);
 
     if (!isNotFavorites) {
-      // throw new ForbiddenException('The photo is already in favorites');
-
-      const postIndex = user.photoFavorites.findIndex(
-        (obj) => obj.id === photo.id,
-      );
-
-      if (postIndex >= 0) {
-        user.photoFavorites.splice(postIndex, 1);
-        photo.photoFavorites--;
-        await this.userRepository.save(user);
-        await this.photoRepository.save(photo);
-      }
+      await this.photoRepository.save({
+        ...photo,
+        photoFavoriteAdders: [...photo.photoFavoriteAdders, user],
+      });
     }
 
     if (isNotFavorites) {
-      user.photoFavorites.push(photo);
-      photo.photoFavorites++;
-      await this.userRepository.save(user);
+      photo.photoFavoriteAdders = photo.photoFavoriteAdders?.filter(
+        (u) => u.id !== user.id,
+      );
+
       await this.photoRepository.save(photo);
     }
 
-    return {
-      favorites: { ...returnPostPhotoForCommunity(photo), favoritePhotoUsers },
-    };
+    // const isNotFavorites =
+    //   user.photoFavorites.findIndex((obj) => obj.id === photo.id) === -1;
+    //
+    // if (!isNotFavorites) {
+    //   // throw new ForbiddenException('The photo is already in favorites');
+    //
+    //   const postIndex = user.photoFavorites.findIndex(
+    //     (obj) => obj.id === photo.id,
+    //   );
+    //
+    //   if (postIndex >= 0) {
+    //     user.photoFavorites.splice(postIndex, 1);
+    //     photo.photoFavorites--;
+    //     await this.userRepository.save(user);
+    //     await this.photoRepository.save(photo);
+    //   }
+    // }
+    //
+    // if (isNotFavorites) {
+    //   user.photoFavorites.push(photo);
+    //   photo.photoFavorites++;
+    //   await this.userRepository.save(user);
+    //   await this.photoRepository.save(photo);
+    // }
+    return await this.getOne(photoId);
   }
 
   // FOR COMMUNITY

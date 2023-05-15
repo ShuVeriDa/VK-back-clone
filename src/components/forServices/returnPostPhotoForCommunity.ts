@@ -1,5 +1,5 @@
 import { returnUserData } from './returnUserData';
-import { PostEntity } from '../../post/entity/post.entity';
+import { PhotoEntity } from '../../photo/entity/photo.entity';
 
 export const returnPostPhotoForCommunity = (thing: any) => {
   // const members = thing.community?.members.map((member) => {
@@ -9,6 +9,10 @@ export const returnPostPhotoForCommunity = (thing: any) => {
   // const admins = thing.community?.admins.map((admin) => {
   //   return returnUserData(admin);
   // });
+
+  const favorites = thing.photoFavoriteAdders?.map((user) =>
+    returnUserData(user),
+  );
 
   delete thing.community?.admins;
   delete thing.community?.members;
@@ -22,5 +26,6 @@ export const returnPostPhotoForCommunity = (thing: any) => {
     // admins: admins,
     // author: returnUserData(thing.community?.author),
     user: returnUserData(thing.user),
+    photoFavoriteAdders: favorites,
   };
 };
