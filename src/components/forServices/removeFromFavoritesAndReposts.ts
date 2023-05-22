@@ -34,17 +34,17 @@ export const removeFromFavoritesAndReposts = async (
   }
 
   if (title === 'reposts') {
-    const postIndex = user.reposts.findIndex((obj) => obj.id === post.id);
-
-    if (postIndex < 0)
-      throw new ForbiddenException('The post is no longer reposted');
-
-    if (postIndex >= 0) {
-      user.reposts.splice(postIndex, 1);
-      post.reposts--;
-      await userRepos.save(user);
-      await postRepos.save(post);
-    }
+    // const postIndex = user.reposts.findIndex((obj) => obj.id === post.id);
+    //
+    // if (postIndex < 0)
+    //   throw new ForbiddenException('The post is no longer reposted');
+    //
+    // if (postIndex >= 0) {
+    //   user.reposts.splice(postIndex, 1);
+    //   post.reposts--;
+    //   await userRepos.save(user);
+    //   await postRepos.save(post);
+    // }
   }
 
   return returnPostPhotoForCommunity(post);

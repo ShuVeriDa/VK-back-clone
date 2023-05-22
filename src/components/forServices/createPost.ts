@@ -8,6 +8,7 @@ export const createPost = async (
   dto: CreatePostDto,
   userId: string,
   communityId?: string,
+  reposts?: PostEntity,
 ) => {
   const post = await postRepos.save({
     text: dto.text,
@@ -15,13 +16,14 @@ export const createPost = async (
     musicUrl: dto.musicUrl,
     videoUrl: dto.videoUrl,
     turnOffComments: dto.turnOffComments,
+    reposts: reposts,
     user: { id: userId },
     community: communityId ? { id: communityId } : null,
   });
 
   const fetchPost = await postRepos.findOne({
     where: { id: post.id },
-    relations: ['community'],
+    relations: ['community', 'reposts'],
   });
 
   return returnPostPhotoForCommunity(fetchPost);

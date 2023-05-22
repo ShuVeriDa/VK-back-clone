@@ -66,9 +66,9 @@ export class UserEntity {
   })
   photos: PhotoEntity[];
 
-  @ManyToMany(() => PostEntity)
-  @JoinTable()
-  reposts: PostEntity[];
+  // @ManyToMany(() => PostEntity, (post) => post.reposts)
+  // @JoinTable()
+  // reposts: PostEntity[];
 
   @ManyToMany(() => PostEntity)
   @JoinTable()

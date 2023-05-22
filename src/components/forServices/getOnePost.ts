@@ -9,7 +9,7 @@ export const getOnePost = async (
 ) => {
   const post = await postRepos.findOne({
     where: { id },
-    relations: ['community'],
+    relations: ['community', 'reposts'],
   });
 
   if (!post) throw new NotFoundException('Post not found');

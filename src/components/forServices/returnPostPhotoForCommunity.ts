@@ -1,7 +1,10 @@
 import { returnUserData } from './returnUserData';
-import { PhotoEntity } from '../../photo/entity/photo.entity';
+import { PostEntity } from '../../post/entity/post.entity';
 
-export const returnPostPhotoForCommunity = (thing: any) => {
+export const returnPostPhotoForCommunity = (
+  thing: any,
+  repost?: PostEntity,
+) => {
   // const members = thing.community?.members.map((member) => {
   //   return returnUserData(member);
   // });
@@ -10,22 +13,23 @@ export const returnPostPhotoForCommunity = (thing: any) => {
   //   return returnUserData(admin);
   // });
 
-  const favorites = thing.photoFavoriteAdders?.map((user) =>
+  const photoFavorites = thing?.photoFavoriteAdders?.map((user) =>
     returnUserData(user),
   );
 
-  delete thing.community?.admins;
-  delete thing.community?.members;
-  delete thing.community?.author;
+  delete thing?.community?.admins;
+  delete thing?.community?.members;
+  delete thing?.community?.author;
   // delete thing.community?.description;
 
   return {
     ...thing,
-    community: thing.community ? { ...thing.community } : null,
+    community: thing?.community ? { ...thing.community } : null,
     // members: members,
     // admins: admins,
     // author: returnUserData(thing.community?.author),
-    user: returnUserData(thing.user),
-    photoFavoriteAdders: favorites,
+    user: returnUserData(thing?.user),
+    photoFavoriteAdders: photoFavorites,
+    reposts: repost,
   };
 };

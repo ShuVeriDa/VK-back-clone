@@ -5,6 +5,7 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -37,10 +38,9 @@ export class PostEntity {
   })
   views: number;
 
-  @Column({
-    default: 0,
-  })
-  reposts: number;
+  @ManyToOne(() => PostEntity)
+  @JoinColumn({ name: 'postFavoritesId' })
+  reposts: PostEntity;
 
   @Column({ default: 0 })
   favorites: number;

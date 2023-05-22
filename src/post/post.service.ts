@@ -11,7 +11,6 @@ import { CreatePostDto } from './dto/create.dto';
 import { SearchPostDto } from './dto/search.dto';
 import { UpdatePostDto } from './dto/update.dto';
 import { getOnePost } from '../components/forServices/getOnePost';
-import { favoritesAndReposts } from '../components/forServices/favoritesAndReposts';
 import { removeFromFavoritesAndReposts } from '../components/forServices/removeFromFavoritesAndReposts';
 import { CommunityEntity } from '../community/entity/community.entity';
 import { FetchPostDto } from './dto/fetch.dto';
@@ -45,12 +44,12 @@ export class PostService {
   async getMyPosts(userId: string) {
     const posts = await this.postRepository.find({
       where: { user: { id: userId } },
-      relations: ['community'],
+      relations: ['community', 'reposts'],
     });
 
     const user = await this.userRepository.findOne({
       where: { id: userId },
-      relations: ['reposts'],
+      // relations: ['reposts'],
     });
 
     if (!user) throw new NotFoundException('User not found');
@@ -177,13 +176,20 @@ export class PostService {
   }
 
   async addToFavorites(id: string, userId: string) {
-    return favoritesAndReposts(
-      id,
-      userId,
-      'favorites',
-      this.postRepository,
-      this.userRepository,
-    );
+    const post = await getOnePost(id, this.postRepository);
+
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      // relations: ['reposts'],
+    });
+
+    // return favoritesAndReposts(
+    //   id,
+    //   userId,
+    //   'favorites',
+    //   this.postRepository,
+    //   this.userRepository,
+    // );
   }
 
   async removeFromFavorites(id: string, userId: string) {
@@ -197,21 +203,33 @@ export class PostService {
   }
 
   async repostPost(id: string, userId: string, dto: CreatePostDto) {
-    await favoritesAndReposts(
-      id,
-      userId,
-      'reposts',
-      this.postRepository,
-      this.userRepository,
-    );
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
 
-    const createPost = await this.create(dto, userId);
+    if (!user) new NotFoundException('User not found');
+
     const repost = await this.findOne(id);
 
-    return {
-      ...createPost,
-      repost: repost,
-    };
+    const post = await this.postRepository.save({
+      text: dto.text,
+      imageUrl: dto.imageUrl,
+      musicUrl: dto.musicUrl,
+      videoUrl: dto.videoUrl,
+      turnOffComments: dto.turnOffComments,
+      reposts: returnPostPhotoForCommunity(repost),
+      user: { id: userId },
+    });
+
+    const fetchPost = await this.postRepository.findOne({
+      where: { id: post.id },
+      relations: ['community', 'reposts'],
+    });
+
+    return returnPostPhotoForCommunity(
+      fetchPost,
+      returnPostPhotoForCommunity(repost),
+    );
   }
 
   async removeFromRepost(repostId: string, userId: string) {
