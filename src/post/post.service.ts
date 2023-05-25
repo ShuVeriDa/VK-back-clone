@@ -18,6 +18,7 @@ import { validationCRUDInCommunity } from '../components/forServices/validationC
 import { getOnePostInCommunityComponent } from '../components/forServices/getOnePostInCommunityComponent';
 import { returnPostPhotoForCommunity } from '../components/forServices/returnPostPhotoForCommunity';
 import { createPost } from '../components/forServices/createPost';
+import { PhotoEntity } from '../photo/entity/photo.entity';
 
 @Injectable()
 export class PostService {
@@ -27,6 +28,8 @@ export class PostService {
   private readonly userRepository: Repository<UserEntity>;
   @InjectRepository(CommunityEntity)
   private readonly communityRepository: Repository<CommunityEntity>;
+  @InjectRepository(PhotoEntity)
+  private readonly PhotoRepository: Repository<PhotoEntity>;
 
   async findAll() {
     const posts = await this.postRepository.find({
@@ -209,7 +212,16 @@ export class PostService {
 
     if (!user) new NotFoundException('User not found');
 
-    const repost = await this.findOne(id);
+    const repostPost = await this.postRepository.findOne({
+      where: { id: id },
+    });
+    const repostPhoto = await this.PhotoRepository.findOne({
+      where: { id: id },
+    });
+
+    const repost = repostPost
+      ? returnPostPhotoForCommunity(repostPost)
+      : returnPostPhotoForCommunity(repostPhoto);
 
     const post = await this.postRepository.save({
       text: dto.text,
@@ -217,7 +229,7 @@ export class PostService {
       musicUrl: dto.musicUrl,
       videoUrl: dto.videoUrl,
       turnOffComments: dto.turnOffComments,
-      reposts: returnPostPhotoForCommunity(repost),
+      reposts: repost,
       user: { id: userId },
     });
 
@@ -226,10 +238,7 @@ export class PostService {
       relations: ['community', 'reposts'],
     });
 
-    return returnPostPhotoForCommunity(
-      fetchPost,
-      returnPostPhotoForCommunity(repost),
-    );
+    return returnPostPhotoForCommunity(fetchPost, repost);
   }
 
   async removeFromRepost(repostId: string, userId: string) {

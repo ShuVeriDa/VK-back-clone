@@ -41,7 +41,13 @@ export const removeFromFavoritesAndReposts = async (
     //
     // if (postIndex >= 0) {
     //   user.reposts.splice(postIndex, 1);
-    //   post.reposts--;
+    //   post.reposts--;{
+    // 	"text": "12:39",
+    // 	"imageUrl": null,
+    // 	"musicUrl": "/uploads/music/00233.mp3",
+    // 	"videoUrl": "/uploads/video/short.mp4",
+    // 	"turnOffComments": false
+    // }
     //   await userRepos.save(user);
     //   await postRepos.save(post);
     // }
