@@ -214,14 +214,11 @@ export class PostService {
 
     const repostPost = await this.postRepository.findOne({
       where: { id: id },
+      // relations: ['reposts'],
     });
     const repostPhoto = await this.PhotoRepository.findOne({
       where: { id: id },
     });
-
-    const repost = repostPost
-      ? returnPostPhotoForCommunity(repostPost)
-      : returnPostPhotoForCommunity(repostPhoto);
 
     const post = await this.postRepository.save({
       text: dto.text,
@@ -229,16 +226,17 @@ export class PostService {
       musicUrl: dto.musicUrl,
       videoUrl: dto.videoUrl,
       turnOffComments: dto.turnOffComments,
-      reposts: repost,
+      reposts: repostPost,
+      repostsPhoto: repostPhoto,
       user: { id: userId },
     });
 
     const fetchPost = await this.postRepository.findOne({
       where: { id: post.id },
-      relations: ['community', 'reposts'],
+      relations: ['community', 'reposts', 'repostsPhoto'],
     });
 
-    return returnPostPhotoForCommunity(fetchPost, repost);
+    return returnPostPhotoForCommunity(fetchPost);
   }
 
   async removeFromRepost(repostId: string, userId: string) {

@@ -12,6 +12,7 @@ import {
 import { UserEntity } from '../../user/entity/user.entity';
 import { CommentEntity } from '../../comment/entity/comment.entity';
 import { CommunityEntity } from '../../community/entity/community.entity';
+import { PhotoEntity } from '../../photo/entity/photo.entity';
 
 @Entity('posts')
 export class PostEntity {
@@ -38,9 +39,13 @@ export class PostEntity {
   })
   views: number;
 
-  @ManyToOne(() => PostEntity)
-  @JoinColumn({ name: 'postFavoritesId' })
+  @ManyToOne(() => PostEntity, (post) => post.reposts)
+  @JoinColumn({ name: 'repostId' })
   reposts: PostEntity;
+
+  @ManyToOne(() => PhotoEntity, (photo) => photo)
+  @JoinColumn({ name: 'repostPhotoId' })
+  repostsPhoto: PhotoEntity;
 
   @Column({ default: 0 })
   favorites: number;
