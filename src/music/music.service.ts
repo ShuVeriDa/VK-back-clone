@@ -87,7 +87,7 @@ export class MusicService {
       return returnMusicForCommunity(m);
     });
 
-    return { music: correctedMusic, total };
+    return correctedMusic;
   }
 
   async getOne(musicId: string) {
