@@ -9,6 +9,10 @@ export class SearchMusicDto {
   @IsString()
   artist?: string;
 
+  // @IsOptional()
+  // @IsString()
+  // titleOrder?: 'DESC' | 'ASC';
+
   @IsOptional()
   @IsNumber()
   limit?: number;
