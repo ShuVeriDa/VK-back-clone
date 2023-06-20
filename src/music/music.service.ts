@@ -134,7 +134,7 @@ export class MusicService {
     return await this.getOnePlaylist(playlist.id, userId);
   }
 
-  async addMusicToPlaylist(
+  async ToggleMusicToPlaylist(
     playlistId: string,
     dto: AddMusicToPlaylistDto,
     userId: string,
@@ -150,41 +150,18 @@ export class MusicService {
 
     const isExist = playlist.music.some((m) => m.id === music.id);
 
-    if (isExist)
-      throw new ForbiddenException(
-        'This music already exists in this playlist',
-      );
+    if (!isExist) {
+      await this.playlistRepository.save({
+        ...playlist,
+        music: [...playlist.music, music],
+      });
+    }
 
-    await this.playlistRepository.save({
-      ...playlist,
-      music: [...playlist.music, music],
-    });
+    if (isExist) {
+      playlist.music = playlist.music.filter((m) => m.id !== dto.musicId);
 
-    return await this.getOnePlaylist(playlist.id, userId);
-  }
-
-  async removeMusicToPlaylist(
-    playlistId: string,
-    dto: AddMusicToPlaylistDto,
-    userId: string,
-  ) {
-    const playlist = await this.getOnePlaylist(playlistId, userId);
-
-    const music = await this.getOne(dto.musicId);
-
-    const isRights = playlist.user.id === userId;
-
-    if (!isRights)
-      throw new ForbiddenException('You do not have rights to this playlist');
-
-    const isExist = playlist.music.some((m) => m.id === music.id);
-
-    if (!isExist)
-      throw new ForbiddenException('This music is no longer in this playlist.');
-
-    playlist.music = playlist.music.filter((m) => m.id !== dto.musicId);
-
-    await this.playlistRepository.save(playlist);
+      await this.playlistRepository.save(playlist);
+    }
 
     return await this.getOnePlaylist(playlist.id, userId);
   }

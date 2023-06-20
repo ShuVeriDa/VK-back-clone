@@ -68,23 +68,12 @@ export class MusicController {
   @Post('playlists/add/:id')
   @HttpCode(200)
   @Auth('user')
-  addMusicToPlaylist(
+  toggleMusicToPlaylist(
     @Param('id') playlistId: string,
     @Body() dto: AddMusicToPlaylistDto,
     @User('id') userId: string,
   ) {
-    return this.musicService.addMusicToPlaylist(playlistId, dto, userId);
-  }
-
-  @UsePipes(new ValidationPipe())
-  @Delete('playlists/add/:id')
-  @Auth('user')
-  removeMusicToPlaylist(
-    @Param('id') playlistId: string,
-    @Body() dto: AddMusicToPlaylistDto,
-    @User('id') userId: string,
-  ) {
-    return this.musicService.removeMusicToPlaylist(playlistId, dto, userId);
+    return this.musicService.ToggleMusicToPlaylist(playlistId, dto, userId);
   }
 
   @Delete('playlists/:id')
