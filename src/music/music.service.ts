@@ -18,6 +18,8 @@ import { validationCommunity } from '../components/forServices/validationCommuni
 import { returnMusicForCommunity } from '../components/forServices/returnMusicForCommunity';
 import { addAndRemoveMusicInCommunity } from '../components/forServices/addAndRemoveMusicInCommunity';
 import { PlaylistEntity } from './entity/playlist.entity';
+import { CreatePlaylistDto } from './dto/createPlaylist.dto';
+import { returnUserData } from '../components/forServices/returnUserData';
 
 @Injectable()
 export class MusicService {
@@ -30,6 +32,10 @@ export class MusicService {
 
   @InjectRepository(CommunityEntity)
   private readonly communityRepository: Repository<CommunityEntity>;
+
+  //           //
+  // Playlists //
+  //           //
 
   async getAllPlaylist(userId: string) {
     const user = await this.userRepository.findOne({
@@ -44,8 +50,38 @@ export class MusicService {
       order: { createdAt: 'DESC' },
     });
 
-    return playlist;
+    return playlist.map((pl) => {
+      return {
+        ...pl,
+        user: returnUserData(pl.user),
+      };
+    });
   }
+
+  async createPlaylist(dto: CreatePlaylistDto, userId: string) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    const playlist = await this.playlistRepository.save({
+      title: dto.title,
+      description: dto.description,
+      coverUrl: dto.coverUrl,
+      music: [] as PlaylistEntity[],
+      user: user,
+    });
+
+    return {
+      ...playlist,
+      user: returnUserData(playlist.user),
+    };
+  }
+
+  //       //
+  // Music //
+  //       //
 
   async getAll() {
     const music = await this.musicRepository.find({

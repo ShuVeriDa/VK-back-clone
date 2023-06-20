@@ -22,7 +22,7 @@ export class PlaylistEntity {
   @Column({ nullable: true })
   description: string;
 
-  @Column()
+  @Column({ nullable: true })
   coverUrl: string;
 
   @ManyToOne(() => UserEntity, { eager: true, nullable: false })

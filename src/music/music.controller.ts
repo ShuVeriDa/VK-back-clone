@@ -18,16 +18,33 @@ import { CreateMusicDto } from './dto/create.dto';
 import { UpdateMusicDto } from './dto/update.dto';
 import { SearchMusicDto } from './dto/search.dto';
 import { FetchMusicDto } from './dto/fetch.dto';
+import { CreatePlaylistDto } from './dto/createPlaylist.dto';
 
 @Controller('music')
 export class MusicController {
   constructor(private readonly musicService: MusicService) {}
 
-  @Get('playlist')
+  //           //
+  // Playlists //
+  //           //
+
+  @Get('playlists')
   @Auth('user')
   getAllPlaylists(@User('id') userId: string) {
     return this.musicService.getAllPlaylist(userId);
   }
+
+  @UsePipes(new ValidationPipe())
+  @Post('playlists')
+  @HttpCode(200)
+  @Auth('user')
+  createPlaylist(@Body() dto: CreatePlaylistDto, @User('id') userId: string) {
+    return this.musicService.createPlaylist(dto, userId);
+  }
+
+  //       //
+  // Music //
+  //       //
 
   @Get('all')
   getAll() {
