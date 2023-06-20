@@ -63,12 +63,13 @@ export class PhotoService {
     });
 
     if (!album) throw new NotFoundException('Album not found');
-    console.log(album);
 
     const user = await this.userRepository.findOne({
       where: { id: userId },
       relations: ['friends'],
     });
+
+    if (!user) throw new NotFoundException('User not found');
 
     const isMe = album.user.id === user.id;
 
@@ -131,9 +132,7 @@ export class PhotoService {
       where: { id: userId },
     });
 
-    if (!user) throw new NotFoundException('User not found');
-
-    const isAuthor = album.user.id === userId;
+    const isAuthor = album.user.id === user.id;
 
     if (!isAuthor)
       throw new ForbiddenException("You don't have access to this album");

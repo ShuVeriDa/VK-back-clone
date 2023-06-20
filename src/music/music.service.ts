@@ -100,13 +100,33 @@ export class MusicService {
     };
   }
 
-  // async updatePlaylist(
-  //   dto: UpdatePlaylistDto,
-  //   playlistId: string,
-  //   userId: string,
-  // ) {
-  //   const playlist = await this.
-  // }
+  async updatePlaylist(
+    dto: UpdatePlaylistDto,
+    playlistId: string,
+    userId: string,
+  ) {
+    const playlist = await this.getOnePlaylist(playlistId, userId);
+
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    const isAuthor = playlist.user.id === user.id;
+
+    if (!isAuthor)
+      throw new ForbiddenException("You don't have access to this playlist");
+
+    await this.playlistRepository.update(
+      { id: playlist.id },
+      {
+        title: dto.title,
+        description: dto.description,
+        coverUrl: dto.coverUrl,
+      },
+    );
+
+    return await this.getOnePlaylist(playlist.id, userId);
+  }
 
   //       //
   // Music //

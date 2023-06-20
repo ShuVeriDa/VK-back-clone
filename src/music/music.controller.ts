@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -50,17 +51,17 @@ export class MusicController {
     return this.musicService.createPlaylist(dto, userId);
   }
 
-  // @UsePipes(new ValidationPipe())
-  // @Put('playlists/:id')
-  // @HttpCode(200)
-  // @Auth('user')
-  // updatePlaylist(
-  //   @Body() dto: UpdatePlaylistDto,
-  //   @Param('id') playlistId: string,
-  //   @User('id') userId: string,
-  // ) {
-  //   return this.musicService.updatePlaylist(dto, playlistId, userId);
-  // }
+  @UsePipes(new ValidationPipe())
+  @Patch('playlists/:id')
+  @HttpCode(200)
+  @Auth('user')
+  updatePlaylist(
+    @Body() dto: UpdatePlaylistDto,
+    @Param('id') playlistId: string,
+    @User('id') userId: string,
+  ) {
+    return this.musicService.updatePlaylist(dto, playlistId, userId);
+  }
 
   //       //
   // Music //
