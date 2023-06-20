@@ -17,16 +17,35 @@ import { FetchMusicDto } from './dto/fetch.dto';
 import { validationCommunity } from '../components/forServices/validationCommunity';
 import { returnMusicForCommunity } from '../components/forServices/returnMusicForCommunity';
 import { addAndRemoveMusicInCommunity } from '../components/forServices/addAndRemoveMusicInCommunity';
+import { PlaylistEntity } from './entity/playlist.entity';
 
 @Injectable()
 export class MusicService {
   @InjectRepository(MusicEntity)
   private readonly musicRepository: Repository<MusicEntity>;
+  @InjectRepository(PlaylistEntity)
+  private readonly playlistRepository: Repository<PlaylistEntity>;
   @InjectRepository(UserEntity)
   private readonly userRepository: Repository<UserEntity>;
 
   @InjectRepository(CommunityEntity)
   private readonly communityRepository: Repository<CommunityEntity>;
+
+  async getAllPlaylist(userId: string) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    const playlist = await this.playlistRepository.find({
+      where: { user: { id: user.id } },
+      // relations: ['communities'],
+      order: { createdAt: 'DESC' },
+    });
+
+    return playlist;
+  }
 
   async getAll() {
     const music = await this.musicRepository.find({
@@ -200,6 +219,7 @@ export class MusicService {
       return returnMusicForCommunity(music);
     });
   }
+
   async getOneInCommunity(dto: FetchMusicDto, musicId: string) {
     const music = await this.getOne(musicId);
 

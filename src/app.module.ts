@@ -22,6 +22,7 @@ import { VideoModule } from './video/video.module';
 import { VideoEntity } from './video/entity/video.entity';
 import { AlbumEntity } from './photo/entity/album.entity';
 import { RealTimeChatModule } from './real-time-chat/real-time-chat.module';
+import { PlaylistEntity } from './music/entity/playlist.entity';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { RealTimeChatModule } from './real-time-chat/real-time-chat.module';
         PhotoEntity,
         VideoEntity,
         AlbumEntity,
+        PlaylistEntity,
       ],
       synchronize: true,
     }),

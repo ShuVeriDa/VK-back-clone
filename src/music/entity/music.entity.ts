@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -10,6 +11,7 @@ import {
 } from 'typeorm';
 import { UserEntity } from '../../user/entity/user.entity';
 import { CommunityEntity } from '../../community/entity/community.entity';
+import { PlaylistEntity } from './playlist.entity';
 
 @Entity('music')
 export class MusicEntity {
@@ -35,6 +37,10 @@ export class MusicEntity {
   })
   @JoinColumn({ name: 'musicAddersId' })
   musicAdders: UserEntity[];
+
+  @ManyToMany(() => PlaylistEntity, (playlist) => playlist.music)
+  @JoinTable()
+  playlists: PlaylistEntity[];
 
   @ManyToMany(() => CommunityEntity, (community) => community.music)
   @JoinColumn({ name: 'communityId' })
