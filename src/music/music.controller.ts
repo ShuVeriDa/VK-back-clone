@@ -63,10 +63,15 @@ export class MusicController {
     return this.musicService.updatePlaylist(dto, playlistId, userId);
   }
 
+  @Delete('playlists/:id')
+  @Auth('user')
+  deletePlaylist(@Param('id') playlistId: string, userId: string) {
+    return this.musicService.deletePlaylist(playlistId, userId);
+  }
+
   //       //
   // Music //
   //       //
-
   @Get('all')
   getAll() {
     return this.musicService.getAll();

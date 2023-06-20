@@ -21,6 +21,7 @@ import { PlaylistEntity } from './entity/playlist.entity';
 import { CreatePlaylistDto } from './dto/createPlaylist.dto';
 import { returnUserData } from '../components/forServices/returnUserData';
 import { UpdatePlaylistDto } from './dto/updatePlaylist.dto';
+import { AlbumEntity } from '../photo/entity/album.entity';
 
 @Injectable()
 export class MusicService {
@@ -126,6 +127,36 @@ export class MusicService {
     );
 
     return await this.getOnePlaylist(playlist.id, userId);
+  }
+
+  async deletePlaylist(playlistId: string, userId: string) {
+    await this.playlistRepository.manager.transaction(async (manager) => {
+      const playlist = await manager.findOne(PlaylistEntity, {
+        where: { id: playlistId },
+        // relations: ['photos'],
+      });
+
+      if (!playlist) throw new NotFoundException('Playlist not found');
+
+      const user = await this.userRepository.findOne({
+        where: { id: userId },
+      });
+
+      if (!user) throw new NotFoundException('User not found');
+
+      const isAuthor = playlist.user.id === user.id;
+
+      if (!isAuthor) {
+        throw new ForbiddenException("You don't have access to this playlist");
+      }
+
+      const music = playlist.music;
+      for (const mus of music) {
+        await manager.remove(mus);
+      }
+
+      await manager.remove(playlist);
+    });
   }
 
   //       //
