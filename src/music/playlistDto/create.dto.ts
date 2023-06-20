@@ -1,6 +1,6 @@
 import { IsOptional, IsString, MinLength } from 'class-validator';
 
-export class CreatePlaylistDto {
+export class CreateDto {
   @IsString()
   @MinLength(3, {
     message: 'The minimum length must be more than 3 characters',

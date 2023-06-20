@@ -15,13 +15,13 @@ import {
 import { MusicService } from './music.service';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { User } from '../user/decorators/user.decorator';
-import { CreateMusicDto } from './dto/create.dto';
-import { UpdateMusicDto } from './dto/update.dto';
-import { SearchMusicDto } from './dto/search.dto';
-import { FetchMusicDto } from './dto/fetch.dto';
-import { CreatePlaylistDto } from './dto/createPlaylist.dto';
-import { UpdateAlbumDto } from '../photo/albumDto/update.dto';
-import { UpdatePlaylistDto } from './dto/updatePlaylist.dto';
+import { CreateMusicDto } from './musicDto/create.dto';
+import { UpdateMusicDto } from './musicDto/update.dto';
+import { SearchMusicDto } from './musicDto/search.dto';
+import { FetchMusicDto } from './musicDto/fetch.dto';
+import { CreateDto } from './playlistDto/create.dto';
+import { UpdateDto } from './playlistDto/update.dto';
+import { AddMusicToPlaylistDto } from './playlistDto/addMusicToPlaylist.dto';
 
 @Controller('music')
 export class MusicController {
@@ -47,7 +47,7 @@ export class MusicController {
   @Post('playlists')
   @HttpCode(200)
   @Auth('user')
-  createPlaylist(@Body() dto: CreatePlaylistDto, @User('id') userId: string) {
+  createPlaylist(@Body() dto: CreateDto, @User('id') userId: string) {
     return this.musicService.createPlaylist(dto, userId);
   }
 
@@ -56,11 +56,23 @@ export class MusicController {
   @HttpCode(200)
   @Auth('user')
   updatePlaylist(
-    @Body() dto: UpdatePlaylistDto,
+    @Body() dto: UpdateDto,
     @Param('id') playlistId: string,
     @User('id') userId: string,
   ) {
     return this.musicService.updatePlaylist(dto, playlistId, userId);
+  }
+
+  @UsePipes(new ValidationPipe())
+  @Post('playlists/add/:id')
+  @HttpCode(200)
+  @Auth('user')
+  addMusicToPlaylist(
+    @Param('id') playlistId: string,
+    @Body() dto: AddMusicToPlaylistDto,
+    @User('id') userId: string,
+  ) {
+    return this.musicService.addMusicToPlaylist(playlistId, dto, userId);
   }
 
   @Delete('playlists/:id')

@@ -6,22 +6,22 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { MusicEntity } from './entity/music.entity';
 import { Repository } from 'typeorm';
-import { CreateMusicDto } from './dto/create.dto';
-import { UpdateMusicDto } from './dto/update.dto';
+import { CreateMusicDto } from './musicDto/create.dto';
+import { UpdateMusicDto } from './musicDto/update.dto';
 import { UserEntity } from '../user/entity/user.entity';
-import { SearchMusicDto } from './dto/search.dto';
+import { SearchMusicDto } from './musicDto/search.dto';
 import { addAndRemoveAdderMusic } from '../components/forServices/addAndRemoveAdderMusic';
 import { CommunityEntity } from '../community/entity/community.entity';
 import { validationCRUDInCommunity } from '../components/forServices/validationCRUDInCommunity';
-import { FetchMusicDto } from './dto/fetch.dto';
+import { FetchMusicDto } from './musicDto/fetch.dto';
 import { validationCommunity } from '../components/forServices/validationCommunity';
 import { returnMusicForCommunity } from '../components/forServices/returnMusicForCommunity';
 import { addAndRemoveMusicInCommunity } from '../components/forServices/addAndRemoveMusicInCommunity';
 import { PlaylistEntity } from './entity/playlist.entity';
-import { CreatePlaylistDto } from './dto/createPlaylist.dto';
+import { CreateDto } from './playlistDto/create.dto';
 import { returnUserData } from '../components/forServices/returnUserData';
-import { UpdatePlaylistDto } from './dto/updatePlaylist.dto';
-import { AlbumEntity } from '../photo/entity/album.entity';
+import { UpdateDto } from './playlistDto/update.dto';
+import { AddMusicToPlaylistDto } from './playlistDto/addMusicToPlaylist.dto';
 
 @Injectable()
 export class MusicService {
@@ -74,13 +74,20 @@ export class MusicService {
 
     if (!playlist) throw new NotFoundException('Playlist not found');
 
+    const refactoredMusic = playlist.music.map((m) => {
+      delete m.musicAdders;
+      delete m.user;
+      return m;
+    });
+
     return {
       ...playlist,
+      music: refactoredMusic,
       user: returnUserData(playlist.user),
     };
   }
 
-  async createPlaylist(dto: CreatePlaylistDto, userId: string) {
+  async createPlaylist(dto: CreateDto, userId: string) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
     });
@@ -101,11 +108,7 @@ export class MusicService {
     };
   }
 
-  async updatePlaylist(
-    dto: UpdatePlaylistDto,
-    playlistId: string,
-    userId: string,
-  ) {
+  async updatePlaylist(dto: UpdateDto, playlistId: string, userId: string) {
     const playlist = await this.getOnePlaylist(playlistId, userId);
 
     const user = await this.userRepository.findOne({
@@ -129,11 +132,34 @@ export class MusicService {
     return await this.getOnePlaylist(playlist.id, userId);
   }
 
+  async addMusicToPlaylist(
+    playlistId: string,
+    dto: AddMusicToPlaylistDto,
+    userId: string,
+  ) {
+    const playlist = await this.getOnePlaylist(playlistId, userId);
+
+    const music = await this.getOne(dto.musicId);
+
+    const isExist = playlist.music.some((m) => m.id === music.id);
+
+    if (isExist)
+      throw new ForbiddenException(
+        'This music already exists in this playlist',
+      );
+
+    await this.playlistRepository.save({
+      ...playlist,
+      music: [...playlist.music, music],
+    });
+
+    return await this.getOnePlaylist(playlist.id, userId);
+  }
+
   async deletePlaylist(playlistId: string, userId: string) {
     await this.playlistRepository.manager.transaction(async (manager) => {
       const playlist = await manager.findOne(PlaylistEntity, {
         where: { id: playlistId },
-        // relations: ['photos'],
       });
 
       if (!playlist) throw new NotFoundException('Playlist not found');
