@@ -22,6 +22,7 @@ import { FetchMusicDto } from './musicDto/fetch.dto';
 import { CreateDto } from './playlistDto/create.dto';
 import { UpdateDto } from './playlistDto/update.dto';
 import { AddMusicToPlaylistDto } from './playlistDto/addMusicToPlaylist.dto';
+import { AddPhotoToAlbum } from '../photo/albumDto/addPhotoToAlbum.dto';
 
 @Controller('music')
 export class MusicController {
@@ -73,6 +74,17 @@ export class MusicController {
     @User('id') userId: string,
   ) {
     return this.musicService.addMusicToPlaylist(playlistId, dto, userId);
+  }
+
+  @UsePipes(new ValidationPipe())
+  @Delete('playlists/add/:id')
+  @Auth('user')
+  removeMusicToPlaylist(
+    @Param('id') playlistId: string,
+    @Body() dto: AddMusicToPlaylistDto,
+    @User('id') userId: string,
+  ) {
+    return this.musicService.removeMusicToPlaylist(playlistId, dto, userId);
   }
 
   @Delete('playlists/:id')

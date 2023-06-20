@@ -186,6 +186,11 @@ export class PhotoService {
     //   relations: ['photos'],
     // });
 
+    const isRights = album.user.id === userId;
+
+    if (!isRights)
+      throw new ForbiddenException('You do not have rights to this album');
+
     const isExist = album.photos.some((photo) => photo.id === dto.photoId);
 
     if (isExist) {

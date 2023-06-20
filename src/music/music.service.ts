@@ -1,4 +1,5 @@
 import {
+  Body,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -22,6 +23,7 @@ import { CreateDto } from './playlistDto/create.dto';
 import { returnUserData } from '../components/forServices/returnUserData';
 import { UpdateDto } from './playlistDto/update.dto';
 import { AddMusicToPlaylistDto } from './playlistDto/addMusicToPlaylist.dto';
+import { User } from '../user/decorators/user.decorator';
 
 @Injectable()
 export class MusicService {
@@ -141,6 +143,11 @@ export class MusicService {
 
     const music = await this.getOne(dto.musicId);
 
+    const isRights = playlist.user.id === userId;
+
+    if (!isRights)
+      throw new ForbiddenException('You do not have rights to this playlist');
+
     const isExist = playlist.music.some((m) => m.id === music.id);
 
     if (isExist)
@@ -152,6 +159,32 @@ export class MusicService {
       ...playlist,
       music: [...playlist.music, music],
     });
+
+    return await this.getOnePlaylist(playlist.id, userId);
+  }
+
+  async removeMusicToPlaylist(
+    playlistId: string,
+    dto: AddMusicToPlaylistDto,
+    userId: string,
+  ) {
+    const playlist = await this.getOnePlaylist(playlistId, userId);
+
+    const music = await this.getOne(dto.musicId);
+
+    const isRights = playlist.user.id === userId;
+
+    if (!isRights)
+      throw new ForbiddenException('You do not have rights to this playlist');
+
+    const isExist = playlist.music.some((m) => m.id === music.id);
+
+    if (!isExist)
+      throw new ForbiddenException('This music is no longer in this playlist.');
+
+    playlist.music = playlist.music.filter((m) => m.id !== dto.musicId);
+
+    await this.playlistRepository.save(playlist);
 
     return await this.getOnePlaylist(playlist.id, userId);
   }
