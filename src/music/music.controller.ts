@@ -19,6 +19,8 @@ import { UpdateMusicDto } from './dto/update.dto';
 import { SearchMusicDto } from './dto/search.dto';
 import { FetchMusicDto } from './dto/fetch.dto';
 import { CreatePlaylistDto } from './dto/createPlaylist.dto';
+import { UpdateAlbumDto } from '../photo/albumDto/update.dto';
+import { UpdatePlaylistDto } from './dto/updatePlaylist.dto';
 
 @Controller('music')
 export class MusicController {
@@ -34,6 +36,12 @@ export class MusicController {
     return this.musicService.getAllPlaylist(userId);
   }
 
+  @Get('playlists/:id')
+  @Auth('user')
+  getOnePlaylist(@Param('id') playlistId: string, @User('id') userId: string) {
+    return this.musicService.getOnePlaylist(playlistId, userId);
+  }
+
   @UsePipes(new ValidationPipe())
   @Post('playlists')
   @HttpCode(200)
@@ -41,6 +49,18 @@ export class MusicController {
   createPlaylist(@Body() dto: CreatePlaylistDto, @User('id') userId: string) {
     return this.musicService.createPlaylist(dto, userId);
   }
+
+  // @UsePipes(new ValidationPipe())
+  // @Put('playlists/:id')
+  // @HttpCode(200)
+  // @Auth('user')
+  // updatePlaylist(
+  //   @Body() dto: UpdatePlaylistDto,
+  //   @Param('id') playlistId: string,
+  //   @User('id') userId: string,
+  // ) {
+  //   return this.musicService.updatePlaylist(dto, playlistId, userId);
+  // }
 
   //       //
   // Music //

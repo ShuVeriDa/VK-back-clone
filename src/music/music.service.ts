@@ -20,6 +20,7 @@ import { addAndRemoveMusicInCommunity } from '../components/forServices/addAndRe
 import { PlaylistEntity } from './entity/playlist.entity';
 import { CreatePlaylistDto } from './dto/createPlaylist.dto';
 import { returnUserData } from '../components/forServices/returnUserData';
+import { UpdatePlaylistDto } from './dto/updatePlaylist.dto';
 
 @Injectable()
 export class MusicService {
@@ -58,6 +59,26 @@ export class MusicService {
     });
   }
 
+  async getOnePlaylist(playlistId: string, userId: string) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    const playlist = await this.playlistRepository.findOne({
+      where: { id: playlistId },
+      relations: ['music'],
+    });
+
+    if (!playlist) throw new NotFoundException('Playlist not found');
+
+    return {
+      ...playlist,
+      user: returnUserData(playlist.user),
+    };
+  }
+
   async createPlaylist(dto: CreatePlaylistDto, userId: string) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
@@ -78,6 +99,14 @@ export class MusicService {
       user: returnUserData(playlist.user),
     };
   }
+
+  // async updatePlaylist(
+  //   dto: UpdatePlaylistDto,
+  //   playlistId: string,
+  //   userId: string,
+  // ) {
+  //   const playlist = await this.
+  // }
 
   //       //
   // Music //
