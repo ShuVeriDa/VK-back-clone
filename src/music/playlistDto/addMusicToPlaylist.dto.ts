@@ -1,6 +1,9 @@
-import { IsString } from 'class-validator';
+import { ArrayNotEmpty, ArrayUnique, IsArray, IsString } from 'class-validator';
 
 export class AddMusicToPlaylistDto {
-  @IsString()
-  musicId: string;
+  @IsArray()
+  // @ArrayNotEmpty()
+  @ArrayUnique()
+  @IsString({ each: true })
+  musicIds: string[];
 }

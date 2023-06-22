@@ -140,28 +140,43 @@ export class MusicService {
     userId: string,
   ) {
     const playlist = await this.getOnePlaylist(playlistId, userId);
-
-    const music = await this.getOne(dto.musicId);
+    const musicIds = dto.musicIds;
 
     const isRights = playlist.user.id === userId;
 
     if (!isRights)
       throw new ForbiddenException('You do not have rights to this playlist');
 
-    const isExist = playlist.music.some((m) => m.id === music.id);
+    const existingMusicIds = playlist.music.map((m) => m.id);
 
-    if (!isExist) {
-      await this.playlistRepository.save({
-        ...playlist,
-        music: [...playlist.music, music],
-      });
+    for (const id of musicIds) {
+      if (!existingMusicIds.includes(id)) {
+        const music = await this.getOne(id);
+        playlist.music.push(music);
+      } else {
+        playlist.music = playlist.music.filter((m) => m.id !== id);
+      }
     }
 
-    if (isExist) {
-      playlist.music = playlist.music.filter((m) => m.id !== dto.musicId);
+    // const musicToAdd = musicIds.filter((id) => !existingMusicIds.includes(id));
+    // const musicToRemove = existingMusicIds.filter((id) =>
+    //   musicIds.includes(id),
+    // );
+    //
+    // if (musicToAdd.length > 0) {
+    //   const newMusic = await Promise.all(
+    //     musicToAdd.map((id) => this.getOne(id)),
+    //   );
+    //   playlist.music.push(...newMusic);
+    // }
+    //
+    // if (musicToRemove.length > 0) {
+    //   playlist.music = playlist.music.filter(
+    //     (m) => !musicToRemove.includes(m.id),
+    //   );
+    // }
 
-      await this.playlistRepository.save(playlist);
-    }
+    await this.playlistRepository.save(playlist);
 
     return await this.getOnePlaylist(playlist.id, userId);
   }
