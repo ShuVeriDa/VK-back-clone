@@ -1,4 +1,10 @@
-import { IsOptional, IsString, MinLength } from 'class-validator';
+import {
+  ArrayUnique,
+  IsArray,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 export class CreateDto {
   @IsString()
@@ -9,12 +15,16 @@ export class CreateDto {
 
   @IsOptional()
   @IsString()
-  @MinLength(3, {
-    message: 'The minimum length must be more than 3 characters',
-  })
   description?: string;
 
   @IsOptional()
   @IsString()
   coverUrl: string;
+
+  @IsOptional()
+  @IsArray()
+  // @ArrayNotEmpty()
+  @ArrayUnique()
+  @IsString({ each: true })
+  musicIds: string[];
 }

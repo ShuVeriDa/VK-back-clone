@@ -95,12 +95,18 @@ export class MusicService {
     });
 
     if (!user) throw new NotFoundException('User not found');
+    const musicIds = dto.musicIds;
+    const addedMusic = [];
+    for (const id of musicIds) {
+      const music = await this.getOne(id);
+      addedMusic.push(music);
+    }
 
     const playlist = await this.playlistRepository.save({
       title: dto.title,
       description: dto.description,
       coverUrl: dto.coverUrl,
-      music: [] as PlaylistEntity[],
+      music: addedMusic ? addedMusic : [],
       user: user,
     });
 
@@ -157,24 +163,6 @@ export class MusicService {
         playlist.music = playlist.music.filter((m) => m.id !== id);
       }
     }
-
-    // const musicToAdd = musicIds.filter((id) => !existingMusicIds.includes(id));
-    // const musicToRemove = existingMusicIds.filter((id) =>
-    //   musicIds.includes(id),
-    // );
-    //
-    // if (musicToAdd.length > 0) {
-    //   const newMusic = await Promise.all(
-    //     musicToAdd.map((id) => this.getOne(id)),
-    //   );
-    //   playlist.music.push(...newMusic);
-    // }
-    //
-    // if (musicToRemove.length > 0) {
-    //   playlist.music = playlist.music.filter(
-    //     (m) => !musicToRemove.includes(m.id),
-    //   );
-    // }
 
     await this.playlistRepository.save(playlist);
 

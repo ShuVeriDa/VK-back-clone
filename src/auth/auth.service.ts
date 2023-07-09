@@ -13,7 +13,6 @@ import { compare, genSalt, hash } from 'bcryptjs';
 import { LoginDto } from '../user/dto/login.dto';
 import { RefreshTokenDto } from './dto/refreshToken.dto';
 import { returnUserData } from '../components/forServices/returnUserData';
-import { returnCommunity } from '../components/forServices/returnCommunity';
 import { returnCommunityForUser } from '../components/forServices/returnCommunityForUser';
 
 @Injectable()
@@ -62,7 +61,7 @@ export class AuthService {
 
     if (!user) throw new UnauthorizedException('User not found');
 
-    const isValidPassword = await compare(dto.password, user.password); // сравнение пароля который пришел из photoDto с паролемя который находится в базе данных
+    const isValidPassword = await compare(dto.password, user.password); // сравнение пароля который пришел из LoginDto с паролемя который находится в базе данных
     if (!isValidPassword) throw new UnauthorizedException('Invalid password');
 
     return user;
