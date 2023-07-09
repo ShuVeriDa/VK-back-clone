@@ -113,8 +113,16 @@ export class MusicService {
       user: user,
     });
 
+    const music = playlist.music.map((m) => {
+      delete m.user;
+      delete m.musicAdders;
+      delete m.communities;
+      return m;
+    });
+
     return {
       ...playlist,
+      music: music,
       user: returnUserData(playlist.user),
     };
   }
