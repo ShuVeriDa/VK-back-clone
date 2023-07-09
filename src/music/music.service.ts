@@ -95,8 +95,11 @@ export class MusicService {
     });
 
     if (!user) throw new NotFoundException('User not found');
+
     const musicIds = dto.musicIds;
+
     const addedMusic = [];
+
     for (const id of musicIds) {
       const music = await this.getOne(id);
       addedMusic.push(music);
@@ -123,10 +126,31 @@ export class MusicService {
       where: { id: userId },
     });
 
+    const musicIds = dto.musicIds;
+
     const isAuthor = playlist.user.id === user.id;
 
     if (!isAuthor)
       throw new ForbiddenException("You don't have access to this playlist");
+
+    const musicAdds = [];
+
+    if (musicIds) {
+      const existingMusicIds = playlist.music.map((m) => m.id);
+
+      for (const id of musicIds) {
+        if (!existingMusicIds.includes(id)) {
+          const music = await this.getOne(id);
+          playlist.music.push(music);
+          musicAdds.push(playlist.music);
+        } else {
+          playlist.music = playlist.music.filter((m) => m.id !== id);
+          musicAdds.push(playlist.music);
+        }
+      }
+    }
+
+    await this.playlistRepository.save(playlist);
 
     await this.playlistRepository.update(
       { id: playlist.id },
