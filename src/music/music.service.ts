@@ -24,6 +24,7 @@ import { returnUserData } from '../components/forServices/returnUserData';
 import { UpdateDto } from './playlistDto/update.dto';
 import { AddMusicToPlaylistDto } from './playlistDto/addMusicToPlaylist.dto';
 import { User } from '../user/decorators/user.decorator';
+import { returnMusicWithUser } from '../components/forServices/returnMusicWithUser';
 
 @Injectable()
 export class MusicService {
@@ -57,6 +58,11 @@ export class MusicService {
     return playlist.map((pl) => {
       return {
         ...pl,
+        music: pl.music.map((m) => {
+          delete m.musicAdders;
+          delete m.user;
+          return returnMusicForCommunity(m);
+        }),
         user: returnUserData(pl.user),
       };
     });
