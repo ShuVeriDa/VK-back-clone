@@ -101,6 +101,15 @@ export class MusicController {
     return this.musicService.search(dto);
   }
 
+  @Get('search/mo')
+  @Auth('user')
+  searchMyAndOtherMusic(
+    @Query() dto: SearchMusicDto,
+    @User('id') userId: string,
+  ) {
+    return this.musicService.searchMyAndOtherMusic(dto, userId);
+  }
+
   @Get(':id')
   getOne(@Param('id') musicId: string) {
     return this.musicService.getOne(musicId);

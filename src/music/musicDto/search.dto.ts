@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class SearchMusicDto {
   @IsOptional()
@@ -12,6 +12,10 @@ export class SearchMusicDto {
   // @IsOptional()
   // @IsString()
   // titleOrder?: 'DESC' | 'ASC';
+
+  @IsOptional()
+  @IsBoolean()
+  isOtherMusic: boolean;
 
   @IsOptional()
   @IsNumber()

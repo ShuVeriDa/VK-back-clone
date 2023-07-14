@@ -1,5 +1,4 @@
 import {
-  Body,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -23,8 +22,6 @@ import { CreateDto } from './playlistDto/create.dto';
 import { returnUserData } from '../components/forServices/returnUserData';
 import { UpdateDto } from './playlistDto/update.dto';
 import { AddMusicToPlaylistDto } from './playlistDto/addMusicToPlaylist.dto';
-import { User } from '../user/decorators/user.decorator';
-import { returnMusicWithUser } from '../components/forServices/returnMusicWithUser';
 
 @Injectable()
 export class MusicService {
@@ -295,11 +292,23 @@ export class MusicService {
       .leftJoinAndSelect('music.communities', 'communities')
       .getManyAndCount();
 
-    const correctedMusic = music.map((m) => {
+    return music.map((m) => {
       return returnMusicForCommunity(m);
     });
+  }
 
-    return correctedMusic;
+  async searchMyAndOtherMusic(dto: SearchMusicDto, userId: string) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['music'],
+    });
+
+    const foundedMusic: MusicEntity[] = await this.search(dto);
+    const myMusic = user.music
+      .filter((m) => foundedMusic.some((other) => m.id === other.id))
+      .map((m) => returnMusicForCommunity(m));
+
+    return { otherMusic: foundedMusic, myMusic: myMusic };
   }
 
   async getOne(musicId: string) {
