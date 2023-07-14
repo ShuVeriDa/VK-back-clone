@@ -304,11 +304,20 @@ export class MusicService {
     });
 
     const foundedMusic: MusicEntity[] = await this.search(dto);
-    const myMusic = user.music
-      .filter((m) => foundedMusic.some((other) => m.id === other.id))
-      .map((m) => returnMusicForCommunity(m));
 
-    return { otherMusic: foundedMusic, myMusic: myMusic };
+    const myMusic: MusicEntity[] = user.music
+      .filter((m) => foundedMusic.some((all) => m.id === all.id))
+      .map((mu) => returnMusicForCommunity(mu));
+
+    const filteredMusic = foundedMusic.filter((item) => {
+      const found = myMusic.find((myItem) => myItem.id === item.id);
+      return !found;
+    });
+
+    return {
+      otherMusic: filteredMusic,
+      myMusic: myMusic,
+    };
   }
 
   async getOne(musicId: string) {
