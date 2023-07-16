@@ -21,8 +21,10 @@ import { PhotoEntity } from './photo/entity/photo.entity';
 import { VideoModule } from './video/video.module';
 import { VideoEntity } from './video/entity/video.entity';
 import { AlbumEntity } from './photo/entity/album.entity';
-import { RealTimeChatModule } from './real-time-chat/real-time-chat.module';
 import { PlaylistEntity } from './music/entity/playlist.entity';
+import { RealtimeEntity } from './real-time-chat/entity/realtime.entity';
+import { GatewayModule } from './real-time-chat/gateway.module';
+import { SocketGateway } from './real-time-chat/gateway';
 
 @Module({
   imports: [
@@ -45,6 +47,7 @@ import { PlaylistEntity } from './music/entity/playlist.entity';
         VideoEntity,
         AlbumEntity,
         PlaylistEntity,
+        RealtimeEntity,
       ],
       synchronize: true,
     }),
@@ -55,13 +58,13 @@ import { PlaylistEntity } from './music/entity/playlist.entity';
     CommentModule,
     // FriendModule,
     CommunityModule,
-    MessageModule,
+    // MessageModule,
     MusicModule,
     PhotoModule,
     VideoModule,
-    // SocketModule,
-    RealTimeChatModule,
     // GatewayModule,
+    // SocketModule,
+    GatewayModule,
   ],
   controllers: [AppController],
   providers: [AppService],
