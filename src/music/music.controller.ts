@@ -78,7 +78,7 @@ export class MusicController {
 
   @Delete('playlists/:id')
   @Auth('user')
-  deletePlaylist(@Param('id') playlistId: string, userId: string) {
+  deletePlaylist(@Param('id') playlistId: string, @User('id') userId: string) {
     return this.musicService.deletePlaylist(playlistId, userId);
   }
 
