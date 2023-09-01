@@ -12,7 +12,6 @@ import { CommentModule } from './comment/comment.module';
 import { CommentEntity } from './comment/entity/comment.entity';
 import { CommunityModule } from './community/community.module';
 import { CommunityEntity } from './community/entity/community.entity';
-import { MessageModule } from './message/message.module';
 import { MessageEntity } from './message/entity/message.entity';
 import { MusicModule } from './music/music.module';
 import { MusicEntity } from './music/entity/music.entity';
@@ -24,7 +23,6 @@ import { AlbumEntity } from './photo/entity/album.entity';
 import { PlaylistEntity } from './music/entity/playlist.entity';
 import { RealtimeEntity } from './real-time-chat/entity/realtime.entity';
 import { GatewayModule } from './real-time-chat/gateway.module';
-import { SocketGateway } from './real-time-chat/gateway';
 
 @Module({
   imports: [

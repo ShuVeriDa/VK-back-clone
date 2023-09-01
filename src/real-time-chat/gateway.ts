@@ -1,10 +1,11 @@
 import {
-  WebSocketGateway,
-  WebSocketServer,
-  SubscribeMessage,
+  ConnectedSocket,
+  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
-  MessageBody,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
@@ -12,12 +13,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RealtimeEntity } from './entity/realtime.entity';
 import { ChatDto } from './dto/chat.dto';
+import { UserEntity } from '../user/entity/user.entity';
 
 @WebSocketGateway()
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     @InjectRepository(RealtimeEntity)
     private readonly messageRepository: Repository<RealtimeEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
   ) {}
 
   @WebSocketServer()
@@ -32,26 +36,24 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('newMessage')
-  async handleMessage(client: Socket, dto: ChatDto): Promise<void> {
-    console.log(`Received message: ${dto}`);
+  // @Auth('user')
+  // @AuthWebSocket()
+  async handleMessage(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() dto: ChatDto,
+  ): Promise<void> {
+    console.log(`Received message: ${dto.message}`);
 
-    const newMessage = this.messageRepository.create({
-      content: dto.content,
-      senderId: dto.senderId,
-      receiverId: dto.receiverId,
+    const user = client.user; // Assuming the user property is set during WebSocket authentication
+
+    const message = this.messageRepository.create({
+      message: dto.message,
+      sender: { id: '4' },
+      recipient: { id: dto.receiverId },
     });
 
-    const savedMessage = await this.messageRepository.save(newMessage);
+    const savedMessage = await this.messageRepository.save(message);
 
     this.server.emit('onMessage', savedMessage);
   }
-
-  // @SubscribeMessage('newMessage')
-  // onNewMessage(@MessageBody() dto: ChatDto) {
-  //   console.log(dto);
-  //   this.server.emit('onMessage', {
-  //     msg: 'New Message',
-  //     content: dto,
-  //   });
-  // }
 }

@@ -1,4 +1,9 @@
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import {
+  CanActivate,
+  createParamDecorator,
+  ExecutionContext,
+  Injectable,
+} from '@nestjs/common';
 import { UserEntity } from '../entity/user.entity';
 
 type TypeData = keyof UserEntity;
@@ -10,3 +15,12 @@ export const User = createParamDecorator(
     return data ? user[data] : user;
   },
 );
+
+@Injectable()
+export class WebSocketAuthGuard implements CanActivate {
+  canActivate(context: ExecutionContext): boolean {
+    const socket = context.switchToWs().getClient();
+    // Проверяем, что пользователь авторизован
+    return !!socket.user;
+  }
+}

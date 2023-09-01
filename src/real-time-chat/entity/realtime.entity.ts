@@ -1,4 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  UpdateDateColumn,
+  CreateDateColumn,
+} from 'typeorm';
+import { UserEntity } from '../../user/entity/user.entity';
 
 @Entity()
 export class RealtimeEntity {
@@ -6,14 +15,25 @@ export class RealtimeEntity {
   id: number;
 
   @Column()
-  content: string;
+  message: string;
 
-  @Column()
-  senderId: number;
+  @ManyToOne(() => UserEntity, { eager: true })
+  @JoinColumn({ name: 'senderId' })
+  sender: UserEntity;
 
-  @Column()
-  receiverId: number;
+  @ManyToOne(() => UserEntity, { eager: true })
+  @JoinColumn({ name: 'recipientId' })
+  recipient: UserEntity;
 
-  @Column({ default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ default: false })
+  read: boolean;
+
+  @UpdateDateColumn()
+  readAt: Date;
+
+  @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updateAt: Date;
 }

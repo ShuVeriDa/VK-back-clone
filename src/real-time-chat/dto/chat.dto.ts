@@ -2,11 +2,11 @@ import { IsNumber, IsString } from 'class-validator';
 
 export class ChatDto {
   @IsString()
-  content: string;
+  message: string;
 
-  @IsNumber()
-  senderId: number;
+  // @IsNumber()
+  // senderId: number;
 
-  @IsNumber()
-  receiverId: number;
+  @IsString()
+  receiverId: string;
 }

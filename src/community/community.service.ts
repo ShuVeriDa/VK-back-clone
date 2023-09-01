@@ -126,7 +126,12 @@ export class CommunityService {
 
     const [members, total] = await qb.getManyAndCount();
 
-    return { members: members, total };
+    const membrs = members.map((m) => {
+      delete m.password;
+      return m;
+    });
+
+    return { members: membrs, total };
   }
 
   async create(dto: CreateCommunityDto, userId: string) {
